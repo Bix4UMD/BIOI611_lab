@@ -1,0 +1,37 @@
+# Project Information
+site_name: SF_biocontainer Documentation
+site_author: CCRSFIFX
+site_description: >-
+  Lab note for BIOI611
+
+# Repository
+repo_name: Bix4UMD/BIOI611_lab
+repo_url: https://github.com/Bix4UMD/BIOI611_lab.git 
+edit_uri: https://github.com/Bix4UMD/BIOI611_lab/edit/main/docs/
+
+# Copyright
+copyright: Copyright &copy; 2024 Shaojun Xie
+
+theme:
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - yaml
+    - rust
+
+# Customization
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/CCRSF-IFX
+
+# Page Tree
+nav:
+  - Intronduction:
+    - Introduction: notebook/s1_lab_RNAseq_lab.md 
+
+  - FAQ:
+      - General Questions: general-questions.md
+      - Troubleshooting: troubleshooting.md
+  - Reference: ref.md
+  - License: license.md
