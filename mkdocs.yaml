@@ -1,5 +1,5 @@
 # Project Information
-site_name: SF_biocontainer Documentation
+site_name: Lab note for UMD BIOI611
 site_author: CCRSFIFX
 site_description: >-
   Lab note for BIOI611
@@ -23,12 +23,12 @@ theme:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/CCRSF-IFX
+      link: https://github.com/Bix4UMD
 
 # Page Tree
 nav:
   - Intronduction:
-    - Introduction: notebook/s1_lab_RNAseq_lab.md 
+    - Introduction: s1_lab_RNAseq_lab.md 
 
   - FAQ:
       - General Questions: general-questions.md
