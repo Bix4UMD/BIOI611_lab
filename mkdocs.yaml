@@ -28,7 +28,7 @@ extra:
 # Page Tree
 nav:
   - Intronduction:
-    - Introduction: s1_lab_RNAseq_lab.md 
+    - RNA-seq data analysis: s1_lab_RNAseq_lab.md 
 
   - FAQ:
       - General Questions: general-questions.md
