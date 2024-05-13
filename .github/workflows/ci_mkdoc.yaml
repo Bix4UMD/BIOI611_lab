@@ -6,6 +6,7 @@ on:
     paths:
       - 'mkdocs.yaml'
       - 'notebook/**'
+      - 'docs/**'
 permissions:
   contents: write
 jobs:
@@ -30,7 +31,6 @@ jobs:
       - run: pip install mkdocs-material # (4)!
       - run: pip install jupyterlab==4.1.1 
       - run: pwd & ls
-      - run: find notebook/ -not -path "*.ipynb_checkpoints*" -name "*.ipynb" -exec jupyter nbconvert --to markdown --output-dir docs/ {}   \;
-      - run: pwd & rm -rf notebook/ 
+      - run: find docs/ -not -path "*.ipynb_checkpoints*" -name "*.ipynb" -exec jupyter nbconvert --to markdown --output-dir docs/ {}   \;
       - run: pwd & ls docs/
       - run: mkdocs gh-deploy --force --remote-branch gh-pages # mkdocs gh-deploy --force
