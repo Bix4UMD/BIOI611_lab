@@ -4,6 +4,7 @@ on:
     branches:
       - main
     paths:
+      #- 'docs/**'
       - 'notebook/**'
 permissions:
   contents: write
@@ -22,7 +23,7 @@ jobs:
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV # (3)!
       - uses: actions/cache@v4
         with:
-          key: SF_biocontainer-${{ env.cache_id }}
+          key: BIOI611_lab-${{ env.cache_id }}
           path: .cache
           restore-keys: |
             mkdocs-material-

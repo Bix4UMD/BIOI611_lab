@@ -1,13 +1,13 @@
 # Project Information
 site_name: Lab note for UMD BIOI611
-site_author: CCRSFIFX
+site_author: Shaojun Xie 
 site_description: >-
   Lab note for BIOI611
 
 # Repository
 repo_name: Bix4UMD/BIOI611_lab
 repo_url: https://github.com/Bix4UMD/BIOI611_lab.git 
-edit_uri: https://github.com/Bix4UMD/BIOI611_lab/edit/main/docs/
+#edit_uri: https://github.com/Bix4UMD/BIOI611_lab/edit/main/docs/
 
 # Copyright
 copyright: Copyright &copy; 2024 Shaojun Xie
