@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>RNA-seq data analysis - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "RNA-seq data analysis";
+        var mkdocs_page_input_path = "s1_lab_RNAseq_lab.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../basic_r.md">Basic R</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../basic_python.md">Basic Python</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Intronduction</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">RNA-seq data analysis</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#how-many-chromsomes-there-are">How many chromsomes there are</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-many-genes-there-are">How many genes there are</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">FAQ</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../general-questions/">General Questions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../ref/">Reference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../license/">License</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Intronduction</li>
+      <li class="breadcrumb-item active">RNA-seq data analysis</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/s1_lab_RNAseq_lab.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <pre><code class="language-python">import os
+os.getcwd()
+try: 
+    os.mkdir(&quot;../analysis/&quot;)
+except FileExistsError:
+    print(&quot;Directory already exists&quot;)
+os.chdir(&quot;../analysis&quot;)
+os.getcwd()
+</code></pre>
+<pre><code>Directory already exists
+
+
+
+
+
+'/home/xie186/github/UMD_BIOI611_lab/analysis'
+</code></pre>
+<pre><code class="language-python">
+</code></pre>
+<pre><code class="language-python">%%bash
+</code></pre>
+<pre><code>/home/xie186/github/UMD_BIOI611_lab/notebook
+</code></pre>
+<pre><code class="language-python">
+</code></pre>
+<h2 id="download-reference-genome">Download reference genome</h2>
+<p>To download the reference for this lab, we use <a href="https://useast.ensembl.org/Caenorhabditis_elegans/Info/Index">ENSEMBL database</a>. 
+In ENSEMBL database, each species may have different releases of genome build. We use <code>release-111</code> in this project. </p>
+<p>The genome sequences can be obtained from the link below:
+https://ftp.ensembl.org/pub/release-111/fasta/caenorhabditis_elegans/dna/</p>
+<p>The genoe anntation file in gtf format can be obtained here: 
+https://ftp.ensembl.org/pub/release-111/gtf/caenorhabditis_elegans/</p>
+<pre><code class="language-bash">%%bash
+mkdir -p reference/ 
+    wget -O reference/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz -nv https://ftp.ensembl.org/pub/release-111/fasta/caenorhabditis_elegans/dna/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz
+gunzip reference/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz
+</code></pre>
+<pre><code>2024-05-11 20:47:10 URL:https://ftp.ensembl.org/pub/release-111/fasta/caenorhabditis_elegans/dna/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz [30316631/30316631] -&gt; "Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz" [1]
+</code></pre>
+<pre><code class="language-bash">%%bash
+## A *fai file will be generated
+samtools faidx reference/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa 
+</code></pre>
+<pre><code class="language-python">
+</code></pre>
+<pre><code class="language-bash">%%bash
+wget -O reference/Caenorhabditis_elegans.WBcel235.111.gtf.gz -nv https://ftp.ensembl.org/pub/release-111/gtf/caenorhabditis_elegans/Caenorhabditis_elegans.WBcel235.111.gtf.gz
+gunzip reference/Caenorhabditis_elegans.WBcel235.111.gtf.gz
+</code></pre>
+<pre><code>2024-05-11 21:03:37 URL:https://ftp.ensembl.org/pub/release-111/gtf/caenorhabditis_elegans/Caenorhabditis_elegans.WBcel235.111.gtf.gz [8730028/8730028] -&gt; "Caenorhabditis_elegans.WBcel235.111.gtf.gz" [1]
+</code></pre>
+<h3 id="how-many-chromsomes-there-are">How many chromsomes there are</h3>
+<pre><code class="language-bash">%%bash
+grep '&gt;' reference/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa
+</code></pre>
+<pre><code>&gt;I dna:chromosome chromosome:WBcel235:I:1:15072434:1 REF
+&gt;II dna:chromosome chromosome:WBcel235:II:1:15279421:1 REF
+&gt;III dna:chromosome chromosome:WBcel235:III:1:13783801:1 REF
+&gt;IV dna:chromosome chromosome:WBcel235:IV:1:17493829:1 REF
+&gt;V dna:chromosome chromosome:WBcel235:V:1:20924180:1 REF
+&gt;X dna:chromosome chromosome:WBcel235:X:1:17718942:1 REF
+&gt;MtDNA dna:chromosome chromosome:WBcel235:MtDNA:1:13794:1 REF
+</code></pre>
+<h3 id="how-many-genes-there-are">How many genes there are</h3>
+<pre><code class="language-bash">%%bash
+grep -v '#' reference/Caenorhabditis_elegans.WBcel235.111.gtf \
+       |awk '$3==&quot;gene&quot;' \
+       |sed 's/.*gene_biotype &quot;//' \
+       |sed 's/&quot;;//'|sort |uniq -c \
+       | sort -k1,1n
+</code></pre>
+<pre><code>     22 rRNA
+    100 antisense_RNA
+    129 snRNA
+    194 lincRNA
+    261 miRNA
+    346 snoRNA
+    634 tRNA
+   2128 pseudogene
+   7764 ncRNA
+  15363 piRNA
+  19985 protein_coding
+</code></pre>
+<p><img alt="image.png" src="../s1_lab_RNAseq_lab_files/ffadf6f7-cfd1-4cdd-907e-7d4ac12c2a76.png" />
+Source: https://useast.ensembl.org/Help/Faq?id=468eudogene</p>
+<h2 id="build-reference-genome">Build reference genome</h2>
+<pre><code class="language-bash">%%bash
+awk '$3==&quot;gene&quot;' reference/Caenorhabditis_elegans.WBcel235.111.gtf |head -n 3
+awk '$3==&quot;gene&quot;' reference/Caenorhabditis_elegans.WBcel235.111.gtf |wc -l 
+</code></pre>
+<pre><code>V   WormBase    gene    9244402 9246360 .   -   .   gene_id "WBGene00000003"; gene_name "aat-2"; gene_source "WormBase"; gene_biotype "protein_coding";
+V   WormBase    gene    11466842    11470663    .   -   .   gene_id "WBGene00000007"; gene_name "aat-6"; gene_source "WormBase"; gene_biotype "protein_coding";
+V   WormBase    gene    15817410    15817846    .   -   .   gene_id "WBGene00000014"; gene_name "abf-3"; gene_source "WormBase"; gene_biotype "protein_coding";
+46926
+</code></pre>
+<pre><code class="language-bash">%%bash
+STAR --runThreadN 23 --runMode genomeGenerate --genomeDir STAR_ref \
+         --genomeFastaFiles reference/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa \
+         --sjdbGTFfile reference/Caenorhabditis_elegans.WBcel235.111.gtf \
+         --genomeSAindexNbases 12 
+</code></pre>
+<pre><code class="language-bash">%%bash
+ls -sh STAR_ref/
+</code></pre>
+<pre><code>total 2.6G
+4.0K chrLength.txt
+4.0K chrNameLength.txt
+4.0K chrName.txt
+4.0K chrStart.txt
+7.9M exonGeTrInfo.tab
+3.2M exonInfo.tab
+1.6M geneInfo.tab
+119M Genome
+4.0K genomeParameters.txt
+8.0K Log.out
+973M SA
+1.5G SAindex
+2.9M sjdbInfo.txt
+3.0M sjdbList.fromGTF.out.tab
+2.4M sjdbList.out.tab
+3.1M transcriptInfo.tab
+</code></pre>
+<pre><code class="language-python">
+</code></pre>
+<h2 id="download-the-reads">Download the reads</h2>
+<table>
+<thead>
+<tr>
+<th>SRR_ID</th>
+<th>Sample_name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SRR15694101</td>
+<td>N2_day7_rep2</td>
+</tr>
+<tr>
+<td>SRR15694102</td>
+<td>N2_day7_rep1</td>
+</tr>
+<tr>
+<td>SRR15694100</td>
+<td>N2_day7_rep3</td>
+</tr>
+<tr>
+<td>SRR15694099</td>
+<td>N2_day1_rep1</td>
+</tr>
+<tr>
+<td>SRR15694098</td>
+<td>N2_day1_rep2</td>
+</tr>
+<tr>
+<td>SRR15694097</td>
+<td>N2_day1_rep3</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash">%%bash
+mkdir -p raw_data/ 
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/002/SRR15694102/SRR15694102.fastq.gz -o raw_data/N2_day7_rep1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/001/SRR15694101/SRR15694101.fastq.gz -o raw_data/N2_day7_rep2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/000/SRR15694100/SRR15694100.fastq.gz -o raw_data/N2_day7_rep3.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/099/SRR15694099/SRR15694099.fastq.gz -o raw_data/N2_day1_rep1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/098/SRR15694098/SRR15694098.fastq.gz -o raw_data/N2_day1_rep2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/097/SRR15694097/SRR15694097.fastq.gz -o raw_data/N2_day1_rep3.fastq.gz
+</code></pre>
+<pre><code>  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+ 16 4123M   16  684M    0     0   655k      0  1:47:22  0:17:49  1:29:33  519k
+curl: (18) transfer closed with 3605679051 bytes remaining to read
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+</code></pre>
+<h2 id="check-the-read-quality">Check the read quality</h2>
+<pre><code class="language-bash">%%bash
+ls
+</code></pre>
+<pre><code class="language-python">
+</code></pre>
+<pre><code class="language-python">
+</code></pre>
+<h2 id="clean-up-data">Clean up data</h2>
+<pre><code class="language-bash">%%bash
+# Clean up the folders
+cleanup=True
+if [ cleanup ]; then
+    rm -rf Caenorhabditis_elegans.WBcel235.dna.toplevel.fa* Caenorhabditis_elegans.WBcel235.111.gtf*\
+    rm -rf STAR_ref 
+    rm -rf raw_data/ 
+fi
+</code></pre>
+<pre><code class="language-python">
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../basic_linux/" class="btn btn-neutral float-left" title="Basic Linux"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../general-questions/" class="btn btn-neutral float-right" title="General Questions">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2024 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../basic_linux/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../general-questions/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
