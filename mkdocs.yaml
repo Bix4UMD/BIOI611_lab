@@ -30,11 +30,11 @@ nav:
   
   - Get ready for the course: 
     - Basic Linux:  basic_linux.md
-    - Basic R:      basic_r.md
-    - Basic Python: basic_python.md
+    #- Basic R:      basic_r.md
+    #- Basic Python: basic_python.md
    
-  - Intronduction:
-    - RNA-seq data analysis: s1_lab_RNAseq_lab.md 
+    #- Intronduction:
+    #- RNA-seq data analysis: s1_lab_RNAseq_lab.md 
 
   - FAQ:
       - General Questions: general-questions.md
