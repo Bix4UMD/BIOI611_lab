@@ -36,8 +36,8 @@ nav:
     #- Intronduction:
     #- RNA-seq data analysis: s1_lab_RNAseq_lab.md 
 
-  - FAQ:
-      - General Questions: general-questions.md
-      - Troubleshooting: troubleshooting.md
-  - Reference: ref.md
-  - License: license.md
+ #- FAQ:
+ #     - General Questions: general-questions.md
+ #     - Troubleshooting: troubleshooting.md
+ #- Reference: ref.md
+ # - License: license.md
