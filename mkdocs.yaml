@@ -33,7 +33,7 @@ nav:
 
   - Bulk RNA-seq:
     - Prepare data: bulkRNAseq_lab.md
-    - Phred score in FASTQ: Phred_FQ.ipynb 
+    - Phred score in FASTQ: Phred_FQ.md
       #- Basic R:      basic_r.md
     #- Basic Python: basic_python.md
    
