@@ -30,7 +30,8 @@ nav:
   
   - Get ready for the course: 
     - Basic Linux:  basic_linux.md
-  - Bulk RNA-seq
+
+  - Bulk RNA-seq:
     - Prepare data: bulkRNAseq_lab.md
     - Phred score in FASTQ: FASTQ_PHRED.md 
       #- Basic R:      basic_r.md
