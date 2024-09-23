@@ -42,8 +42,8 @@ nav:
   - Bulk RNA-seq:
     - Prepare data: bulkRNAseq_lab.md
     - Phred score in FASTQ: Phred_FQ.md
-    - IntroR: BIOI611_introR.md
-    - DESeq2: BIOI611_DESeq2_analysis.md  
+    - Minimal R Introduction: BIOI611_introR.md
+    - DEG analysis using DESeq2: BIOI611_DESeq2_analysis.md  
       #- Basic R:      basic_r.md
     #- Basic Python: basic_python.md
    
