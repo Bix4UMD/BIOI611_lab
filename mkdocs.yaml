@@ -40,7 +40,7 @@ nav:
     - Basic Linux:  basic_linux.md
 
   - Bulk RNA-seq:
-    - Prepare data: bulkRNAseq_lab.md
+    - Read QC and alignment: bulkRNAseq_lab.md
     - Phred score in FASTQ: Phred_FQ.md
     - Minimal R Introduction: BIOI611_introR.md
     - DEG analysis using DESeq2: BIOI611_DESeq2_analysis.md  
