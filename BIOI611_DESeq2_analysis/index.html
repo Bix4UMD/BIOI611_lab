@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>DEG analysis using DESeq2 - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "DEG analysis using DESeq2";
+        var mkdocs_page_input_path = "BIOI611_DESeq2_analysis.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">DEG analysis using DESeq2</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#instsall-required-r-packages">Instsall required R packages</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#load-r-packages">Load R packages</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#navigation-in-the-file-system-and-read-the-count-files">Navigation in the file system and read the count files</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#check-count-matrix">Check count matrix</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#run-deseq2-to-identify-deg">Run DESeq2 to identify DEG</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#plot-normalized-genes">Plot normalized genes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#extract-deg-results-using-results-function">Extract DEG results using results function</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#understand-normalized-count-in-deseq2-optional">Understand normalized count in DESeq2 (Optional)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#create-a-pseudo-reference-sample-row-wise-geometric-mean">Create a pseudo-reference sample (row-wise geometric mean)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#calculate-ratio-between-each-sample-and-the-pseudo-reference-for-each-gene">Calculate ratio between each sample and the pseudo-reference for each gene</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#calculate-scaling-factor">Calculate scaling factor</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#normalize-the-counts">Normalize the counts</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Bulk RNA-seq</li>
+      <li class="breadcrumb-item active">DEG analysis using DESeq2</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/BIOI611_DESeq2_analysis.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a href="https://colab.research.google.com/github/Bix4UMD/BIOI611_lab/blob/main/docs/BIOI611_DESeq2_analysis.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a></p>
+<h1 id="analysis-of-rna-seq-data-using-r">Analysis of RNA-seq data using R</h1>
+<h2 id="instsall-required-r-packages">Instsall required R packages</h2>
+<pre><code class="language-R">if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+BiocManager::install(&quot;DESeq2&quot;)
+BiocManager::install(&quot;EnhancedVolcano&quot;)
+</code></pre>
+<pre><code>Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+
+'getOption("repos")' replaces Bioconductor standard repositories, see
+'help("repositories", package = "BiocManager")' for details.
+Replacement repositories:
+    CRAN: https://cran.rstudio.com
+
+Bioconductor version 3.19 (BiocManager 1.30.25), R 4.4.1 (2024-06-14)
+
+Installing package(s) 'BiocVersion', 'DESeq2'
+
+also installing the dependencies ‘formatR’, ‘UCSC.utils’, ‘GenomeInfoDbData’, ‘zlibbioc’, ‘abind’, ‘SparseArray’, ‘lambda.r’, ‘futile.options’, ‘GenomeInfoDb’, ‘XVector’, ‘S4Arrays’, ‘DelayedArray’, ‘futile.logger’, ‘snow’, ‘BH’, ‘S4Vectors’, ‘IRanges’, ‘GenomicRanges’, ‘SummarizedExperiment’, ‘BiocGenerics’, ‘Biobase’, ‘BiocParallel’, ‘matrixStats’, ‘locfit’, ‘MatrixGenerics’, ‘RcppArmadillo’
+
+
+Old packages: 'Matrix'
+
+'getOption("repos")' replaces Bioconductor standard repositories, see
+'help("repositories", package = "BiocManager")' for details.
+Replacement repositories:
+    CRAN: https://cran.rstudio.com
+
+Bioconductor version 3.19 (BiocManager 1.30.25), R 4.4.1 (2024-06-14)
+
+Installing package(s) 'EnhancedVolcano'
+
+also installing the dependency ‘ggrepel’
+
+
+Old packages: 'Matrix'
+</code></pre>
+<h2 id="load-r-packages">Load R packages</h2>
+<pre><code class="language-R">library(DESeq2)
+library(dplyr)
+library(EnhancedVolcano)
+</code></pre>
+<pre><code>Loading required package: S4Vectors
+
+Loading required package: stats4
+
+Loading required package: BiocGenerics
+
+
+Attaching package: ‘BiocGenerics’
+
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
+    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
+    Position, rank, rbind, Reduce, rownames, sapply, setdiff, table,
+    tapply, union, unique, unsplit, which.max, which.min
+
+
+
+Attaching package: ‘S4Vectors’
+
+
+The following object is masked from ‘package:utils’:
+
+    findMatches
+
+
+The following objects are masked from ‘package:base’:
+
+    expand.grid, I, unname
+
+
+Loading required package: IRanges
+
+Loading required package: GenomicRanges
+
+Loading required package: GenomeInfoDb
+
+Loading required package: SummarizedExperiment
+
+Loading required package: MatrixGenerics
+
+Loading required package: matrixStats
+
+
+Attaching package: ‘MatrixGenerics’
+
+
+The following objects are masked from ‘package:matrixStats’:
+
+    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
+    colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
+    colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
+    colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
+    colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
+    colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
+    colWeightedMeans, colWeightedMedians, colWeightedSds,
+    colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
+    rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
+    rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
+    rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
+    rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
+    rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
+    rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
+    rowWeightedSds, rowWeightedVars
+
+
+Loading required package: Biobase
+
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+
+
+Attaching package: ‘Biobase’
+
+
+The following object is masked from ‘package:MatrixGenerics’:
+
+    rowMedians
+
+
+The following objects are masked from ‘package:matrixStats’:
+
+    anyMissing, rowMedians
+
+
+
+Attaching package: ‘dplyr’
+
+
+The following object is masked from ‘package:Biobase’:
+
+    combine
+
+
+The following object is masked from ‘package:matrixStats’:
+
+    count
+
+
+The following objects are masked from ‘package:GenomicRanges’:
+
+    intersect, setdiff, union
+
+
+The following object is masked from ‘package:GenomeInfoDb’:
+
+    intersect
+
+
+The following objects are masked from ‘package:IRanges’:
+
+    collapse, desc, intersect, setdiff, slice, union
+
+
+The following objects are masked from ‘package:S4Vectors’:
+
+    first, intersect, rename, setdiff, setequal, union
+
+
+The following objects are masked from ‘package:BiocGenerics’:
+
+    combine, intersect, setdiff, union
+
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+
+Loading required package: ggplot2
+
+Loading required package: ggrepel
+</code></pre>
+<h2 id="navigation-in-the-file-system-and-read-the-count-files">Navigation in the file system and read the count files</h2>
+<pre><code class="language-R">getwd()
+</code></pre>
+<p>'/content'</p>
+<pre><code class="language-R">list.files()
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'N2_day1_rep1.ReadsPerGene.out.tab'</li><li>'N2_day1_rep2.ReadsPerGene.out.tab'</li><li>'N2_day1_rep3.ReadsPerGene.out.tab'</li><li>'N2_day7_rep1.ReadsPerGene.out.tab'</li><li>'N2_day7_rep2.ReadsPerGene.out.tab'</li><li>'N2_day7_rep3.ReadsPerGene.out.tab'</li><li>'sample_data'</li></ol>
+
+<pre><code class="language-R">file_paths &lt;- list.files(pattern = &quot;*.ReadsPerGene.out.tab&quot;)
+file_paths
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'N2_day1_rep1.ReadsPerGene.out.tab'</li><li>'N2_day1_rep2.ReadsPerGene.out.tab'</li><li>'N2_day1_rep3.ReadsPerGene.out.tab'</li><li>'N2_day7_rep1.ReadsPerGene.out.tab'</li><li>'N2_day7_rep2.ReadsPerGene.out.tab'</li><li>'N2_day7_rep3.ReadsPerGene.out.tab'</li></ol>
+
+<pre><code class="language-R"># Function to read the STAR ReadsPerGene.out.tab file
+read_star_file &lt;- function(file_path) {
+  # Read the file
+  df &lt;- read.table(file_path, header = FALSE, stringsAsFactors = FALSE)
+
+  # Keep only the first (gene) and second (unstranded counts) columns
+  df &lt;- df %&gt;% select(V1, V2)
+
+  # Rename the columns for clarity (GeneID and counts for this sample)
+  colnames(df) &lt;- c(&quot;GeneID&quot;, gsub(&quot;.ReadsPerGene.out.tab&quot;, &quot;&quot;, basename(file_path)))
+
+  return(df)
+}
+
+# Read all files into a list of data frames
+list_of_dfs &lt;- lapply(file_paths, read_star_file)
+
+# Merge all data frames by the GeneID column
+merged_df &lt;- Reduce(function(x, y) merge(x, y, by = &quot;GeneID&quot;), list_of_dfs)
+
+merged_df &lt;- merged_df[-c(1:4), ]
+
+# Check the first few rows of the combined data frame
+head(merged_df)
+
+# Optionally, write the combined data frame to a CSV file
+write.csv(merged_df, &quot;combined_gene_counts.csv&quot;, row.names = FALSE)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 7</caption>
+<thead>
+    <tr><th></th><th scope=col>GeneID</th><th scope=col>N2_day1_rep1</th><th scope=col>N2_day1_rep2</th><th scope=col>N2_day1_rep3</th><th scope=col>N2_day7_rep1</th><th scope=col>N2_day7_rep2</th><th scope=col>N2_day7_rep3</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>5</th><td>WBGene00000001</td><td>3227</td><td>2168</td><td>2589</td><td>5659</td><td>2619</td><td>5239</td></tr>
+    <tr><th scope=row>6</th><td>WBGene00000002</td><td> 270</td><td> 203</td><td> 266</td><td> 355</td><td> 191</td><td> 425</td></tr>
+    <tr><th scope=row>7</th><td>WBGene00000003</td><td> 341</td><td> 415</td><td> 411</td><td> 387</td><td> 255</td><td> 499</td></tr>
+    <tr><th scope=row>8</th><td>WBGene00000004</td><td> 584</td><td> 438</td><td> 518</td><td>1028</td><td> 541</td><td> 888</td></tr>
+    <tr><th scope=row>9</th><td>WBGene00000005</td><td> 383</td><td> 395</td><td> 483</td><td> 119</td><td>  65</td><td> 189</td></tr>
+    <tr><th scope=row>10</th><td>WBGene00000006</td><td> 343</td><td> 344</td><td> 334</td><td> 206</td><td> 114</td><td> 220</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">class(list_of_dfs)
+</code></pre>
+<p>'list'</p>
+<pre><code class="language-R">head(list_of_dfs[[2]])
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 2</caption>
+<thead>
+    <tr><th></th><th scope=col>GeneID</th><th scope=col>N2_day1_rep2</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>N_unmapped    </td><td>1400596</td></tr>
+    <tr><th scope=row>2</th><td>N_multimapping</td><td>1305129</td></tr>
+    <tr><th scope=row>3</th><td>N_noFeature   </td><td> 152183</td></tr>
+    <tr><th scope=row>4</th><td>N_ambiguous   </td><td> 439830</td></tr>
+    <tr><th scope=row>5</th><td>WBGene00000003</td><td>    415</td></tr>
+    <tr><th scope=row>6</th><td>WBGene00000007</td><td>    513</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">
+</code></pre>
+<pre><code class="language-R">rownames(merged_df) = merged_df$GeneID
+
+</code></pre>
+<pre><code class="language-R">head(merged_df)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 7</caption>
+<thead>
+    <tr><th></th><th scope=col>GeneID</th><th scope=col>N2_day1_rep1</th><th scope=col>N2_day1_rep2</th><th scope=col>N2_day1_rep3</th><th scope=col>N2_day7_rep1</th><th scope=col>N2_day7_rep2</th><th scope=col>N2_day7_rep3</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>WBGene00000001</th><td>WBGene00000001</td><td>3227</td><td>2168</td><td>2589</td><td>5659</td><td>2619</td><td>5239</td></tr>
+    <tr><th scope=row>WBGene00000002</th><td>WBGene00000002</td><td> 270</td><td> 203</td><td> 266</td><td> 355</td><td> 191</td><td> 425</td></tr>
+    <tr><th scope=row>WBGene00000003</th><td>WBGene00000003</td><td> 341</td><td> 415</td><td> 411</td><td> 387</td><td> 255</td><td> 499</td></tr>
+    <tr><th scope=row>WBGene00000004</th><td>WBGene00000004</td><td> 584</td><td> 438</td><td> 518</td><td>1028</td><td> 541</td><td> 888</td></tr>
+    <tr><th scope=row>WBGene00000005</th><td>WBGene00000005</td><td> 383</td><td> 395</td><td> 483</td><td> 119</td><td>  65</td><td> 189</td></tr>
+    <tr><th scope=row>WBGene00000006</th><td>WBGene00000006</td><td> 343</td><td> 344</td><td> 334</td><td> 206</td><td> 114</td><td> 220</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R"># NULL reserved word representing empty
+merged_df$GeneID = NULL
+head(merged_df)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 6</caption>
+<thead>
+    <tr><th></th><th scope=col>N2_day1_rep1</th><th scope=col>N2_day1_rep2</th><th scope=col>N2_day1_rep3</th><th scope=col>N2_day7_rep1</th><th scope=col>N2_day7_rep2</th><th scope=col>N2_day7_rep3</th></tr>
+    <tr><th></th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>WBGene00000001</th><td>3227</td><td>2168</td><td>2589</td><td>5659</td><td>2619</td><td>5239</td></tr>
+    <tr><th scope=row>WBGene00000002</th><td> 270</td><td> 203</td><td> 266</td><td> 355</td><td> 191</td><td> 425</td></tr>
+    <tr><th scope=row>WBGene00000003</th><td> 341</td><td> 415</td><td> 411</td><td> 387</td><td> 255</td><td> 499</td></tr>
+    <tr><th scope=row>WBGene00000004</th><td> 584</td><td> 438</td><td> 518</td><td>1028</td><td> 541</td><td> 888</td></tr>
+    <tr><th scope=row>WBGene00000005</th><td> 383</td><td> 395</td><td> 483</td><td> 119</td><td>  65</td><td> 189</td></tr>
+    <tr><th scope=row>WBGene00000006</th><td> 343</td><td> 344</td><td> 334</td><td> 206</td><td> 114</td><td> 220</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">subset_df4test &lt;- merged_df[, c(&quot;N2_day1_rep1&quot;, &quot;N2_day1_rep2&quot;, &quot;N2_day1_rep3&quot;)]
+head(subset_df4test)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 3</caption>
+<thead>
+    <tr><th></th><th scope=col>N2_day1_rep1</th><th scope=col>N2_day1_rep2</th><th scope=col>N2_day1_rep3</th></tr>
+    <tr><th></th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>WBGene00000001</th><td>3227</td><td>2168</td><td>2589</td></tr>
+    <tr><th scope=row>WBGene00000002</th><td> 270</td><td> 203</td><td> 266</td></tr>
+    <tr><th scope=row>WBGene00000003</th><td> 341</td><td> 415</td><td> 411</td></tr>
+    <tr><th scope=row>WBGene00000004</th><td> 584</td><td> 438</td><td> 518</td></tr>
+    <tr><th scope=row>WBGene00000005</th><td> 383</td><td> 395</td><td> 483</td></tr>
+    <tr><th scope=row>WBGene00000006</th><td> 343</td><td> 344</td><td> 334</td></tr>
+</tbody>
+</table>
+
+<h2 id="check-count-matrix">Check count matrix</h2>
+<p>Different samples have different total number of counts</p>
+<pre><code class="language-R">as.data.frame(colSums(merged_df))
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 1</caption>
+<thead>
+    <tr><th></th><th scope=col>colSums(merged_df)</th></tr>
+    <tr><th></th><th scope=col>&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>N2_day1_rep1</th><td>37398898</td></tr>
+    <tr><th scope=row>N2_day1_rep2</th><td>29488709</td></tr>
+    <tr><th scope=row>N2_day1_rep3</th><td>34593136</td></tr>
+    <tr><th scope=row>N2_day7_rep1</th><td>48275683</td></tr>
+    <tr><th scope=row>N2_day7_rep2</th><td>23204449</td></tr>
+    <tr><th scope=row>N2_day7_rep3</th><td>46005617</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">barplot(colSums(merged_df),
+         las = 2,
+         cex.names= 0.6)
+</code></pre>
+<p><img alt="png" src="../BIOI611_DESeq2_analysis_files/BIOI611_DESeq2_analysis_21_0.png" /></p>
+<pre><code class="language-R"># inkscape: an open source software for editing the graph saved in pdf
+pdf(&quot;total_count_barplot.pdf&quot;)
+barplot(colSums(merged_df),
+         las = 2,
+         cex.names= 0.6)
+dev.off()
+</code></pre>
+<p><strong>pdf:</strong> 2</p>
+<pre><code class="language-R">coldata &lt;- colnames(merged_df)
+coldata_df &lt;- cbind(group = gsub(&quot;_rep\\d&quot;, &quot;&quot;, coldata))
+coldata_df
+</code></pre>
+<table class="dataframe">
+<caption>A matrix: 6 × 1 of type chr</caption>
+<thead>
+    <tr><th scope=col>group</th></tr>
+</thead>
+<tbody>
+    <tr><td>N2_day1</td></tr>
+    <tr><td>N2_day1</td></tr>
+    <tr><td>N2_day1</td></tr>
+    <tr><td>N2_day7</td></tr>
+    <tr><td>N2_day7</td></tr>
+    <tr><td>N2_day7</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">rownames(coldata_df) = coldata
+coldata_df
+</code></pre>
+<table class="dataframe">
+<caption>A matrix: 6 × 1 of type chr</caption>
+<thead>
+    <tr><th></th><th scope=col>group</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>N2_day1_rep1</th><td>N2_day1</td></tr>
+    <tr><th scope=row>N2_day1_rep2</th><td>N2_day1</td></tr>
+    <tr><th scope=row>N2_day1_rep3</th><td>N2_day1</td></tr>
+    <tr><th scope=row>N2_day7_rep1</th><td>N2_day7</td></tr>
+    <tr><th scope=row>N2_day7_rep2</th><td>N2_day7</td></tr>
+    <tr><th scope=row>N2_day7_rep3</th><td>N2_day7</td></tr>
+</tbody>
+</table>
+
+<h2 id="run-deseq2-to-identify-deg">Run DESeq2 to identify DEG</h2>
+<pre><code class="language-R">dds &lt;- DESeqDataSetFromMatrix(countData = merged_df,
+                              colData = coldata_df,
+                              design =~ group)
+</code></pre>
+<pre><code>Warning message in DESeqDataSet(se, design = design, ignoreRank):
+“some variables in design formula are characters, converting to factors”
+</code></pre>
+<pre><code class="language-R">class(dds)
+</code></pre>
+<p>'DESeqDataSet'</p>
+<p>The <code>DESeq()</code> function normalizes the read counts,estimates dispersions, and fits the linear model, all in one go.</p>
+<pre><code class="language-R">dds &lt;- DESeq(dds)
+</code></pre>
+<pre><code>estimating size factors
+
+estimating dispersions
+
+gene-wise dispersion estimates
+
+mean-dispersion relationship
+
+final dispersion estimates
+
+fitting model and testing
+</code></pre>
+<p>Dispersion is a measure of spread or variability in the data. Variance, standard deviation, IQR, among other measures, can all be used to measure dispersion.</p>
+<p>DESeq2 uses a specific measure of dispersion (α) related to the mean (μ) and variance of the data: Var = μ + α*μ^2.</p>
+<pre><code class="language-R">sizeFactors(dds)
+</code></pre>
+<style>
+.dl-inline {width: auto; margin:0; padding: 0}
+.dl-inline>dt, .dl-inline>dd {float: none; width: auto; display: inline-block}
+.dl-inline>dt::after {content: ":\0020"; padding-right: .5ex}
+.dl-inline>dt:not(:first-of-type) {padding-left: .5ex}
+</style>
+<dl class=dl-inline><dt>N2_day1_rep1</dt><dd>1.00236113145741</dd><dt>N2_day1_rep2</dt><dd>0.810736816029527</dd><dt>N2_day1_rep3</dt><dd>0.944781672438598</dd><dt>N2_day7_rep1</dt><dd>1.31189917666838</dd><dt>N2_day7_rep2</dt><dd>0.71546097217711</dd><dt>N2_day7_rep3</dt><dd>1.42600915363567</dd></dl>
+
+<pre><code class="language-R">head(counts(dds,  normalized = TRUE))
+</code></pre>
+<table class="dataframe">
+<caption>A matrix: 6 × 6 of type dbl</caption>
+<thead>
+    <tr><th></th><th scope=col>N2_day1_rep1</th><th scope=col>N2_day1_rep2</th><th scope=col>N2_day1_rep3</th><th scope=col>N2_day7_rep1</th><th scope=col>N2_day7_rep2</th><th scope=col>N2_day7_rep3</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>WBGene00000001</th><td>3219.3986</td><td>2674.1107</td><td>2740.3156</td><td>4313.59368</td><td>3660.57703</td><td>3673.8895</td></tr>
+    <tr><th scope=row>WBGene00000002</th><td> 269.3640</td><td> 250.3895</td><td> 281.5465</td><td> 270.60006</td><td> 266.96075</td><td> 298.0346</td></tr>
+    <tr><th scope=row>WBGene00000003</th><td> 340.1968</td><td> 511.8800</td><td> 435.0211</td><td> 294.99218</td><td> 356.41357</td><td> 349.9276</td></tr>
+    <tr><th scope=row>WBGene00000004</th><td> 582.6243</td><td> 540.2493</td><td> 548.2748</td><td> 783.59680</td><td> 756.15585</td><td> 622.7169</td></tr>
+    <tr><th scope=row>WBGene00000005</th><td> 382.0978</td><td> 487.2111</td><td> 511.2292</td><td>  90.70819</td><td>  90.85052</td><td> 132.5377</td></tr>
+    <tr><th scope=row>WBGene00000006</th><td> 342.1920</td><td> 424.3054</td><td> 353.5208</td><td> 157.02426</td><td> 159.33783</td><td> 154.2767</td></tr>
+</tbody>
+</table>
+
+<p>The function <code>plotDispEsts</code> shows the dispersion by mean of normalized counts. We expect the dispersion to decrease as the mean of normalized counts increases.</p>
+<p>The functions shows:</p>
+<ol>
+<li>
+<p>black per-gene dispersion estimates</p>
+</li>
+<li>
+<p>a red trend line representing the global relationship between dispersion and normalized count</p>
+</li>
+<li>
+<p>blue 'shrunken' values moderating individual dispersion estimates by the global relationship</p>
+</li>
+<li>
+<p>blue-circled dispersion outliers with high gene-wise dispersion that were not adjusted.</p>
+</li>
+</ol>
+<pre><code class="language-R">plotDispEsts(dds)
+</code></pre>
+<p><img alt="png" src="../BIOI611_DESeq2_analysis_files/BIOI611_DESeq2_analysis_34_0.png" /></p>
+<pre><code class="language-R">
+</code></pre>
+<h3 id="plot-normalized-genes">Plot normalized genes</h3>
+<p>The function <code>plotCounts</code> is used to plot normalized counts plus a pseudocount of 0.5 by default.</p>
+<pre><code class="language-R">vsd &lt;- vst(dds, blind=FALSE)
+</code></pre>
+<pre><code class="language-R">?vst
+</code></pre>
+<pre><code class="language-R">class(vsd)
+</code></pre>
+<p>'DESeqTransform'</p>
+<pre><code class="language-R">
+</code></pre>
+<pre><code class="language-R">
+</code></pre>
+<pre><code class="language-R">plotPCA(vsd, intgroup = c(&quot;group&quot;))
+</code></pre>
+<pre><code>using ntop=500 top features by variance
+</code></pre>
+<p><img alt="png" src="../BIOI611_DESeq2_analysis_files/BIOI611_DESeq2_analysis_42_1.png" /></p>
+<h3 id="extract-deg-results-using-results-function">Extract DEG results using <code>results</code> function</h3>
+<pre><code class="language-R">res &lt;- results(dds)
+res
+</code></pre>
+<pre><code>log2 fold change (MLE): group N2 day7 vs N2 day1 
+Wald test p-value: group N2 day7 vs N2 day1 
+DataFrame with 46926 rows and 6 columns
+                baseMean log2FoldChange     lfcSE      stat      pvalue
+               &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;   &lt;numeric&gt;
+WBGene00000001  3380.314      0.4320800  0.136502  3.165370 1.54886e-03
+WBGene00000002   272.816      0.0620929  0.165747  0.374626 7.07939e-01
+WBGene00000003   381.405     -0.3623262  0.199673 -1.814594 6.95864e-02
+WBGene00000004   638.936      0.3698102  0.151232  2.445312 1.44727e-02
+WBGene00000005   282.439     -2.1244976  0.227771 -9.327337 1.08564e-20
+...                  ...            ...       ...       ...         ...
+WBGene00306078  0.566369       0.947326  3.076775  0.307896 7.58162e-01
+WBGene00306080  0.243919       1.429602  4.042905  0.353608 7.23633e-01
+WBGene00306081 27.265033      -3.108820  0.627823 -4.951747 7.35501e-07
+WBGene00306121 14.219195      -0.210100  0.691162 -0.303981 7.61142e-01
+WBGene00306122  0.000000             NA        NA        NA          NA
+                      padj
+                 &lt;numeric&gt;
+WBGene00000001 4.06703e-03
+WBGene00000002 7.84660e-01
+WBGene00000003 1.17161e-01
+WBGene00000004 2.96896e-02
+WBGene00000005 1.92160e-19
+...                    ...
+WBGene00306078          NA
+WBGene00306080          NA
+WBGene00306081 3.70005e-06
+WBGene00306121 8.26621e-01
+WBGene00306122          NA
+</code></pre>
+<pre><code class="language-R">class(res)
+</code></pre>
+<p>'DESeqResults'</p>
+<pre><code class="language-R">mcols(res)$description
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'mean of normalized counts for all samples'</li><li>'log2 fold change (MLE): group N2 day7 vs N2 day1'</li><li>'standard error: group N2 day7 vs N2 day1'</li><li>'Wald statistic: group N2 day7 vs N2 day1'</li><li>'Wald test p-value: group N2 day7 vs N2 day1'</li><li>'BH adjusted p-values'</li></ol>
+
+<ul>
+<li><code>baseMean</code>: mean of normalized counts for all samples</li>
+<li><code>log2FoldChange</code>: log2 fold change</li>
+<li><code>lfcSE</code>: standard error</li>
+<li><code>stat</code>: Wald statistic</li>
+<li><code>pvalue</code>: Wald test p-value</li>
+<li><code>padj</code>: BH adjusted p-values</li>
+</ul>
+<p>If we used the p-value directly from the Wald test with a significance cut-off of p &lt; 0.05, that means there is a 5% chance it is a false positives. Each p-value is the result of a single test (single gene). The more genes we test, the more we inflate the false positive rate. This is the multiple testing problem. For example, if we test 20,000 genes for differential expression, at p &lt; 0.05 we would expect to find 1,000 genes by chance. If we found 3000 genes to be differentially expressed total, roughly one third of our genes are false positives. We would not want to sift through our “significant” genes to identify which ones are true positives.</p>
+<p>DESeq2 helps reduce the number of genes tested by removing those genes unlikely to be significantly DE prior to testing, such as those with low number of counts and outlier samples (gene-level QC). However, we still need to correct for multiple testing to reduce the number of false positives, and there are a few common approaches:</p>
+<ol>
+<li>
+<p>Bonferroni: The adjusted p-value is calculated by: p-value * m (m = total number of tests). This is a very conservative approach with a high probability of false negatives, so is generally not recommended.</p>
+</li>
+<li>
+<p>FDR/Benjamini-Hochberg: Benjamini and Hochberg (1995) defined the concept of FDR and created an algorithm to control the expected FDR below a specified level given a list of independent p-values. An interpretation of the BH method for controlling the FDR is implemented in DESeq2 in which we rank the genes by p-value, then multiply each ranked p-value by m/rank.</p>
+</li>
+<li>
+<p>Q-value / Storey method: The minimum FDR that can be attained when calling that feature significant. For example, if gene X has a q-value of 0.013 it means that 1.3% of genes that show p-values at least as small as gene X are false positives
+In DESeq2, the p-values attained by the Wald test are corrected for multiple testing using the Benjamini and Hochberg method by default. There are options to use other methods in the results() function. The p-adjusted values should be used to determine significant genes. The significant genes can be output for visualization and/or functional analysis.</p>
+</li>
+</ol>
+<p>So what does FDR &lt; 0.05 mean? By setting the FDR cutoff to &lt; 0.05, we’re saying that the proportion of false positives we expect amongst our differentially expressed genes is 5%. For example, if you call 500 genes as differentially expressed with an FDR cutoff of 0.05, you expect 25 of them to be false positives.</p>
+<p>Note on p-values set to <code>NA</code>: some values in the results table can be set to <code>NA</code> for one of the following reasons:</p>
+<ol>
+<li>
+<p>If within a row, all samples have zero counts, the baseMean column will be zero, and the log2 fold change estimates, p value and adjusted p value will all be set to NA.</p>
+</li>
+<li>
+<p>If a row contains a sample with an extreme count outlier then the p value and adjusted p value will be set to NA. These outlier counts are detected by Cook’s distance. Customization of this outlier filtering and description of functionality for replacement of outlier counts and refitting is described below</p>
+</li>
+<li>
+<p>If a row is filtered by automatic independent filtering, for having a low mean normalized count, then only the adjusted p value will be set to NA. Description and customization of independent filtering is described below</p>
+</li>
+</ol>
+<pre><code class="language-R">plotMA(res, ylim=c(-2,2))
+
+</code></pre>
+<p><img alt="png" src="../BIOI611_DESeq2_analysis_files/BIOI611_DESeq2_analysis_50_0.png" /></p>
+<pre><code class="language-R">write.csv(res, file = &quot;BIOI_bulkRNAseq_SE_DESeq2_res.csv&quot;)
+</code></pre>
+<pre><code class="language-R">d &lt;- plotCounts(dds, gene=which.min(res$padj), intgroup=&quot;group&quot;,
+                returnData=TRUE)
+</code></pre>
+<pre><code class="language-R">d
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 2</caption>
+<thead>
+    <tr><th></th><th scope=col>count</th><th scope=col>group</th></tr>
+    <tr><th></th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;fct&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>N2_day1_rep1</th><td>37716.448</td><td>N2_day1</td></tr>
+    <tr><th scope=row>N2_day1_rep2</th><td>46554.449</td><td>N2_day1</td></tr>
+    <tr><th scope=row>N2_day1_rep3</th><td>45402.524</td><td>N2_day1</td></tr>
+    <tr><th scope=row>N2_day7_rep1</th><td> 1544.064</td><td>N2_day7</td></tr>
+    <tr><th scope=row>N2_day7_rep2</th><td> 1564.527</td><td>N2_day7</td></tr>
+    <tr><th scope=row>N2_day7_rep3</th><td> 1489.270</td><td>N2_day7</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">which.min(res$padj)
+</code></pre>
+<p>465</p>
+<pre><code class="language-R">library(&quot;ggplot2&quot;)
+ggplot(d, aes(x=group, y=count)) +
+  geom_point(position=position_jitter(w=0.1,h=0)) +
+  scale_y_log10(breaks=c(25,100,400))
+</code></pre>
+<p><img alt="png" src="../BIOI611_DESeq2_analysis_files/BIOI611_DESeq2_analysis_55_0.png" /></p>
+<pre><code class="language-R">?EnhancedVolcano
+</code></pre>
+<pre><code class="language-R">  EnhancedVolcano(res,
+    lab = rownames(res),
+    x = 'log2FoldChange',
+    y = 'pvalue')
+</code></pre>
+<pre><code>Warning message:
+“One or more p-values is 0. Converting to 10^-1 * current lowest non-zero p-value...”
+</code></pre>
+<p><img alt="png" src="../BIOI611_DESeq2_analysis_files/BIOI611_DESeq2_analysis_57_1.png" /></p>
+<h2 id="understand-normalized-count-in-deseq2-optional">Understand normalized count in DESeq2 (Optional)</h2>
+<h4 id="create-a-pseudo-reference-sample-row-wise-geometric-mean">Create a pseudo-reference sample (row-wise geometric mean)</h4>
+<p>The code below creates a new column called <code>pseudo_reference</code> that contains the average log-transformed expression value for each gene across all samples. This pseudo-reference is similar to calculating a "reference sample" to compare other samples.</p>
+<pre><code class="language-R">log_data = log(merged_df)
+head(log_data)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 6</caption>
+<thead>
+    <tr><th></th><th scope=col>N2_day1_rep1</th><th scope=col>N2_day1_rep2</th><th scope=col>N2_day1_rep3</th><th scope=col>N2_day7_rep1</th><th scope=col>N2_day7_rep2</th><th scope=col>N2_day7_rep3</th></tr>
+    <tr><th></th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>WBGene00000001</th><td>8.079308</td><td>7.681560</td><td>7.859027</td><td>8.641002</td><td>7.870548</td><td>8.563886</td></tr>
+    <tr><th scope=row>WBGene00000002</th><td>5.598422</td><td>5.313206</td><td>5.583496</td><td>5.872118</td><td>5.252273</td><td>6.052089</td></tr>
+    <tr><th scope=row>WBGene00000003</th><td>5.831882</td><td>6.028279</td><td>6.018593</td><td>5.958425</td><td>5.541264</td><td>6.212606</td></tr>
+    <tr><th scope=row>WBGene00000004</th><td>6.369901</td><td>6.082219</td><td>6.249975</td><td>6.935370</td><td>6.293419</td><td>6.788972</td></tr>
+    <tr><th scope=row>WBGene00000005</th><td>5.948035</td><td>5.978886</td><td>6.180017</td><td>4.779123</td><td>4.174387</td><td>5.241747</td></tr>
+    <tr><th scope=row>WBGene00000006</th><td>5.837730</td><td>5.840642</td><td>5.811141</td><td>5.327876</td><td>4.736198</td><td>5.393628</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">library(dplyr)
+library(tibble) # rownames_to_column
+
+log_data = log_data %&gt;%
+             rownames_to_column('gene') %&gt;%
+             mutate (pseudo_reference = rowMeans(log_data))
+
+head(log_data)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 8</caption>
+<thead>
+    <tr><th></th><th scope=col>gene</th><th scope=col>N2_day1_rep1</th><th scope=col>N2_day1_rep2</th><th scope=col>N2_day1_rep3</th><th scope=col>N2_day7_rep1</th><th scope=col>N2_day7_rep2</th><th scope=col>N2_day7_rep3</th><th scope=col>pseudo_reference</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>WBGene00000001</td><td>8.079308</td><td>7.681560</td><td>7.859027</td><td>8.641002</td><td>7.870548</td><td>8.563886</td><td>8.115889</td></tr>
+    <tr><th scope=row>2</th><td>WBGene00000002</td><td>5.598422</td><td>5.313206</td><td>5.583496</td><td>5.872118</td><td>5.252273</td><td>6.052089</td><td>5.611934</td></tr>
+    <tr><th scope=row>3</th><td>WBGene00000003</td><td>5.831882</td><td>6.028279</td><td>6.018593</td><td>5.958425</td><td>5.541264</td><td>6.212606</td><td>5.931841</td></tr>
+    <tr><th scope=row>4</th><td>WBGene00000004</td><td>6.369901</td><td>6.082219</td><td>6.249975</td><td>6.935370</td><td>6.293419</td><td>6.788972</td><td>6.453309</td></tr>
+    <tr><th scope=row>5</th><td>WBGene00000005</td><td>5.948035</td><td>5.978886</td><td>6.180017</td><td>4.779123</td><td>4.174387</td><td>5.241747</td><td>5.383699</td></tr>
+    <tr><th scope=row>6</th><td>WBGene00000006</td><td>5.837730</td><td>5.840642</td><td>5.811141</td><td>5.327876</td><td>4.736198</td><td>5.393628</td><td>5.491203</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">table(log_data$pseudo_reference == &quot;-Inf&quot;)
+</code></pre>
+<pre><code>FALSE  TRUE 
+16951 29975
+</code></pre>
+<pre><code class="language-R">filtered_log_data = log_data %&gt;% filter(pseudo_reference != &quot;-Inf&quot;)
+head(filtered_log_data)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 8</caption>
+<thead>
+    <tr><th></th><th scope=col>gene</th><th scope=col>N2_day1_rep1</th><th scope=col>N2_day1_rep2</th><th scope=col>N2_day1_rep3</th><th scope=col>N2_day7_rep1</th><th scope=col>N2_day7_rep2</th><th scope=col>N2_day7_rep3</th><th scope=col>pseudo_reference</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>WBGene00000001</td><td>8.079308</td><td>7.681560</td><td>7.859027</td><td>8.641002</td><td>7.870548</td><td>8.563886</td><td>8.115889</td></tr>
+    <tr><th scope=row>2</th><td>WBGene00000002</td><td>5.598422</td><td>5.313206</td><td>5.583496</td><td>5.872118</td><td>5.252273</td><td>6.052089</td><td>5.611934</td></tr>
+    <tr><th scope=row>3</th><td>WBGene00000003</td><td>5.831882</td><td>6.028279</td><td>6.018593</td><td>5.958425</td><td>5.541264</td><td>6.212606</td><td>5.931841</td></tr>
+    <tr><th scope=row>4</th><td>WBGene00000004</td><td>6.369901</td><td>6.082219</td><td>6.249975</td><td>6.935370</td><td>6.293419</td><td>6.788972</td><td>6.453309</td></tr>
+    <tr><th scope=row>5</th><td>WBGene00000005</td><td>5.948035</td><td>5.978886</td><td>6.180017</td><td>4.779123</td><td>4.174387</td><td>5.241747</td><td>5.383699</td></tr>
+    <tr><th scope=row>6</th><td>WBGene00000006</td><td>5.837730</td><td>5.840642</td><td>5.811141</td><td>5.327876</td><td>4.736198</td><td>5.393628</td><td>5.491203</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">filtered_log_data$pseudo_reference = exp(filtered_log_data$pseudo_reference)
+</code></pre>
+<pre><code class="language-R">dim(log_data)
+dim(filtered_log_data)
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>46926</li><li>8</li></ol>
+
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>16951</li><li>8</li></ol>
+
+<h3 id="calculate-ratio-between-each-sample-and-the-pseudo-reference-for-each-gene">Calculate ratio between each sample and the pseudo-reference for each gene</h3>
+<p>This step calculates the fold change between each sample and the pseudo-reference for each gene.</p>
+<pre><code class="language-R">ratio_data = sweep(exp(filtered_log_data[,2:7]), 1, filtered_log_data[,8], &quot;/&quot;)
+head(ratio_data)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 6</caption>
+<thead>
+    <tr><th></th><th scope=col>N2_day1_rep1</th><th scope=col>N2_day1_rep2</th><th scope=col>N2_day1_rep3</th><th scope=col>N2_day7_rep1</th><th scope=col>N2_day7_rep2</th><th scope=col>N2_day7_rep3</th></tr>
+    <tr><th></th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>0.9640805</td><td>0.6476996</td><td>0.7734752</td><td>1.6906513</td><td>0.7824378</td><td>1.5651745</td></tr>
+    <tr><th scope=row>2</th><td>0.9865787</td><td>0.7417610</td><td>0.9719628</td><td>1.2971683</td><td>0.6979131</td><td>1.5529480</td></tr>
+    <tr><th scope=row>3</th><td>0.9048746</td><td>1.1012403</td><td>1.0906259</td><td>1.0269398</td><td>0.6766657</td><td>1.3241420</td></tr>
+    <tr><th scope=row>4</th><td>0.9199753</td><td>0.6899815</td><td>0.8160055</td><td>1.6194086</td><td>0.8522374</td><td>1.3988666</td></tr>
+    <tr><th scope=row>5</th><td>1.7582795</td><td>1.8133692</td><td>2.2173603</td><td>0.5463062</td><td>0.2984025</td><td>0.8676627</td></tr>
+    <tr><th scope=row>6</th><td>1.4141490</td><td>1.4182718</td><td>1.3770430</td><td>0.8493139</td><td>0.4700087</td><td>0.9070343</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">
+</code></pre>
+<h3 id="calculate-scaling-factor">Calculate  scaling factor</h3>
+<p>The code below computes the median fold change for each sample across all genes.</p>
+<pre><code class="language-R">
+</code></pre>
+<pre><code class="language-R">scaling_factors = apply(ratio_data, 2, median, na.rm = TRUE)
+scaling_factors
+</code></pre>
+<style>
+.dl-inline {width: auto; margin:0; padding: 0}
+.dl-inline>dt, .dl-inline>dd {float: none; width: auto; display: inline-block}
+.dl-inline>dt::after {content: ":\0020"; padding-right: .5ex}
+.dl-inline>dt:not(:first-of-type) {padding-left: .5ex}
+</style>
+<dl class=dl-inline><dt>N2_day1_rep1</dt><dd>1.00236113145741</dd><dt>N2_day1_rep2</dt><dd>0.810736816029527</dd><dt>N2_day1_rep3</dt><dd>0.944781672438598</dd><dt>N2_day7_rep1</dt><dd>1.31189917666838</dd><dt>N2_day7_rep2</dt><dd>0.71546097217711</dd><dt>N2_day7_rep3</dt><dd>1.42600915363567</dd></dl>
+
+<p>The <code>2</code> indicates that the function is applied to columns, i.e., for each sample.</p>
+<h3 id="normalize-the-counts">Normalize the counts</h3>
+<p>This step below normalizes each sample by its scaling factors, making the data comparable across samples. The result is a normalized gene expression matrix.</p>
+<pre><code class="language-R">manually_normalized = sweep(merged_df, 2, scaling_factors, &quot;/&quot;)
+head(manually_normalized)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 6</caption>
+<thead>
+    <tr><th></th><th scope=col>N2_day1_rep1</th><th scope=col>N2_day1_rep2</th><th scope=col>N2_day1_rep3</th><th scope=col>N2_day7_rep1</th><th scope=col>N2_day7_rep2</th><th scope=col>N2_day7_rep3</th></tr>
+    <tr><th></th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>WBGene00000001</th><td>3219.3986</td><td>2674.1107</td><td>2740.3156</td><td>4313.59368</td><td>3660.57703</td><td>3673.8895</td></tr>
+    <tr><th scope=row>WBGene00000002</th><td> 269.3640</td><td> 250.3895</td><td> 281.5465</td><td> 270.60006</td><td> 266.96075</td><td> 298.0346</td></tr>
+    <tr><th scope=row>WBGene00000003</th><td> 340.1968</td><td> 511.8800</td><td> 435.0211</td><td> 294.99218</td><td> 356.41357</td><td> 349.9276</td></tr>
+    <tr><th scope=row>WBGene00000004</th><td> 582.6243</td><td> 540.2493</td><td> 548.2748</td><td> 783.59680</td><td> 756.15585</td><td> 622.7169</td></tr>
+    <tr><th scope=row>WBGene00000005</th><td> 382.0978</td><td> 487.2111</td><td> 511.2292</td><td>  90.70819</td><td>  90.85052</td><td> 132.5377</td></tr>
+    <tr><th scope=row>WBGene00000006</th><td> 342.1920</td><td> 424.3054</td><td> 353.5208</td><td> 157.02426</td><td> 159.33783</td><td> 154.2767</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">hist(log2(manually_normalized$N2_day1_rep1))
+</code></pre>
+<p><img alt="png" src="../BIOI611_DESeq2_analysis_files/BIOI611_DESeq2_analysis_80_0.png" /></p>
+<p>The code below shows that the size factors and the normalized read counts calculated by ourselves are the same as what DESeq2 function returns.</p>
+<pre><code class="language-R">head(counts(dds,  normalized = TRUE))
+
+</code></pre>
+<table class="dataframe">
+<caption>A matrix: 6 × 6 of type dbl</caption>
+<thead>
+    <tr><th></th><th scope=col>N2_day1_rep1</th><th scope=col>N2_day1_rep2</th><th scope=col>N2_day1_rep3</th><th scope=col>N2_day7_rep1</th><th scope=col>N2_day7_rep2</th><th scope=col>N2_day7_rep3</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>WBGene00000001</th><td>3219.3986</td><td>2674.1107</td><td>2740.3156</td><td>4313.59368</td><td>3660.57703</td><td>3673.8895</td></tr>
+    <tr><th scope=row>WBGene00000002</th><td> 269.3640</td><td> 250.3895</td><td> 281.5465</td><td> 270.60006</td><td> 266.96075</td><td> 298.0346</td></tr>
+    <tr><th scope=row>WBGene00000003</th><td> 340.1968</td><td> 511.8800</td><td> 435.0211</td><td> 294.99218</td><td> 356.41357</td><td> 349.9276</td></tr>
+    <tr><th scope=row>WBGene00000004</th><td> 582.6243</td><td> 540.2493</td><td> 548.2748</td><td> 783.59680</td><td> 756.15585</td><td> 622.7169</td></tr>
+    <tr><th scope=row>WBGene00000005</th><td> 382.0978</td><td> 487.2111</td><td> 511.2292</td><td>  90.70819</td><td>  90.85052</td><td> 132.5377</td></tr>
+    <tr><th scope=row>WBGene00000006</th><td> 342.1920</td><td> 424.3054</td><td> 353.5208</td><td> 157.02426</td><td> 159.33783</td><td> 154.2767</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">sizeFactors(dds)
+</code></pre>
+<style>
+.dl-inline {width: auto; margin:0; padding: 0}
+.dl-inline>dt, .dl-inline>dd {float: none; width: auto; display: inline-block}
+.dl-inline>dt::after {content: ":\0020"; padding-right: .5ex}
+.dl-inline>dt:not(:first-of-type) {padding-left: .5ex}
+</style>
+<dl class=dl-inline><dt>N2_day1_rep1</dt><dd>1.00236113145741</dd><dt>N2_day1_rep2</dt><dd>0.810736816029527</dd><dt>N2_day1_rep3</dt><dd>0.944781672438598</dd><dt>N2_day7_rep1</dt><dd>1.31189917666838</dd><dt>N2_day7_rep2</dt><dd>0.71546097217711</dd><dt>N2_day7_rep3</dt><dd>1.42600915363567</dd></dl>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../BIOI611_introR/" class="btn btn-neutral float-left" title="Minimal R Introduction"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../BIOI611_ballgown_example/" class="btn btn-neutral float-right" title="DE analysis at isoform-leve using ballgown (example data)">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2024 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../BIOI611_introR/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../BIOI611_ballgown_example/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
