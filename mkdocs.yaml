@@ -46,6 +46,7 @@ nav:
     - DEG analysis using DESeq2: BIOI611_DESeq2_analysis.md  
     - DE analysis at isoform-leve using ballgown (example data): BIOI611_ballgown_example.md
     - DE analysis at isoform-leve using ballgown (C. ele data): BIOI611_bulkRNA_SE_ballgown.md 
+    - Long read transcriptome: BIOI611_long_read_transcriptome.md
       #- Basic R:      basic_r.md
     #- Basic Python: basic_python.md
    
