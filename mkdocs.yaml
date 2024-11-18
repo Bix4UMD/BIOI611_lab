@@ -48,7 +48,8 @@ nav:
     - DE analysis at isoform-leve using ballgown (C. ele data): BIOI611_bulkRNA_SE_ballgown.md 
     - Long read transcriptome: BIOI611_long_read_transcriptome.md
   - scRNA-seq:
-    - 10x scRNA-seq data for human PBMC: BIOI611_analysis_10x_dataset_PBMC.md 
+    - Initial analysis of 10x scRNA-seq data for human PBMC using cellranger: BIOI611_analysis_10x_dataset_PBMC.md 
+    - Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat: BIOI611_scRNA.md
 
       #- Basic R:      basic_r.md
     #- Basic Python: basic_python.md
