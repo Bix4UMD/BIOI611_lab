@@ -50,6 +50,8 @@ nav:
   - scRNA-seq:
     - Initial analysis of 10x scRNA-seq data for human PBMC using cellranger: BIOI611_analysis_10x_dataset_PBMC.md 
     - Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat: BIOI611_scRNA.md
+    -  Initial analysis of 10x scRNA-seq data for C. elegans using cellranger: BIOI611_scRNA_seq_cele_cellranger.md
+    - Downstream analysis of 10x scRNA-seq data for C. elegans data: BIOI611_scRNA_cele.md
 
       #- Basic R:      basic_r.md
     #- Basic Python: basic_python.md
