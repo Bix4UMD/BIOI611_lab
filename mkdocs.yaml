@@ -52,7 +52,7 @@ nav:
     - Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat: BIOI611_scRNA.md
     -  Initial analysis of 10x scRNA-seq data for C. elegans using cellranger: BIOI611_scRNA_seq_cele_cellranger.md
     - Downstream analysis of 10x scRNA-seq data for C. elegans data: BIOI611_scRNA_cele.md
-    - Downstream analysis: trajectory analysis using Monocle3: bioi611_monocle_cele.md
+    - Downstream analysis - trajectory analysis using Monocle3: bioi611_monocle_cele.md
       #- Basic R:      basic_r.md
     #- Basic Python: basic_python.md
    
