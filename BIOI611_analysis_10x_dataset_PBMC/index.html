@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Initial analysis of 10x scRNA-seq data for human PBMC using cellranger - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Initial analysis of 10x scRNA-seq data for human PBMC using cellranger";
+        var mkdocs_page_input_path = "BIOI611_analysis_10x_dataset_PBMC.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#download-the-data">Download the data</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#check-r1-and-r2">Check R1 and R2</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#run-cellranger">Run Cellranger</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#output-folder">Output folder</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">scRNA-seq</li>
+      <li class="breadcrumb-item active">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/BIOI611_analysis_10x_dataset_PBMC.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="_1"></h1>
+<h2 id="download-the-data">Download the data</h2>
+<p>You can download the data from the link <a href="https://www.10xgenomics.com/datasets/5k-human-pbmcs-3-v3-1-chromium-controller-3-1-standard">here</a></p>
+<pre><code># https://www.10xgenomics.com/datasets/5k-human-pbmcs-3-v3-1-chromium-controller-3-1-standard
+wget https://cf.10xgenomics.com/samples/cell-exp/7.0.1/SC3pv3_GEX_Human_PBMC/SC3pv3_GEX_Human_PBMC_fastqs.tar
+tar xvf SC3pv3_GEX_Human_PBMC_fastqs.tar
+</code></pre>
+<p>For this class, you can find a copy under the path: </p>
+<pre><code class="language-bash">%%bash
+ls /scratch/zt1/project/bioi611/shared/raw_data/Chromium_3p_GEX_Human_PBMC_fastqs/
+</code></pre>
+<pre><code>Chromium_3p_GEX_Human_PBMC_S1_L001_I1_001.fastq.gz
+Chromium_3p_GEX_Human_PBMC_S1_L001_I2_001.fastq.gz
+Chromium_3p_GEX_Human_PBMC_S1_L001_R1_001.fastq.gz
+Chromium_3p_GEX_Human_PBMC_S1_L001_R2_001.fastq.gz
+</code></pre>
+<h3 id="check-r1-and-r2">Check R1 and R2</h3>
+<table>
+<thead>
+<tr>
+<th>Read</th>
+<th>Read 1</th>
+<th>i7 Index</th>
+<th>i5 Index</th>
+<th>Read 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Purpose</td>
+<td>Cell barcode &amp; UMI</td>
+<td>Sample Index</td>
+<td>Sample Index</td>
+<td>Insert</td>
+</tr>
+<tr>
+<td>Length**</td>
+<td>28</td>
+<td>10</td>
+<td>10</td>
+<td>90</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="image.png" src="../BIOI611_analysis_10x_dataset_PBMC_files/image.png" /></p>
+<p>An Unique Molecular Identifier (UMI) is a short sequence tag (usually 8-12 nucleotides long) that is added to each RNA molecule during library preparation. UMIs are critical for accurately quantifying gene expression, as they help to distinguish between unique RNA molecules and technical duplicates that arise from PCR amplification.</p>
+<p>How ow UMIs work in the 10x scRNA-seq workflow:</p>
+<ol>
+<li>
+<p>Library Preparation: Each RNA molecule is tagged with a UMI as well as cell-specific barcodes. This labeling occurs before PCR amplification, so each original RNA molecule within a single cell is uniquely identifiable.</p>
+</li>
+<li>
+<p>Eliminating Amplification Bias: When the tagged molecules are amplified by PCR, each original molecule (regardless of how many duplicates it creates) retains its unique UMI. Later, when sequencing reads are aligned and counted, duplicate reads with the same UMI and gene alignment are considered as representing a single molecule.</p>
+</li>
+<li>
+<p>Accurate Quantification: Using UMIs allows for a more accurate measure of gene expression by avoiding overcounting due to PCR duplicates, providing a closer representation of the actual RNA molecules present in each cell.</p>
+</li>
+</ol>
+<pre><code class="language-bash">%%bash
+zcat /scratch/zt1/project/bioi611/shared/raw_data/Chromium_3p_GEX_Human_PBMC_fastqs/Chromium_3p_GEX_Human_PBMC_S1_L001_R1_001.fastq.gz |head -12
+</code></pre>
+<pre><code>@A00836:523:HJH22DSXY:1:1101:1823:1016 1:N:0:ATGGAGGGAG+AATGGGTTAT
+TNATGGACAAACAGGCCGTTGCACTAAA
++
+F#FFFFFFFFFFF:FFFFFFFFFFFFFF
+@A00836:523:HJH22DSXY:1:1101:1841:1016 1:N:0:ATGGAGGGAG+AATGGGTTAT
+TNGTGATGTTCTTGTTCTCACTCGAGGT
++
+F#FFFFFFFFFFFFFFFFFFFFFFFFFF
+@A00836:523:HJH22DSXY:1:1101:1949:1016 1:N:0:ATGGAGGGAG+AATGGGTTAT
+ANACAGGGTCCTACGGTTCATCTTTGTG
++
+F#FFFFFFFFFFFFFFFFFFFFFFFFFF
+</code></pre>
+<pre><code class="language-bash">%%bash
+zcat /scratch/zt1/project/bioi611/shared/raw_data/Chromium_3p_GEX_Human_PBMC_fastqs/Chromium_3p_GEX_Human_PBMC_S1_L001_R2_001.fastq.gz |head -12
+</code></pre>
+<pre><code>@A00836:523:HJH22DSXY:1:1101:1823:1016 2:N:0:ATGGAGGGAG+AATGGGTTAT
+GGCTCACACCTGTAATCCCAGCACTTTGGGAGGCCAAGACAGGTGAACTGCTCGAGGCCGGGAGTTTGAGACCAGCCTGGACAACATGGC
++
+FFFF,FFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFFFFFFFFFFF:FFFFFFFFFFFFFFFFFFFF,F,FFF:FFFFFFFFFF
+@A00836:523:HJH22DSXY:1:1101:1841:1016 2:N:0:ATGGAGGGAG+AATGGGTTAT
+CAGGGCCTGTTGGGGGTTGGGGGCAAGGAGAGGGAGAGCATTAGGACAAATACCTAATGTGTGTGGGGCTTAAAACCTAGATGACGGGTT
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF,FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFFFFFF
+@A00836:523:HJH22DSXY:1:1101:1949:1016 2:N:0:ATGGAGGGAG+AATGGGTTAT
+TTTTTTTTGTTCAAATGATTTTAATTATTGGAATGCACAATTTTTTTAATATGCAAATAAAAAGTTTAAAAACCAAAAAAAAAAAAAAGA
++
+FFFFFFFFFFFFFFFFF:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFF,:,:
+</code></pre>
+<h2 id="run-cellranger">Run Cellranger</h2>
+<p>Cell Ranger is a software suite developed by 10x Genomics for processing and analyzing data from their single-cell RNA-seq (scRNA-seq), single-cell ATAC-seq (scATAC-seq), and other single-cell assays. Cell Ranger performs tasks such as alignment, filtering, UMI counting, and data aggregation, streamlining the analysis of single-cell datasets generated by 10x Genomics platforms.</p>
+<p>Key Functions of <code>cellranger count</code>:</p>
+<ul>
+<li>
+<p>Preprocessing and Alignment: Cell Ranger aligns the reads to a reference genome and uses cell and UMI barcodes to assign each read to a specific cell and RNA molecule. It leverages the STAR aligner for RNA-seq data.</p>
+</li>
+<li>
+<p>UMI Counting: Once the reads are aligned, Cell Ranger aggregates UMIs per gene per cell, providing an accurate gene expression count that minimizes PCR amplification bias.</p>
+</li>
+<li>
+<p>Gene Expression Quantification: For scRNA-seq data, Cell Ranger creates a gene expression matrix with rows for genes, columns for cells, and values representing UMI counts. This matrix is foundational for downstream analysis, including cell clustering, differential expression, and pathway analysis.</p>
+</li>
+<li>
+<p>Cell Clustering and Visualization: Cell Ranger includes tools to cluster cells based on gene expression patterns and create basic visualizations (e.g., t-SNE or UMAP plots) for exploratory data analysis.</p>
+</li>
+</ul>
+<pre><code class="language-bash">%%bash
+sbatch /scratch/zt1/project/bioi611/shared/scripts/scRNA_10x_illumina_demo_cellranger.sub
+</code></pre>
+<pre><code>Submitted batch job 8653857
+</code></pre>
+<pre><code class="language-bash">%%bash
+cat /scratch/zt1/project/bioi611/shared/scripts/scRNA_10x_illumina_demo_cellranger.sub
+</code></pre>
+<pre><code>#!/bin/bash
+#SBATCH --partition=standard
+#SBATCH -t 40:00:00
+#SBATCH -n 1
+#SBATCH -c 26
+#SBATCH --mem=250g
+#SBATCH --job-name=scRNA_10x_illumina_demo_cellranger
+#SBATCH --mail-type=FAIL,BEGIN,END
+#SBATCH --error=%x-%J-%u.err
+#SBATCH --output=%x-%J-%u.out
+
+
+## Prepare the input folder 
+WORKDIR="/scratch/zt1/project/bioi611/user/$USER/scRNA_10x_illumina_demo/"
+REFERENCE="/scratch/zt1/project/bioi611/shared/reference/refdata-gex-GRCh38-2024-A"
+FASTQ_DIR=/scratch/zt1/project/bioi611/shared/raw_data/Chromium_3p_GEX_Human_PBMC_fastqs/
+
+mkdir -p $WORKDIR
+cd $WORKDIR
+export PATH=/scratch/zt1/project/bioi611/shared/software/cellranger-8.0.1/bin:$PATH
+
+cellranger count --id GEX3p_Human_PBMC       \
+             --transcriptome $REFERENCE  \
+         --create-bam true           \
+                 --fastqs $FASTQ_DIR
+</code></pre>
+<p>Input files/folder for <code>cellranger count</code>:</p>
+<ol>
+<li>
+<p>Raw fastq files</p>
+</li>
+<li>
+<p>Reference </p>
+</li>
+</ol>
+<p>In this class, the pre-built reference has been downloaded from 10x website: 
+https://www.10xgenomics.com/support/software/cell-ranger/downloads</p>
+<pre><code class="language-bash">%%bash
+ls  /scratch/zt1/project/bioi611/shared/reference/refdata-gex-GRCh38-2024-A
+ls  /scratch/zt1/project/bioi611/shared/reference/refdata-gex-GRCh38-2024-A/fasta/
+ls  /scratch/zt1/project/bioi611/shared/reference/refdata-gex-GRCh38-2024-A/genes/
+ls  /scratch/zt1/project/bioi611/shared/reference/refdata-gex-GRCh38-2024-A/star/
+cat /scratch/zt1/project/bioi611/shared/reference/refdata-gex-GRCh38-2024-A/reference.json 
+</code></pre>
+<pre><code>fasta
+genes
+reference.json
+star
+genome.fa
+genome.fa.fai
+genes.gtf.gz
+chrLength.txt
+chrNameLength.txt
+chrName.txt
+chrStart.txt
+exonGeTrInfo.tab
+exonInfo.tab
+geneInfo.tab
+Genome
+genomeParameters.txt
+SA
+SAindex
+sjdbInfo.txt
+sjdbList.fromGTF.out.tab
+sjdbList.out.tab
+transcriptInfo.tab
+{
+    "fasta_hash": "b6f131840f9f337e7b858c3d1e89d7ce0321b243",
+    "genomes": [
+        "GRCh38"
+    ],
+    "gtf_hash.gz": "432db3ab308171ef215fac5dc4ca40096099a4c6",
+    "input_fasta_files": [
+        "Homo_sapiens.GRCh38.dna.primary_assembly.fa.modified"
+    ],
+    "input_gtf_files": [
+        "gencode.v44.primary_assembly.annotation.gtf.filtered"
+    ],
+    "mem_gb": 16,
+    "mkref_version": "8.0.0",
+    "threads": 2,
+    "version": "2024-A"
+}
+</code></pre>
+<h3 id="output-folder">Output folder</h3>
+<p>The job you submitted will generate an output folder: </p>
+<pre><code class="language-bash">%%bash
+ls /scratch/zt1/project/bioi611/user/$USER/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/*
+</code></pre>
+<pre><code>/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_cmdline
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_filelist
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_finalstate
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/GEX3p_Human_PBMC.mri.tgz
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_invocation
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_jobmode
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_log
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_mrosource
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_perf
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_perf._truncated_
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_sitecheck
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_tags
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_timestamp
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_uuid
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_vdrkill
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/_versions
+
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/outs:
+analysis
+cloupe.cloupe
+filtered_feature_bc_matrix
+filtered_feature_bc_matrix.h5
+metrics_summary.csv
+molecule_info.h5
+possorted_genome_bam.bam
+possorted_genome_bam.bam.bai
+raw_feature_bc_matrix
+raw_feature_bc_matrix.h5
+web_summary.html
+
+/scratch/zt1/project/bioi611/user/xie186/scRNA_10x_illumina_demo/GEX3p_Human_PBMC/SC_RNA_COUNTER_CS:
+CELLRANGER_PREFLIGHT
+CELLRANGER_PREFLIGHT_LOCAL
+COPY_CHEMISTRY_SPEC
+fork0
+FULL_COUNT_INPUTS
+GET_AGGREGATE_BARCODES_OUT
+SC_MULTI_CORE
+_STRUCTIFY
+WRITE_GENE_INDEX
+</code></pre>
+<p>You can also find a copy here:</p>
+<pre><code>/scratch/zt1/project/bioi611/shared/output/scRNA_10x_illumina_demo
+</code></pre>
+<p>The summary file in html format is the first file you will check:</p>
+<pre><code>/scratch/zt1/project/bioi611/shared/output/scRNA_10x_illumina_demo/outs/web_summary.html
+</code></pre>
+<p>A detailed documentation can be found <a href="https://www.10xgenomics.com/support/single-cell-gene-expression/documentation/steps/sequencing/interpreting-cell-ranger-web-summary-files-for-single-cell-gene-expression-assays">here</a> to help you interpret the summary file. </p>
+<p>If there is any metrics that is not within the expectation, a warning or an error message will be shown on the top of the summary. </p>
+<p>The three files below are usually used as input for downstream analysis. </p>
+<pre><code class="language-bash">%%bash
+ls /scratch/zt1/project/bioi611/shared/output/scRNA_10x_illumina_demo/outs/filtered_feature_bc_matrix
+</code></pre>
+<pre><code>barcodes.tsv.gz
+features.tsv.gz
+matrix.mtx.gz
+</code></pre>
+<p>The folder above contains only detected cell-associated
+barcodes. Each element of the matrix is the
+number of UMIs associated with a feature
+(row) and a barcode (column.</p>
+<p>It can be input into third-party packages
+and allows users to wrangle the barcodefeature matrix (e.g. to filter outlier cells, run
+dimensionality reduction, normalize gene
+expression).</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../BIOI611_long_read_transcriptome/" class="btn btn-neutral float-left" title="Long read transcriptome"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../BIOI611_scRNA/" class="btn btn-neutral float-right" title="Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../BIOI611_long_read_transcriptome/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../BIOI611_scRNA/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Phred score in FASTQ - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Phred score in FASTQ";
+        var mkdocs_page_input_path = "Phred_FQ.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Phred score in FASTQ</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Bulk RNA-seq</li>
+      <li class="breadcrumb-item active">Phred score in FASTQ</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/Phred_FQ.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="what-is-phred-scores">What is PHRED Scores</h2>
+<p>A Phred score is a measure of the probability that a base call in a DNA sequencing read is incorrect. It is a logarithmic scale, meaning that a small change in the Phred score represents a large change in the probability of an error.</p>
+<p><span class="arithmatex">\(Q = -10 \cdot \log_{10}(P)\)</span></p>
+<p>Where:</p>
+<ul>
+<li>
+<p>Q is the PHRED score.</p>
+</li>
+<li>
+<p>P is the probability that the base was called incorrectly.</p>
+</li>
+</ul>
+<p>For example:</p>
+<ul>
+<li>
+<p><strong>Q = 20</strong>: This corresponds to a 1 in 100 probability of an incorrect base call, or an accuracy of 99%.</p>
+</li>
+<li>
+<p><strong>Q = 30</strong>: This corresponds to a 1 in 1000 probability of an incorrect base call, or an accuracy of 99.9%.</p>
+</li>
+<li>
+<p><strong>Q = 40</strong>: This corresponds to a 1 in 10,000 probability of an incorrect base call, or an accuracy of 99.99%.</p>
+</li>
+</ul>
+<pre><code class="language-R"># Print the header
+cat(sprintf(&quot;%-5s\t\t%-10s\n&quot;, &quot;Phred&quot;, &quot;Prob of&quot;))
+cat(sprintf(&quot;%-5s\t\t%-10s\n&quot;, &quot;score&quot;, &quot;Incorrect call&quot;))
+
+# Loop through Phred scores from 0 to 41
+for (phred in 0:41) {
+  cat(sprintf(&quot;%-5d\t\t%0.5f\n&quot;, phred, 10^(phred / -10)))
+}
+</code></pre>
+<pre><code>Phred       Prob of   
+score       Incorrect call
+0           1.00000
+1           0.79433
+2           0.63096
+3           0.50119
+4           0.39811
+5           0.31623
+6           0.25119
+7           0.19953
+8           0.15849
+9           0.12589
+10          0.10000
+11          0.07943
+12          0.06310
+13          0.05012
+14          0.03981
+15          0.03162
+16          0.02512
+17          0.01995
+18          0.01585
+19          0.01259
+20          0.01000
+21          0.00794
+22          0.00631
+23          0.00501
+24          0.00398
+25          0.00316
+26          0.00251
+27          0.00200
+28          0.00158
+29          0.00126
+30          0.00100
+31          0.00079
+32          0.00063
+33          0.00050
+34          0.00040
+35          0.00032
+36          0.00025
+37          0.00020
+38          0.00016
+39          0.00013
+40          0.00010
+41          0.00008
+</code></pre>
+<h2 id="what-is-ascii">What is ASCII</h2>
+<p>ASCII (American Standard Code for Information Interchange) is used to represent characters in computers. We can represent Phred scores using ASCII characters. The advantage is that the quality information can be esisly stored in text based FASTQ file.</p>
+<p>Not all <a href="https://www.columbia.edu/kermit/ascii.html">ASCII characters</a> are printable. The first printable ASCII character is <code>!</code> and the decimal code for the character for <code>!</code> is 33.</p>
+<pre><code class="language-R"># Store output in a vector to fit on a slide
+output &lt;- c(sprintf(&quot;%-8s  %-8s&quot;, &quot;Character&quot;, &quot;ASCII #&quot;))
+
+# Loop through ASCII values from 33 to 89
+for (i in 33:89) {
+  output &lt;- c(output, sprintf(&quot;%-8s  %-8d&quot;, intToUtf8(i), i))
+}
+
+# Print the output in a single block (e.g., to fit on a slide)
+cat(paste(output, collapse = &quot;\n&quot;))
+</code></pre>
+<pre><code>Character  ASCII # 
+!         33      
+"         34      
+#         35      
+$         36      
+%         37      
+&amp;         38      
+'         39      
+(         40      
+)         41      
+*         42      
++         43      
+,         44      
+-         45      
+.         46      
+/         47      
+0         48      
+1         49      
+2         50      
+3         51      
+4         52      
+5         53      
+6         54      
+7         55      
+8         56      
+9         57      
+:         58      
+;         59      
+&lt;         60      
+=         61      
+&gt;         62      
+?         63      
+@         64      
+A         65      
+B         66      
+C         67      
+D         68      
+E         69      
+F         70      
+G         71      
+H         72      
+I         73      
+J         74      
+K         75      
+L         76      
+M         77      
+N         78      
+O         79      
+P         80      
+Q         81      
+R         82      
+S         83      
+T         84      
+U         85      
+V         86      
+W         87      
+X         88      
+Y         89
+</code></pre>
+<h2 id="phred-scores-in-fastq-file">Phred scores in FASTQ file</h2>
+<p>In a FASTQ file, Phred scores are represented as ASCII characters. These characters are converted back to numeric values (PHRED scores) based on the encoding scheme used:</p>
+<ol>
+<li>
+<p><strong>PHRED+33 Encoding (Sanger/Illumina 1.8+)</strong>:</p>
+<ul>
+<li>
+<p>The ASCII character for a quality score Q is calculated as:</p>
+<p>ASCII character=chr(Q+33)</p>
+</li>
+<li>
+<p>For example:</p>
+<ul>
+<li>A PHRED score of 30 is encoded as <code>chr(30 + 33) = chr(63)</code>, which corresponds to the ASCII character <code>?</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>PHRED+64 Encoding (Illumina 1.3-1.7)</strong>:</p>
+<ul>
+<li>
+<p>The ASCII character for a quality score QQQ is calculated as:</p>
+<p>ASCII character=chr(Q+64)</p>
+</li>
+<li>
+<p>For example:</p>
+<ul>
+<li>A PHRED score of 30 is encoded as <code>chr(30 + 64) = chr(94)</code>, which corresponds to the ASCII character <code>^</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<pre><code class="language-R"># Print the header
+cat(sprintf(&quot;%-5s\t\t%-10s\t%-6s\t\t%-10s\n&quot;, &quot;Phred&quot;, &quot;Prob. of&quot;, &quot;ASCII&quot;, &quot;ASCII&quot;))
+cat(sprintf(&quot;%-5s\t\t%-10s\t%-6s\t%-10s\n&quot;, &quot;score&quot;, &quot;Error&quot;, &quot;Phred+33&quot;, &quot;Phred+64&quot;))
+
+# Loop through Phred scores from 0 to 41
+for (phred in 0:41) {
+  # Calculate the probability of error
+  prob_error &lt;- 10^(phred / -10)
+
+  # Convert Phred scores to ASCII characters
+  ascii_phred33 &lt;- intToUtf8(phred + 33)
+  ascii_phred64 &lt;- intToUtf8(phred + 64)
+
+  # Print the results in a formatted table
+  cat(sprintf(&quot;%-5d\t\t%0.5f\t\t%-6s\t\t%-10s\n&quot;,
+              phred, prob_error,
+              ascii_phred33, ascii_phred64))
+}
+</code></pre>
+<pre><code>Phred       Prob. of    ASCII       ASCII     
+score       Error       Phred+33    Phred+64  
+0           1.00000     !           @         
+1           0.79433     "           A         
+2           0.63096     #           B         
+3           0.50119     $           C         
+4           0.39811     %           D         
+5           0.31623     &amp;           E         
+6           0.25119     '           F         
+7           0.19953     (           G         
+8           0.15849     )           H         
+9           0.12589     *           I         
+10          0.10000     +           J         
+11          0.07943     ,           K         
+12          0.06310     -           L         
+13          0.05012     .           M         
+14          0.03981     /           N         
+15          0.03162     0           O         
+16          0.02512     1           P         
+17          0.01995     2           Q         
+18          0.01585     3           R         
+19          0.01259     4           S         
+20          0.01000     5           T         
+21          0.00794     6           U         
+22          0.00631     7           V         
+23          0.00501     8           W         
+24          0.00398     9           X         
+25          0.00316     :           Y         
+26          0.00251     ;           Z         
+27          0.00200     &lt;           [         
+28          0.00158     =           \         
+29          0.00126     &gt;           ]         
+30          0.00100     ?           ^         
+31          0.00079     @           _         
+32          0.00063     A           `         
+33          0.00050     B           a         
+34          0.00040     C           b         
+35          0.00032     D           c         
+36          0.00025     E           d         
+37          0.00020     F           e         
+38          0.00016     G           f         
+39          0.00013     H           g         
+40          0.00010     I           h         
+41          0.00008     J           i
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../bulkRNAseq_lab/" class="btn btn-neutral float-left" title="Read QC and alignment"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../BIOI611_introR/" class="btn btn-neutral float-right" title="Minimal R Introduction">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../bulkRNAseq_lab/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../BIOI611_introR/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

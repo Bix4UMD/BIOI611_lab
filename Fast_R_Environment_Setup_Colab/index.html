@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Fast R Environment Setup Colab - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Fast R Environment Setup Colab";
+        var mkdocs_page_input_path = "Fast_R_Environment_Setup_Colab.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Fast R Environment Setup Colab</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/Fast_R_Environment_Setup_Colab.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a href="https://colab.research.google.com/github/Bix4UMD/BIOI611_lab/blob/main/docs/Fast_R_Environment_Setup_Colab.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a></p>
+<pre><code class="language-R">
+</code></pre>
+<h1 id="speeding-up-r-package-installation-in-google-colab">🚀 Speeding Up R Package Installation in Google Colab</h1>
+<p>A Practical Strategy Using tar.gz + sessionInfo()</p>
+<p>Installing R packages in Google Colab can take a long time, especially for large packages such as Seurat, SingleR, celldex, scater, hdf5r, and others commonly used in single-cell data analysis. Since Colab sessions are temporary, all installations disappear once the session ends — forcing users to reinstall everything again.</p>
+<p>To solve this problem, we can archive the entire R library folder once, save it as a .tar.gz file, and reuse it in future sessions. With this strategy, packages load instantly — saving 15–30 minutes per session.</p>
+<h2 id="key-idea">🧠 Key Idea</h2>
+<p>Once packages are installed successfully —
+zip the .libPaths() directory and store it for reuse.</p>
+<p>In new sessions, simply untar and set the library path, and you can use R immediately — no package installation required.</p>
+<h2 id="step-1-install-packages-once">Step 1: Install Packages Once</h2>
+<pre><code class="language-R">
+</code></pre>
+<pre><code class="language-R"># Install the remotes package
+if (!requireNamespace(&quot;remotes&quot;, quietly = TRUE)) {
+  install.packages(&quot;remotes&quot;)
+}
+# Install Seurat; takes around 1 hour or so
+if (!requireNamespace(&quot;Seurat&quot;, quietly = TRUE)) {
+    remotes::install_github(&quot;satijalab/seurat&quot;, &quot;seurat5&quot;, quiet = TRUE)
+}
+# Install BiocManager
+if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+
+# Install SingleR package
+if (!require(&quot;hdf5r&quot;, quietly = TRUE)){
+    BiocManager::install(&quot;hdf5r&quot;)
+}
+# Install SingleR package
+if (!require(&quot;presto&quot;, quietly = TRUE)){
+    remotes::install_github(&quot;immunogenomics/presto&quot;)
+}
+# Install SingleR package
+if (!require(&quot;SingleR&quot;, quietly = TRUE)){
+    BiocManager::install(&quot;SingleR&quot;)
+}
+if (!require(&quot;celldex&quot;, quietly = TRUE)){
+    BiocManager::install(&quot;celldex&quot;)
+}
+if (!require(&quot;SingleCellExperiment&quot;, quietly = TRUE)){
+    BiocManager::install(&quot;SingleCellExperiment&quot;)
+}
+if (!require(&quot;scater&quot;, quietly = TRUE)){
+    BiocManager::install(&quot;scater&quot;)
+}
+if (!require(&quot;loupeR&quot;, quietly = TRUE)){
+    remotes::install_github(&quot;10xGenomics/loupeR&quot;)
+    loupeR::setup()
+}
+if (!require(&quot;DESeq2&quot;, quietly = TRUE)){
+    BiocManager::install(&quot;DESeq2&quot;)
+}
+if (!requireNamespace(&quot;EnhancedVolcano&quot;, quietly = TRUE)){
+    remotes::install_github(&quot;kevinblighe/EnhancedVolcano&quot;, upgrade=FALSE)
+}
+## Takes 37 minutes
+if (!requireNamespace(&quot;monocle3&quot;, quietly = TRUE)){
+    remotes::install_github(&quot;cole-trapnell-lab/monocle3&quot;, upgrade=FALSE)
+}
+</code></pre>
+<pre><code>Downloading GitHub repo cole-trapnell-lab/monocle3@HEAD
+
+Downloading GitHub repo bnprks/BPCells@HEAD
+
+Installing 1 packages: hexbin
+
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+
+
+
+[36m──[39m [36mR CMD build[39m [36m─────────────────────────────────────────────────────────────────[39m
+* checking for file ‘/tmp/RtmpmtNzPs/remotes5676b125db4/bnprks-BPCells-814226d/r/DESCRIPTION’ ... OK
+* preparing ‘BPCells’:
+* checking DESCRIPTION meta-information ... OK
+* cleaning src
+* running ‘cleanup’
+* checking for LF line-endings in source and make files and shell scripts
+* checking for empty or unneeded directories
+* building ‘BPCells_0.3.1.tar.gz’
+
+
+
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+
+Downloading GitHub repo cole-trapnell-lab/speedglm@HEAD
+
+
+
+[36m──[39m [36mR CMD build[39m [36m─────────────────────────────────────────────────────────────────[39m
+* checking for file ‘/tmp/RtmpmtNzPs/remotes5671182c3eb/cole-trapnell-lab-speedglm-ca34b4e/DESCRIPTION’ ... OK
+* preparing ‘speedglm’:
+* checking DESCRIPTION meta-information ... OK
+* checking for LF line-endings in source and make files and shell scripts
+* checking for empty or unneeded directories
+* looking to see if a ‘data/datalist’ file should be added
+* building ‘speedglm_0.3-4.tar.gz’
+
+
+
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+
+Installing 36 packages: proxy, wk, e1071, units, s2, classInt, warp, rbibutils, Rdpack, numDeriv, biglm, sf, spData, slider, furrr, reformulas, nloptr, minqa, statmod, tweenr, quadprog, distributional, ResidualMatrix, spdep, slam, RhpcBLASctl, rsample, pscl, pbmcapply, lme4, limma, grr, ggforce, ggdist, batchelor, assertthat
+
+Installing packages into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+
+Skipping install of 'BPCells' from a github remote, the SHA1 (814226d2) has not changed since last install.
+  Use `force = TRUE` to force installation
+
+Skipping install of 'speedglm' from a github remote, the SHA1 (ca34b4e5) has not changed since last install.
+  Use `force = TRUE` to force installation
+
+
+
+[36m──[39m [36mR CMD build[39m [36m─────────────────────────────────────────────────────────────────[39m
+* checking for file ‘/tmp/RtmpmtNzPs/remotes56712fe36cf/cole-trapnell-lab-monocle3-4f4239a/DESCRIPTION’ ... OK
+* preparing ‘monocle3’:
+* checking DESCRIPTION meta-information ... OK
+* cleaning src
+* excluding invalid files
+Subdirectory 'R' contains invalid file names:
+  ‘bpcells.R.0’
+* checking for LF line-endings in source and make files and shell scripts
+* checking for empty or unneeded directories
+Omitted ‘LazyData’ from DESCRIPTION
+* building ‘monocle3_1.4.26.tar.gz’
+
+
+
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+</code></pre>
+<h2 id="test-the-libraries">Test the libraries</h2>
+<pre><code class="language-R">library(Seurat)
+library(dplyr)
+library(SingleR)
+library(celldex)
+library(scater)
+library(SingleCellExperiment)
+library(loupeR)
+library(DESeq2)
+library(EnhancedVolcano)
+library(monocle3)
+
+</code></pre>
+<pre><code>Attaching package: ‘monocle3’
+
+
+The following object is masked from ‘package:presto’:
+
+    top_markers
+
+
+The following objects are masked from ‘package:Biobase’:
+
+    exprs, fData, fData&lt;-, pData, pData&lt;-
+</code></pre>
+<pre><code class="language-R">sessionInfo()
+</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base
+
+other attached packages:
+ [1] monocle3_1.4.26             EnhancedVolcano_1.13.2     
+ [3] ggrepel_0.9.6               DESeq2_1.50.2              
+ [5] presto_1.0.0                data.table_1.17.8          
+ [7] Rcpp_1.1.0                  hdf5r_1.3.12               
+ [9] BiocManager_1.30.27         loupeR_1.1.4               
+[11] scater_1.38.0               ggplot2_4.0.1              
+[13] scuttle_1.20.0              SingleCellExperiment_1.32.0
+[15] celldex_1.20.0              SingleR_2.12.0             
+[17] SummarizedExperiment_1.40.0 Biobase_2.70.0             
+[19] GenomicRanges_1.62.0        Seqinfo_1.0.0              
+[21] IRanges_2.44.0              S4Vectors_0.48.0           
+[23] BiocGenerics_0.56.0         generics_0.1.4             
+[25] MatrixGenerics_1.22.0       matrixStats_1.5.0          
+[27] dplyr_1.1.4                 Seurat_5.0.0               
+[29] SeuratObject_5.2.0          sp_2.2-0
+
+loaded via a namespace (and not attached):
+  [1] spatstat.sparse_3.1-0     httr_1.4.7               
+  [3] RColorBrewer_1.1-3        repr_1.1.7               
+  [5] tools_4.5.2               sctransform_0.4.2        
+  [7] alabaster.base_1.10.0     R6_2.6.1                 
+  [9] HDF5Array_1.38.0          lazyeval_0.2.2           
+ [11] uwot_0.2.4                rhdf5filters_1.22.0      
+ [13] withr_3.0.2               gridExtra_2.3            
+ [15] progressr_0.18.0          cli_3.6.5                
+ [17] textshaping_1.0.4         spatstat.explore_3.5-3   
+ [19] fastDummies_1.7.5         alabaster.se_1.10.0      
+ [21] S7_0.2.1                  spatstat.data_3.1-9      
+ [23] ggridges_0.5.7            pbapply_1.7-4            
+ [25] systemfonts_1.3.1         pbdZMQ_0.3-14            
+ [27] parallelly_1.45.1         RSQLite_2.4.4            
+ [29] ica_1.0-3                 spatstat.random_3.4-2    
+ [31] Matrix_1.7-4              ggbeeswarm_0.7.2         
+ [33] abind_1.4-8               lifecycle_1.0.4          
+ [35] yaml_2.3.10               rhdf5_2.54.0             
+ [37] SparseArray_1.10.1        BiocFileCache_3.0.0      
+ [39] Rtsne_0.17                grid_4.5.2               
+ [41] blob_1.2.4                promises_1.5.0           
+ [43] ExperimentHub_3.0.0       crayon_1.5.3             
+ [45] miniUI_0.1.2              lattice_0.22-7           
+ [47] beachmat_2.26.0           cowplot_1.2.0            
+ [49] KEGGREST_1.50.0           pillar_1.11.1            
+ [51] boot_1.3-32               future.apply_1.20.0      
+ [53] codetools_0.2-20          leiden_0.4.3.1           
+ [55] glue_1.8.0                spatstat.univar_3.1-5    
+ [57] remotes_2.5.0             Rdpack_2.6.4             
+ [59] vctrs_0.6.5               png_0.1-8                
+ [61] gypsum_1.6.0              spam_2.11-1              
+ [63] gtable_0.3.6              cachem_1.1.0             
+ [65] rbibutils_2.4             S4Arrays_1.10.0          
+ [67] mime_0.13                 reformulas_0.4.2         
+ [69] survival_3.8-3            fitdistrplus_1.2-4       
+ [71] ROCR_1.0-11               nlme_3.1-168             
+ [73] bit64_4.6.0-1             alabaster.ranges_1.10.0  
+ [75] filelock_1.0.3            RcppAnnoy_0.0.22         
+ [77] irlba_2.3.5.1             vipor_0.4.7              
+ [79] KernSmooth_2.23-26        otel_0.2.0               
+ [81] DBI_1.2.3                 tidyselect_1.2.1         
+ [83] processx_3.8.6            bit_4.6.0                
+ [85] compiler_4.5.2            curl_7.0.0               
+ [87] httr2_1.2.1               BiocNeighbors_2.4.0      
+ [89] h5mread_1.2.0             desc_1.4.3               
+ [91] DelayedArray_0.36.0       plotly_4.11.0            
+ [93] scales_1.4.0              lmtest_0.9-40            
+ [95] callr_3.7.6               rappdirs_0.3.3           
+ [97] stringr_1.6.0             digest_0.6.38            
+ [99] goftest_1.2-3             minqa_1.2.8              
+[101] spatstat.utils_3.2-0      alabaster.matrix_1.10.0  
+[103] XVector_0.50.0            htmltools_0.5.8.1        
+[105] pkgconfig_2.0.3           base64enc_0.1-3          
+[107] lme4_1.1-37               sparseMatrixStats_1.22.0 
+[109] dbplyr_2.5.1              fastmap_1.2.0            
+[111] rlang_1.1.6               htmlwidgets_1.6.4        
+[113] shiny_1.11.1              DelayedMatrixStats_1.32.0
+[115] farver_2.1.2              zoo_1.8-14               
+[117] jsonlite_2.0.0            BiocParallel_1.44.0      
+[119] BiocSingular_1.26.0       magrittr_2.0.4           
+[121] dotCall64_1.2             patchwork_1.3.2          
+[123] Rhdf5lib_1.32.0           IRkernel_1.3.2           
+[125] viridis_0.6.5             reticulate_1.44.1        
+[127] stringi_1.8.7             alabaster.schemas_1.10.0 
+[129] MASS_7.3-65               AnnotationHub_4.0.0      
+[131] plyr_1.8.9                pkgbuild_1.4.8           
+[133] parallel_4.5.2            listenv_0.10.0           
+[135] deldir_2.0-4              Biostrings_2.78.0        
+[137] IRdisplay_1.1             splines_4.5.2            
+[139] tensor_1.5.1              locfit_1.5-9.12          
+[141] ps_1.9.1                  igraph_2.2.1             
+[143] uuid_1.2-1                spatstat.geom_3.6-0      
+[145] RcppHNSW_0.6.0            reshape2_1.4.5           
+[147] ScaledMatrix_1.18.0       BiocVersion_3.22.0       
+[149] evaluate_1.0.5            nloptr_2.2.1             
+[151] httpuv_1.6.16             RANN_2.6.2               
+[153] tidyr_1.3.1               purrr_1.2.0              
+[155] polyclip_1.10-7           future_1.68.0            
+[157] scattermore_1.2           rsvd_1.0.5               
+[159] xtable_1.8-4              RSpectra_0.16-2          
+[161] later_1.4.4               viridisLite_0.4.2        
+[163] ragg_1.5.0                tibble_3.3.0             
+[165] memoise_2.0.1             beeswarm_0.4.0           
+[167] AnnotationDbi_1.72.0      cluster_2.1.8.1          
+[169] globals_0.18.0
+</code></pre>
+<pre><code class="language-R">sessionInfo() %&gt;% capture.output(file = &quot;sessionInfo.txt&quot;)
+
+</code></pre>
+<pre><code class="language-R">system(&quot;tar -czf BIOI611_custom_R_lib_Nov_2025.tar.gz $(Rscript -e 'cat(.libPaths()[1])') sessionInfo.txt&quot;,
+          intern = TRUE)
+</code></pre>
+<pre><code class="language-R">cat(system(&quot;du -sh BIOI611_custom_R_lib_Nov_2025.tar.gz&quot;, intern = TRUE), &quot;\n&quot;)
+</code></pre>
+<pre><code>462M    BIOI611_custom_R_lib_Nov_2025.tar.gz
+</code></pre>
+<h2 id="benefits-of-this-strategy">🧪 Benefits of This Strategy</h2>
+<table>
+<thead>
+<tr>
+<th>Advantage</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>⚡ Fast setup</td>
+<td>Skip reinstallation entirely</td>
+</tr>
+<tr>
+<td>🧬 Reproducible</td>
+<td><code>sessionInfo.txt</code> records environment</td>
+</tr>
+<tr>
+<td>📦 Portable</td>
+<td>Share with students / collaborators</td>
+</tr>
+<tr>
+<td>🔁 Works for HPC &amp; Docker</td>
+<td>Same approach applies</td>
+</tr>
+<tr>
+<td>🧠 Perfect for teaching</td>
+<td>Students get a ready-to-use environment</td>
+</tr>
+</tbody>
+</table>
+<p>🎯 Final Thoughts</p>
+<p>This strategy turns Google Colab into a time-saving environment for Bioinformatics, especially when teaching Seurat, SingleR, RNA-seq, and scRNA-seq analysis. Instead of wasting time installing packages repeatedly, we can build reproducible, sharable environments that load in seconds.</p>
+<p>⚠️ Caveats &amp; Limitations</p>
+<p>While this strategy significantly speeds up R setup in Google Colab, there are a few important considerations:</p>
+<ol>
+<li>Colab Environment May Change</li>
+</ol>
+<p>Google Colab updates its system frequently. If the base R version changes (R --version), some previously archived packages might become incompatible.
+Solution: Always save sessionInfo() and compare it when restoring. If R version or system libraries changed, reinstall only affected packages.</p>
+<ol>
+<li>Large File Size</li>
+</ol>
+<p>The archive (tar.gz) may become 500 MB+ depending on how many packages are installed.
+Solutions:</p>
+<p>Only archive custom packages instead of the full directory.</p>
+<p>Use selective backup:</p>
+<pre><code>tar -czf custom_packages.tar.gz $(Rscript -e 'cat(.libPaths()[1])')
+</code></pre>
+<ol>
+<li>Some Packages Depend on System Libraries</li>
+</ol>
+<p>Packages like hdf5r, Seurat, irlba, rlang, vctrs need system-level dependencies.
+When restoring in a different environment (e.g., HPC or Docker), these dependencies may be missing.
+Solution: If an error occurs, reinstall only the missing package:</p>
+<pre><code>install.packages(&quot;hdf5r&quot;)
+</code></pre>
+<ol>
+<li>Not Suitable for CRAN Submission / Production Pipelines</li>
+</ol>
+<p>This strategy is ideal for teaching, workshops, demos, and temporary sessions, but not for official reproducibility pipelines.
+For long-term research or publication, use:</p>
+<p>Better Alternative  Advantages
+Docker / Singularity    Full system reproducibility
+Renviron + renv Tracks package versions
+Conda environment   Cross-language compatibility
+5. Must Reset .libPaths() Every Session</p>
+<p>Colab resets everything after reboot. You must set the library path again:</p>
+<p>.libPaths("/usr/local/lib/R/site-library")</p>
+<ol>
+<li>Cannot Use for Multiple R Versions</li>
+</ol>
+<p>If you switch to R-4.4.0, previously archived packages for R-4.3.1 may fail.
+Solution: Include R version in filename:
+R4.3_Libraries_with_info.tar.gz</p>
+<ol>
+<li>Metadata Required for Collaboration</li>
+</ol>
+<p>If sharing with students/collaborators, include:</p>
+<p>sessionInfo.txt</p>
+<p>installed_packages.csv</p>
+<p>A short README.md with restore instructions</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

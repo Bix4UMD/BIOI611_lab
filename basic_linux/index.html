@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Basic Linux - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Basic Linux";
+        var mkdocs_page_input_path = "basic_linux.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Basic Linux</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#navigating-in-linux-file-system">Navigating in Linux file system</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#path">Path</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#relative-and-absolute-path">Relative and absolute path</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#check-where-you-are-using-command-pwd">Check where you are using command pwd</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#listing-the-contents-using-command-ls">Listing the contents using command ls</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#change-directory-using-command-cd">Change directory using command cd</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#manipulations-of-files-and-directories">Manipulations of files and directories</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#command-line-cp">Command line cp</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#command-line-mv">Command line mv</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#command-mkdir">Command mkdir</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#command-rm">Command rm</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#view-text-files-in-linux">View text files in Linux</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#commands-cat-more-and-less">Commands cat, more and less</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#command-head-and-tail">Command head and tail</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#auto-completion">Auto-completion</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#file-permissions">File permissions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#disk-usage-of-files-and-directories">Disk Usage of Files and Directories</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#symbolic-link">Symbolic link</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#file-management-and-data-handling">File Management and Data Handling</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#compressing-and-decompressing-files-gzip-gunzip-tar">Compressing and decompressing files (gzip, gunzip, tar).</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#transferring-files-within-the-network">Transferring files within the network</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#file-searching-filtering-and-text-processing">File searching, filtering, and text processing</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#command-find">Command find</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#text-data-counts-wc">Text data counts wc</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pipe">Pipe |</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#column-filering">Column filering</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#row-filtering">Row filtering</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#text-processing">Text processing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#regular-expressions">Regular Expressions</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#an-example-of-the-command-line-used">An example of the command line used</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#environment-variables">Environment variables</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#commonly-used-environment-variables">Commonly Used Environment Variables:</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#setting-environment-variables">Setting Environment Variables:</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#software-installation">Software installation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#installation-via-conda">Installation via Conda</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#installation-via-source-code-manual-compilation">Installation via Source Code (Manual Compilation)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#using-container-for-bioinformatics-tools">Using Container for Bioinformatics Tools</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#understanding-containers-and-using-singularity">Understanding Containers and Using Singularity</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#text-editor-in-linux">Text editor in Linux</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#basic-vi-skills">Basic vi skills</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#create-new-text-file-with-vi">Create new text file with vi</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#high-performance-computing-hpc-for-bioinformatics">High-Performance Computing (HPC) for Bioinformatics</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#basics-of-hpc-clusters-and-job-schedulers-slurm">Basics of HPC clusters and job schedulers (SLURM).</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#check-quota-infomation">Check quota infomation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#view-information-about-slurm-nodes-and-partitions">View information about Slurm nodes and partitions.</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#check-partitial-information">Check partitial information</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#display-node-config-information">Display node config information</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#view-information-about-jobs-located-in-the-slurm-scheduling-queue">View information about jobs located in the Slurm scheduling queue.</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#cancel-a-job">Cancel a job</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Get ready for the course</li>
+      <li class="breadcrumb-item active">Basic Linux</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/basic_linux.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="linux-for-bioinformatics">Linux for Bioinformatics</h1>
+<h2 id="navigating-in-linux-file-system">Navigating in Linux file system</h2>
+<p>You are in your home directory after you log into the system and are directed to the shell command prompt. This section will show you hot to explore Linux file system using shell commands.</p>
+<h3 id="path">Path</h3>
+<p>To understand Linux file system, you can image it as a tree structure. </p>
+<p><img alt="image.png" src="../basic_linux_files/9aa63990-e065-4ee7-aee6-c0e56c67cc38.png" /></p>
+<p>In Linux, a path is a unique location of a file or a directory in the file system.</p>
+<p>For convenience, Linux file system is usually thought of in a tree structure. On a standard Linux system you will find the layout generally follows the scheme presented below.</p>
+<p>The tree of the file system starts at the trunk or slash, indicated by a forward slash (<code>/</code>). This directory, containing all underlying directories and files, is also called the root directory or “the root” of the file system. </p>
+<pre><code class="language-bash">%%bash
+## In your account, you will see a folder
+## with you account ID as the name
+cd ~
+echo $HOME
+</code></pre>
+<pre><code>/home/xie186
+</code></pre>
+<h3 id="relative-and-absolute-path">Relative and absolute path</h3>
+<ul>
+<li><strong>Absolute path</strong></li>
+</ul>
+<p>An absolute path is defined as the location of a file or directory from the root directory(/). An absolute path starts from the <code>root</code> of the tree (<code>/</code>).</p>
+<p>Here are some examples: </p>
+<pre><code>/home/xie186
+/home/xie186/.bashrc
+</code></pre>
+<ul>
+<li><strong>Relative path</strong></li>
+</ul>
+<p>Relative path is a path related to the present working directory: 
+<code>data/sample1/</code> and <code>../doc/</code>. </p>
+<p>If you want to get the <strong>absolute path</strong> based on <strong>relative path</strong>, you can use <code>readlink</code> with parameter <code>-f</code>: </p>
+<pre><code>pwd
+readlink -f ../
+</code></pre>
+<p>Once we enter into a Linux file system, we need to 1) know where we are; 2) how to get where we want; 3) how to know what files or directories we have in a particular path. </p>
+<h3 id="check-where-you-are-using-command-pwd">Check where you are using command <code>pwd</code></h3>
+<p>In order to know where we are, we need to use <code>pwd</code> command. The command <code>pwd</code> is short for “print name of current/working directory”. It will return the full path of current directory.</p>
+<p>Command pwd is almost always used by itself. This means you only need to type <code>pwd</code> and press ENTER </p>
+<pre><code class="language-bash">%%bash
+pwd
+</code></pre>
+<h3 id="listing-the-contents-using-command-ls">Listing the contents using command <code>ls</code></h3>
+<p>After you know where you are, then you want to know what you have in that 
+directory, we can use command <code>ls</code> to list directory contents </p>
+<p>Its syntax is:</p>
+<pre><code>ls [option]... [file]...
+
+</code></pre>
+<p><code>ls</code> with no option will list files and directories in bare format. Bare format means the detailed information (type, size, modified date and time, permissions and links etc) won’t be viewed. When you use <code>ls</code>  by itself, it will list files and directories in the current directory. </p>
+<pre><code>ls ~/
+ls -a 
+ls -ld
+</code></pre>
+<p>Linux command options can be combined without a space between them and with a single - (dash).</p>
+<p>The following command is a faster way to use the l and a options and gives the same output as the Linux command shown above.</p>
+<pre><code class="language-python">ls -lt ~/.bashrc
+</code></pre>
+<pre><code>-rw-r--r--. 1 xie186 zt-bioi611 1067 Aug 22 22:27 /home/xie186/.bashrc
+</code></pre>
+<pre><code class="language-python">
+</code></pre>
+<pre><code class="language-python">
+</code></pre>
+<h3 id="change-directory-using-command-cd">Change directory using command <code>cd</code></h3>
+<p>Unlike <code>pwd</code>, when you use <code>cd</code> you usually need to provide the path (either absolute or relative path) which we want to enter. </p>
+<p>If you didn’t provide any path information, you will change to home directory by default.</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Shortcuts</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single dot</td>
+<td>.</td>
+<td>The current folder</td>
+</tr>
+<tr>
+<td>Double dots</td>
+<td>..</td>
+<td>The folder above the current folder</td>
+</tr>
+<tr>
+<td>Tilde character</td>
+<td>~</td>
+<td>Home directory (normally the directory:/home/my_login_name)</td>
+</tr>
+<tr>
+<td>Dash</td>
+<td>-</td>
+<td>Your last working directory</td>
+</tr>
+</tbody>
+</table>
+<p>Here are some examples:</p>
+<pre><code>cd ~
+pwd
+ls
+ls ../
+## 
+pwd
+cd ../
+pwd
+cd ./
+pwd
+</code></pre>
+<p>Each directory has two entries in it at the start, with names <code>.</code> (a link to itself) and <code>..</code> (a link to its parent directory). The exception, of course, is the root directory, where the <code>..</code> directory also refers to the root directory.</p>
+<p>Sometimes you go to a new directory and do something, then you remember that you need to go to the previous working direcotry. To get back instantly, use a dash.</p>
+<pre><code class="language-bash">%%bash 
+
+# This is our current directory
+pwd
+
+# Let us go our home diretory
+cd ~
+
+# Check where we are
+pwd
+
+# Let us go to your previous working directory
+cd -
+# Check where we are now
+pwd
+</code></pre>
+<pre><code>/home/xie186/BIOI611_lab/docs
+/home/xie186
+/home/xie186/BIOI611_lab/docs
+/home/xie186/BIOI611_lab/docs
+</code></pre>
+<h2 id="manipulations-of-files-and-directories">Manipulations of files and directories</h2>
+<p>In Linux, manipulations of files and directories are the most frequent work. In this section, you will learn how to copy, rename, remove, and create files and directories.</p>
+<h3 id="command-line-cp">Command line <code>cp</code></h3>
+<p>In Linux, command <code>cp</code> can help you copy files and directories into a target directory.</p>
+<h3 id="command-line-mv">Command line <code>mv</code></h3>
+<p>Move files/folders and rename file/folders using <code>mv</code>:</p>
+<pre><code># move file from one location to another
+mv file1 target_direcotry/
+# rename
+mv file1 file2 
+mv file1 file2 file3 target_direcotry/
+
+</code></pre>
+<h3 id="command-mkdir">Command <code>mkdir</code></h3>
+<p>The syntax is shown as below:</p>
+<pre><code>mkdir [OPTION ...] DIRECTORY ...
+</code></pre>
+<p>Multiple directories can be specified when calling <code>mkdir</code></p>
+<pre><code>mkdir directory1 directory2
+mkdir -p foo/bar/baz
+</code></pre>
+<p>How to defining complex directory trees with one command: </p>
+<pre><code>mkdir -p project/{software,results,doc/{html,info,pdf},scripts}
+
+</code></pre>
+<p>Then you can view the directory using <code>tree</code>. </p>
+<h3 id="command-rm">Command <code>rm</code></h3>
+<p>You can use rm to remove both files and directories.</p>
+<pre><code>## You can remove one file. 
+rm file1 
+## `rm` can remove multiple files simutaneously
+rm file2 file3 
+</code></pre>
+<p>You can also use 'rm' to remove a folder. If a folder is empty, you can remove it using rm with <code>-r</code>.</p>
+<pre><code>rm -r FOLDER
+</code></pre>
+<p>If a folder is not empty, you can remove it using rm with <code>-r</code> and <code>-f</code>.</p>
+<pre><code>mkdir test_folder
+rm -r test_folder
+</code></pre>
+<h2 id="view-text-files-in-linux">View text files in Linux</h2>
+<h3 id="commands-cat-more-and-less">Commands <code>cat</code>, <code>more</code> and <code>less</code></h3>
+<p>The command cat is short for concatenate files and print on the standard output.</p>
+<p>The syntax is shown as below:</p>
+<pre><code>cat [OPTION]... [FILE]...
+</code></pre>
+<p>For small text file, cat can be used to view the files on the standard output.</p>
+<p>The command more is old utility. When the text passed to it is too large to fit on one screen, it pages it. You can scroll down but not up.</p>
+<p>The syntaxt of <code>more</code> is shown below:</p>
+<pre><code>more [options] file [...]
+</code></pre>
+<p>The command less was written by a man who was fed up with more’s inability to scroll backwards through a file. He turned less into an open source project and over time, various individuals added new features to it. less is massive now. That’s why some small embedded systems have more but not less. For comparison, less’s source is over 27000 lines long. more implementations are generally only a little over 2000 lines long.</p>
+<p>The syntaxt of less is shown below:</p>
+<pre><code>less [options] file [...]
+</code></pre>
+<h3 id="command-head-and-tail">Command <code>head</code> and <code>tail</code></h3>
+<p>The command <code>head</code> is used to output the first part of files. By default, it outputs the first 10 lines of the file. </p>
+<pre><code>head [OPTION]... [FILE]...
+</code></pre>
+<p>Here is an exmaple of printing the first 5 files of the file: </p>
+<pre><code>head -n 5 code_perl/variable_assign.pl
+</code></pre>
+<p>In fact, the letter n does not even need to be used at all. Just the hyphen and the integer (with no intervening space) are sufficient to tell head how many lines to return. Thus, the following would produce the same result as the above commands:</p>
+<pre><code>head -5 target_file.txt
+</code></pre>
+<p>The command <code>tail</code> is used to output the last part of files. By default, it prints the last 10 lines of the file to standard output.</p>
+<p>The syntax is shown below:</p>
+<pre><code>tail [OPTION]... [FILE]...
+</code></pre>
+<p>Here is an exmaple of printing the last 5 files of the file: </p>
+<pre><code>tail -5 target_file.txt
+</code></pre>
+<p>To view lines from a specific point in a file, you can use <code>-n +NUMBER</code> with the <code>tail</code> command. For example, here is an example of viewing the file from the 2nd line of the line. </p>
+<pre><code>tail -n +2 target_file.txt
+</code></pre>
+<pre><code class="language-python">
+</code></pre>
+<h2 id="auto-completion">Auto-completion</h2>
+<p>In most Shell environment, programmable completion feature will also improve your speed of typing. It permits typing a partial name of command or a partial file (or directory), then pressing <code>TAB</code> key to auto-complete the command. If there are more than one possible completions, then TAB will list all of them. </p>
+<p>A handy autocomplete feature also exists. Type one or more letters, press the Tab key twice, and then a list of functions   starting with these letters appears. For example: type <code>so</code>, press the <code>Tab</code> key twice, and then you get the list as: </p>
+<pre><code>soelim        sort          sotruss       soundstretch  source        
+</code></pre>
+<p>Demonstration of programmable completion feature.</p>
+<h2 id="file-permissions">File permissions</h2>
+<p>In Linux, file permissions are a vital aspect of system security and resource management. This is particularly important in bioinformatics, where large datasets and scripts are often shared across teams. Permissions determine who can read, write, or execute a file, ensuring that critical data is not accidentally modified or deleted.</p>
+<p><strong>Three Permission Categories</strong>:</p>
+<ul>
+<li>User (u): The owner of the file.</li>
+<li>Group (g): A group of users who share access to the file.</li>
+<li>Other (o): All other users on the system.</li>
+</ul>
+<p><strong>Permission Types</strong> :</p>
+<ul>
+<li>Read (r): Ability to view the contents of a file.</li>
+<li>Write (w): Ability to modify or delete the file.</li>
+<li>Execute (x): Ability to run the file as a program (for scripts or executables).</li>
+</ul>
+<pre><code class="language-bash">%%bash
+groups $USER animako eunal gstewar1 mjames17 mjeakle nmilza rahooper
+</code></pre>
+<pre><code>xie186 : zt-bioi611 zt-bioi611_mgr
+animako : zt-bioi611
+eunal : zt-bioi611
+gstewar1 : zt-bioi611
+mjames17 : zt-bioi611
+mjeakle : zt-bioi611
+nmilza : zt-bioi611
+rahooper : zt-bioi611
+</code></pre>
+<pre><code class="language-bash">%%bash
+mkdir -p ~/test_permission/
+touch ~/test_permission/test.txt
+ls -l ~/test_permission/
+rm -rf ~/test_permission/
+</code></pre>
+<pre><code>total 0
+-rw-r--r--. 1 xie186 zt-bioi611 0 Sep  8 22:52 test.txt
+</code></pre>
+<p>Here, the first character represents the type of file (e.g., <code>-</code> for a regular file or <code>d</code> for a directory), followed by three groups of three characters, each representing the permissions for the <code>user</code>, <code>group</code>, and <code>others</code>, respectively. </p>
+<p>Examples:</p>
+<p><code>-rwxr-xr--</code>: The <code>owner</code> has <code>read</code>, <code>write</code>, and <code>execute</code> permissions. The group has <code>read</code> and <code>execute</code> permissions, while others can only read the file.
+<code>drwxr-x---</code>: A directory where the owner can read, write, and access (execute). The group can only read and access, while others have no permissions.</p>
+<p>Modify file permissions using the <code>chmod</code> command. Permissions can be set in two ways:</p>
+<p>Symbolic Mode:</p>
+<p>In symbolic mode, you modify permissions by referencing the categories (user, group, other) and specifying whether you're adding (+), removing (-), or setting (=) permissions.</p>
+<pre><code># Add execute permission for the user:
+chmod u+x filename
+# Remove write permission for the group:
+chmod g-w filename
+# Set read-only permission for others:
+chmod o=r filename
+</code></pre>
+<p>Symbolic mode is intuitive and flexible, especially when you want to make precise adjustments to permissions without affecting other categories. This is useful for common file-sharing tasks in bioinformatics where you need to tweak access for specific collaborators.</p>
+<p>Numeric Mode (Octal representation):
+<code>In numeric mode, file permissions are set using a three-digit number. Each digit represents the permissions for</code>user<code>,</code>group<code>, and</code>other<code>, respectively. The digits are calculated by adding the values of the</code>read<code>,</code>write<code>, and</code>execute` permissions:</p>
+<ul>
+<li>Read (r) = 4</li>
+<li>Write (w) = 2</li>
+<li>Execute (x) = 1</li>
+</ul>
+<p>Example Permission Breakdown:</p>
+<p>Read (r), Write (w), and Execute (x) for user = 7</p>
+<p>Read (r) and Execute (x) for group = 5</p>
+<p>Read (r) only for others = 4</p>
+<pre><code>chmod 754 filename
+</code></pre>
+<p>An example to help you understand <code>executable</code>: </p>
+<pre><code class="language-bash">%%bash
+printf '#!/user/bin/python\nprint(&quot;Hello, Welcome to Course BIOI611!&quot;)' &gt; ~/test.py
+</code></pre>
+<pre><code class="language-bash">%%bash
+ls -l ~/test.py
+python ~/test.py
+</code></pre>
+<pre><code>-rw-r--r--. 1 xie186 zt-bioi611 61 Sep  8 23:06 /home/xie186/test.py
+Hello, Welcome to Course BIOI611!
+</code></pre>
+<p>Error message below will be thrown out if you consider <code>~/test.py</code> as a program: </p>
+<pre><code>bash: line 1: /home/xie186/test.py: No such file or directory
+</code></pre>
+<pre><code class="language-bash">%%bash
+chmod u+x ~/test.py
+ls -l ~/test.py
+python ~/test.py
+rm ~/test.py
+</code></pre>
+<pre><code>-rwxr--r--. 1 xie186 zt-bioi611 61 Sep  8 23:06 /home/xie186/test.py
+Hello, Welcome to Course BIOI611!
+</code></pre>
+<h2 id="disk-usage-of-files-and-directories">Disk Usage of Files and Directories</h2>
+<p>The Linux <code>du</code> (short for Disk Usage) is a standard Unix/Linux command, used to check the information of disk usage of files and directories on a machine. The du command has many parameter options that can be used to get the results in many formats. The <code>du</code> command also displays the files and directory sizes in a recursively manner.</p>
+<pre><code class="language-bash">%%bash
+du -h ~/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref
+</code></pre>
+<pre><code>2.5G    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref
+</code></pre>
+<pre><code class="language-bash">%%bash
+du -ah ~/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref
+</code></pre>
+<pre><code>2.9M    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/sjdbList.fromGTF.out.tab
+7.5K    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/Log.out
+936M    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/SA
+1.5G    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/SAindex
+3.0M    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/transcriptInfo.tab
+2.3M    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/sjdbList.out.tab
+1.5M    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/geneInfo.tab
+1.0K    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/genomeParameters.txt
+512 /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/chrLength.txt
+512 /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/chrNameLength.txt
+512 /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/chrStart.txt
+7.6M    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/exonGeTrInfo.tab
+3.1M    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/exonInfo.tab
+2.8M    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/sjdbInfo.txt
+512 /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/chrName.txt
+119M    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref/Genome
+2.5G    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref
+</code></pre>
+<pre><code class="language-bash">%%bash
+du -csh /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/*
+</code></pre>
+<pre><code>19G /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/raw_data
+0   /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/raw_data_smart_seq
+1.5K    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/s1_download_data.sub
+575K    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/s1_download_smart_seq-7478223-xie186.err
+0   /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/s1_download_smart_seq-7478223-xie186.out
+8.5K    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/s1_download_smart_seq.sub
+2.5K    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/s2_star.sub
+34G /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_align
+2.5G    /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/STAR_ref
+512 /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/test.sub
+512 /home/xie186/scratch.bioi611/Analysis/bulk_RNAseq/test.txt
+55G total
+</code></pre>
+<h2 id="symbolic-link">Symbolic link</h2>
+<p>Symbolic link, similar to shortcuts, can point to another file/folder. </p>
+<pre><code>ln -s &lt;path_to_files/folder_to_be_linked&gt; &lt;symlink_to_be_created&gt;
+ls -l &lt;symlink&gt;
+unlink &lt;symlink&gt;
+
+</code></pre>
+<h2 id="file-management-and-data-handling">File Management and Data Handling</h2>
+<h3 id="compressing-and-decompressing-files-gzip-gunzip-tar">Compressing and decompressing files (gzip, gunzip, tar).</h3>
+<p>Compress one file: </p>
+<pre><code class="language-bash">%%bash 
+perl -e 'for($i=0; $i&lt;10000; ++$i){ print &quot;test\n&quot;;}' &gt; test.txt 
+du -h test.txt
+gzip test.txt
+du -h test.txt.gz
+gunzip test.txt
+ls test.txt
+rm test.txt
+</code></pre>
+<pre><code>52K test.txt
+4.0K    test.txt.gz
+test.txt
+</code></pre>
+<pre><code class="language-python">Compress multiple files: 
+</code></pre>
+<pre><code class="language-bash">%%bash 
+perl -e 'for($i=0; $i&lt;10000; ++$i){ print &quot;test\n&quot;;}' &gt; test1.txt 
+perl -e 'for($i=0; $i&lt;10000; ++$i){ print &quot;test\n&quot;;}' &gt; test2.txt
+du -h test1.txt test2.txt
+tar zcvf test.tar.gz test1.txt test2.txt
+du -sh test.tar.gz
+ls test1.txt test2.txt
+</code></pre>
+<pre><code>52K test1.txt
+52K test2.txt
+test1.txt
+test2.txt
+4.0K    test.tar.gz
+test1.txt
+test2.txt
+</code></pre>
+<p><code>z</code>: This option tells tar to compress the archive using gzip. The resulting archive will have a .gz extension to indicate that it has been compressed with the gzip utility.</p>
+<p><code>c</code>: This option stands for create. It instructs tar to create a new archive.</p>
+<p><code>v</code>: This stands for verbose. When used, tar will display detailed information about the files being added to the archive, such as their names.</p>
+<p><code>f</code>: This stands for file. It tells tar that the next argument (test.tar.gz) is the name of the archive file to create.</p>
+<pre><code class="language-bash">%%bash
+tar tvf test.tar.gz
+rm test.tar.gz test1.txt test2.txt
+</code></pre>
+<pre><code>-rw-r--r-- xie186/zt-bioi611 50000 2024-08-25 21:52 test1.txt
+-rw-r--r-- xie186/zt-bioi611 50000 2024-08-25 21:52 test2.txt
+</code></pre>
+<p><code>t</code>: List the contents of archive.tar.</p>
+<p><code>v</code>: Display additional details about each file (like file permissions, size, and modification date).</p>
+<p><code>f</code>: Specifies that archive.tar is the archive file to operate on.</p>
+<p>To uncompress a <code>tar.gz</code> file, use <code>tar zxvf</code>:</p>
+<pre><code>tar zxvf test.tar.gz
+</code></pre>
+<h3 id="transferring-files-within-the-network">Transferring files within the network</h3>
+<p>Basic Syntax of <code>scp</code>:</p>
+<pre><code>scp [options] source destination
+
+</code></pre>
+<p>Copy a Local File to a Remote Server</p>
+<pre><code class="language-python"></code></pre>
+<p>scp file.txt username@remote_host:/path/to/destination/</p>
+<pre><code></code></pre>
+<p>Alternative command is <code>rsync</code>. </p>
+<h2 id="file-searching-filtering-and-text-processing">File searching, filtering, and  text processing</h2>
+<h3 id="command-find">Command <code>find</code></h3>
+<p>The <code>find</code> command is designed for comprehensive file and directory sesarches. </p>
+<pre><code>find [path] [options] [expression]
+</code></pre>
+<pre><code class="language-bash">%%bash
+find /home/xie186/scratch/bioi611/bulk_RNAseq -name &quot;*.fastq.gz&quot;
+</code></pre>
+<pre><code>/home/xie186/scratch/bioi611/bulk_RNAseq/raw_data/N2_day7_rep3.fastq.gz
+/home/xie186/scratch/bioi611/bulk_RNAseq/raw_data/N2_day1_rep3.fastq.gz
+/home/xie186/scratch/bioi611/bulk_RNAseq/raw_data/N2_day1_rep1.fastq.gz
+/home/xie186/scratch/bioi611/bulk_RNAseq/raw_data/N2_day7_rep1.fastq.gz
+/home/xie186/scratch/bioi611/bulk_RNAseq/raw_data/N2_day1_rep2.fastq.gz
+/home/xie186/scratch/bioi611/bulk_RNAseq/raw_data/N2_day7_rep2.fastq.gz
+</code></pre>
+<h3 id="text-data-counts-wc">Text data counts <code>wc</code></h3>
+<pre><code class="language-bash">%%bash
+find /home/xie186/scratch/bioi611/bulk_RNAseq -name &quot;*.fastq.gz&quot; |wc -l 
+</code></pre>
+<pre><code>6
+</code></pre>
+<h3 id="pipe">Pipe <code>|</code></h3>
+<p>In Linux and Unix-based systems, the pipe (<code>|</code>) is used in the command line to redirect the output of one command as the input to another command. This allows you to chain commands together and perform more complex tasks in a single line.</p>
+<pre><code class="language-bash">%%bash
+grep '&gt;' ~/scratch/bioi611/reference/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa  |wc -l 
+</code></pre>
+<pre><code>7
+</code></pre>
+<h3 id="column-filering">Column filering</h3>
+<p>Command <code>cut</code> can be used to print selected parts of lines from each FILE to standard output.</p>
+<pre><code class="language-bash">%%bash
+wget -O GSE164073_raw_counts_GRCh38.p13_NCBI.tsv.gz &quot;https://ncbi.nlm.nih.gov/geo/download/?type=rnaseq_counts&amp;acc=GSE102537&amp;format=file&amp;file=GSE102537_raw_counts_GRCh38.p13_NCBI.tsv.gz&quot;
+</code></pre>
+<pre><code>--2024-08-25 21:08:03--  https://ncbi.nlm.nih.gov/geo/download/?type=rnaseq_counts&amp;acc=GSE102537&amp;format=file&amp;file=GSE102537_raw_counts_GRCh38.p13_NCBI.tsv.gz
+Resolving ncbi.nlm.nih.gov (ncbi.nlm.nih.gov)... 2607:f220:41e:4290::110, 130.14.29.110
+Connecting to ncbi.nlm.nih.gov (ncbi.nlm.nih.gov)|2607:f220:41e:4290::110|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 349584 (341K) [application/octet-stream]
+Saving to: ‘GSE164073_raw_counts_GRCh38.p13_NCBI.tsv.gz’
+
+     0K .......... .......... .......... .......... .......... 14% 6.66M 0s
+    50K .......... .......... .......... .......... .......... 29% 16.9M 0s
+   100K .......... .......... .......... .......... .......... 43% 27.5M 0s
+   150K .......... .......... .......... .......... .......... 58% 10.1M 0s
+   200K .......... .......... .......... .......... .......... 73% 17.2M 0s
+   250K .......... .......... .......... .......... .......... 87% 37.6M 0s
+   300K .......... .......... .......... .......... .         100% 10.5M=0.02s
+
+2024-08-25 21:08:04 (13.4 MB/s) - ‘GSE164073_raw_counts_GRCh38.p13_NCBI.tsv.gz’ saved [349584/349584]
+</code></pre>
+<pre><code class="language-bash">%%bash
+zcat GSE164073_raw_counts_GRCh38.p13_NCBI.tsv.gz |head 
+</code></pre>
+<pre><code>GeneID  GSM2740270  GSM2740272  GSM2740273  GSM2740274  GSM2740275
+100287102   9   17  14  14  19
+653635  336 470 467 310 370
+102466751   8   56  46  31  31
+107985730   0   2   2   3   3
+100302278   0   1   0   0   2
+645520  0   3   8   4   7
+79501   0   2   2   1   4
+100996442   16  25  34  20  28
+729737  19  39  33  22  26
+</code></pre>
+<pre><code class="language-bash">%%bash
+zcat GSE164073_raw_counts_GRCh38.p13_NCBI.tsv.gz |cut -f1,2,3 |head 
+</code></pre>
+<pre><code>GeneID  GSM2740270  GSM2740272
+100287102   9   17
+653635  336 470
+102466751   8   56
+107985730   0   2
+100302278   0   1
+645520  0   3
+79501   0   2
+100996442   16  25
+729737  19  39
+</code></pre>
+<h3 id="row-filtering">Row filtering</h3>
+<pre><code class="language-bash">%%bash
+grep '&gt;' ~/scratch/bioi611/reference/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa 
+</code></pre>
+<pre><code>&gt;I dna:chromosome chromosome:WBcel235:I:1:15072434:1 REF
+&gt;II dna:chromosome chromosome:WBcel235:II:1:15279421:1 REF
+&gt;III dna:chromosome chromosome:WBcel235:III:1:13783801:1 REF
+&gt;IV dna:chromosome chromosome:WBcel235:IV:1:17493829:1 REF
+&gt;V dna:chromosome chromosome:WBcel235:V:1:20924180:1 REF
+&gt;X dna:chromosome chromosome:WBcel235:X:1:17718942:1 REF
+&gt;MtDNA dna:chromosome chromosome:WBcel235:MtDNA:1:13794:1 REF
+</code></pre>
+<pre><code class="language-bash">%%bash
+zcat GSE164073_raw_counts_GRCh38.p13_NCBI.tsv.gz |wc -l 
+zcat GSE164073_raw_counts_GRCh38.p13_NCBI.tsv.gz |awk '$2&gt;500' |wc -l 
+zcat GSE164073_raw_counts_GRCh38.p13_NCBI.tsv.gz |awk '$2&gt;500 &amp;&amp; $3&gt;500' |wc -l 
+</code></pre>
+<pre><code>39377
+8773
+3820
+</code></pre>
+<h3 id="text-processing">Text processing</h3>
+<pre><code class="language-bash">%%bash
+grep '&gt;' ~/scratch/bioi611/reference/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa |sed 's/&gt;//' |sed 's/ .*//'
+</code></pre>
+<pre><code>I
+II
+III
+IV
+V
+X
+MtDNA
+</code></pre>
+<h3 id="regular-expressions">Regular Expressions</h3>
+<p>Regular expressions are sequences of characters that define search patterns. They are commonly used for string matching, searching, and text processing.</p>
+<p>Regex is used in text editors, programming languages, command-line tools (like<code>grep</code> and <code>sed</code>), and many bioinformatics tools to search, replace, or extract data from text.</p>
+<ul>
+<li>Metacharacters: Special characters that have specific meanings in regex syntax.
+<code>.</code> (dot): Matches any single character except a newline.
+Example: <code>A.G</code> matches "AAG", "ATG", "ACG", etc.</li>
+</ul>
+<p><code>^</code>: Matches the start of a line.
+Example: <code>^A</code> matches any line starting with "A".</p>
+<p><code>$</code>: Matches the end of a line.
+Example: <code>end$</code> matches any line ending with "end".</p>
+<p><code>*</code>: Matches 0 or more occurrences of the preceding character.
+Example: <code>ca*t</code> matches "ct", "cat", "caat", "caaat", etc.</p>
+<p><code>+</code>: Matches 1 or more occurrences of the preceding character.
+Example: <code>ca+t</code> matches "cat", "caat", "caaat", etc.</p>
+<p><code>?</code>: Matches 0 or 1 occurrence of the preceding character.
+Example: <code>colou?r</code> matches both "color" and "colour".</p>
+<p><code>[]</code>: Matches any one of the characters inside the brackets.
+Example: <code>[aeiou]</code> matches any vowel.</p>
+<p><code>|</code>: Alternation (OR) operator.
+Example: <code>cat|dog</code> matches either "cat" or "dog".</p>
+<ul>
+<li>Character Classes: Represents a set of characters.</li>
+</ul>
+<p><code>\d</code>: Matches any digit (equivalent to [0-9]).</p>
+<p><code>\w</code>: Matches any word character (alphanumeric or underscore).</p>
+<p><code>\s</code>: Matches any whitespace character (spaces, tabs, etc.).</p>
+<p><code>\D</code>: Matches any non-digit character.</p>
+<p><code>\W</code>: Matches any non-word character.</p>
+<p><code>\S</code>: Matches any non-whitespace character.</p>
+<ul>
+<li>Quantifiers: Specify the number of occurrences to match</li>
+</ul>
+<p><code>{n}</code>: Matches exactly n occurrences.
+Example: A{3} matches "AAA".</p>
+<p><code>{n,}</code>: Matches n or more occurrences.
+Example: T{2,} matches "TT", "TTT", "TTTT", etc.</p>
+<p><code>{n,m}</code>: Matches between n and m occurrences.
+Example: G{1,3} matches "G", "GG", or "GGG".</p>
+<h3 id="an-example-of-the-command-line-used">An example of the command line used</h3>
+<pre><code class="language-bash">%%bash
+grep -v '#' ~/scratch/bioi611/reference/Caenorhabditis_elegans.WBcel235.111.gtf \
+       |awk '$3==&quot;gene&quot;' \
+       |sed 's/.*gene_biotype &quot;//' \
+       |sed 's/&quot;;//'|sort |uniq -c \
+       | sort -k1,1n
+</code></pre>
+<pre><code>     22 rRNA
+    100 antisense_RNA
+    129 snRNA
+    194 lincRNA
+    261 miRNA
+    346 snoRNA
+    634 tRNA
+   2128 pseudogene
+   7764 ncRNA
+  15363 piRNA
+  19985 protein_coding
+</code></pre>
+<h2 id="environment-variables">Environment variables</h2>
+<p>Environment variables are dynamic values that affect the behavior of processes and programs in Linux. They are commonly used to store configuration data and are essential in bioinformatics workflows for defining paths to software, libraries, and datasets.</p>
+<h3 id="commonly-used-environment-variables">Commonly Used Environment Variables:</h3>
+<ul>
+<li><code>PATH</code>:</li>
+</ul>
+<p>The <code>PATH</code> variable specifies directories where the system looks for executable files when a command is run.</p>
+<pre><code class="language-bash">%%bash
+echo $PATH
+</code></pre>
+<pre><code>/cvmfs/hpcsw.umd.edu/spack-software/2023.11.20/views/2023/linux-rhel8-zen2/gcc@11.3.0/python-3.10.10/compiler/linux-rhel8-zen2/gcc/11.3.0/texlive/bin/x86_64-linux:/cvmfs/hpcsw.umd.edu/spack-software/2023.11.20/views/2023/linux-rhel8-zen2/gcc@11.3.0/python-3.10.10/compiler/linux-rhel8-zen2/gcc/11.3.0/imagemagick/bin:/cvmfs/hpcsw.umd.edu/spack-software/2023.11.20/views/2023/linux-rhel8-zen2/gcc@11.3.0/python-3.10.10/compiler/linux-rhel8-zen2/gcc/11.3.0/graphviz/bin:/cvmfs/hpcsw.umd.edu/spack-software/2023.11.20/views/2023/linux-rhel8-zen2/gcc@11.3.0/python-3.10.10/compiler/linux-rhel8-zen2/gcc/11.3.0/ghostscript/bin:/cvmfs/hpcsw.umd.edu/spack-software/2023.11.20/views/2023/linux-rhel8-zen2/gcc@11.3.0/python-3.10.10/compiler/linux-rhel8-zen2/gcc/11.3.0/ffmpeg/bin:/cvmfs/hpcsw.umd.edu/spack-software/2023.11.20/views/2023/linux-rhel8-zen2/gcc@11.3.0/python-3.10.10/mpi-nocuda/linux-rhel8-zen2/gcc/11.3.0/bin:/cvmfs/hpcsw.umd.edu/spack-software/2023.11.20/views/2023/linux-rhel8-zen2/gcc@11.3.0/python-3.10.10/nompi-nocuda/linux-rhel8-zen2/gcc/11.3.0/bin:/cvmfs/hpcsw.umd.edu/spack-software/2023.11.20/views/2023/linux-rhel8-zen2/gcc@11.3.0/python-3.10.10/compiler/linux-rhel8-zen2/gcc/11.3.0/bin:/cvmfs/hpcsw.umd.edu/spack-software/2023.11.20/linux-rhel8-x86_64/gcc-rh8-8.5.0/gcc-11.3.0-oedkmii7vhd6rbnqm6xufmg7d3jx4w6l/bin:/cvmfs/hpcsw.umd.edu/spack-software/2023.11.20/linux-rhel8-zen2/gcc-11.3.0/py-jupyter-1.0.0-trwwgzwljql55mhmaygcuxb3nvaevjsu/bin:/software/acigs-utilities/bin:/home/xie186/miniforge3/bin:/home/xie186/miniforge3/condabin:/home/xie186/SHELL.bioi611/software/STAR_2.7.11b/Linux_x86_64_static:/home/xie186/.local/bin:/home/xie186/bin:/software/acigs-utilities/bin:/usr/share/Modules/bin:/usr/lib/heimdal/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/symas/bin:/opt/dell/srvadmin/bin
+</code></pre>
+<ul>
+<li><code>HOME</code>:</li>
+</ul>
+<p>The <code>HOME</code> variable stores the path to the user’s home directory.</p>
+<pre><code class="language-bash">%%bash
+echo $HOME
+</code></pre>
+<pre><code>/home/xie186
+</code></pre>
+<pre><code class="language-bash">%%bash
+echo $SHELL
+</code></pre>
+<pre><code>/bin/bash
+</code></pre>
+<h3 id="setting-environment-variables">Setting Environment Variables:</h3>
+<p>Temporarily setting a variable (valid only for the current shell session):</p>
+<pre><code>export PATH=value:PATH
+</code></pre>
+<p>Permanently setting a variable:</p>
+<p>To make the environment variable persistent across sessions,
+it needs to be added to configuration files like <code>.bashrc</code> or <code>.bash_profile</code>.
+Example: Add the following line to <code>.bashrc</code>:</p>
+<h2 id="software-installation">Software installation</h2>
+<h3 id="installation-via-conda">Installation via Conda</h3>
+<p>Conda is a popular package management system, especially in bioinformatics,
+due to its ability to create isolated environments. This is crucial when working with tools that have conflicting dependencies.</p>
+<ol>
+<li>Install <code>conda/miniforge</code> </li>
+</ol>
+<p>Go to: https://github.com/conda-forge/miniforge/releases
+Download the corresponding installtion file</p>
+<pre><code class="language-bash">%%bash
+uname -m
+</code></pre>
+<pre><code>x86_64
+</code></pre>
+<pre><code>wget https://github.com/conda-forge/miniforge/releases/download/24.7.1-0/Mambaforge-24.7.1-0-Linux-x86_64.sh
+</code></pre>
+<ol>
+<li>Create conda environment and install software</li>
+</ol>
+<pre><code>conda create -n bioi611
+conda activate bioi611
+conda install bioconda::fastqc==0.11.8
+</code></pre>
+<h3 id="installation-via-source-code-manual-compilation">Installation via Source Code (Manual Compilation)</h3>
+<pre><code>git clone https://github.com/lh3/bwa.git
+cd bwa; make
+./bwa index ref.fa
+</code></pre>
+<h3 id="using-container-for-bioinformatics-tools">Using Container for Bioinformatics Tools</h3>
+<h4 id="understanding-containers-and-using-singularity">Understanding Containers and Using Singularity</h4>
+<ol>
+<li>What Are Containers?</li>
+</ol>
+<p>Containers are lightweight, portable environments that bundle software and all its dependencies so that it runs consistently on any system.</p>
+<p>Think of a container as a "self-contained laboratory" — it has all the reagents (software, libraries, dependencies) you need, already prepared.</p>
+<p>In Bioinformatics, where different tools depend on specific versions of Python, R, or system libraries, containers ensure:</p>
+<ul>
+<li>
+<p>Reproducibility: The same tool produces the same results on any computer or HPC.</p>
+</li>
+<li>
+<p>Portability: You can run the same environment locally, in the cloud, or on a supercomputer.</p>
+</li>
+<li>
+<p>Isolation: Tools run in separate environments, avoiding conflicts between software packages.</p>
+</li>
+<li>
+<p>Docker vs. Singularity</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Docker</th>
+<th>Singularity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Designed for</td>
+<td>Cloud, local systems</td>
+<td>HPC, clusters</td>
+</tr>
+<tr>
+<td>Requires root privileges</td>
+<td>Yes</td>
+<td>No (runs safely in user space)</td>
+</tr>
+<tr>
+<td>Image format</td>
+<td><code>.tar</code> / <code>.img</code> (Docker images)</td>
+<td><code>.sif</code> (Singularity Image File)</td>
+</tr>
+<tr>
+<td>Integration with HPC</td>
+<td>Limited</td>
+<td>Excellent</td>
+</tr>
+<tr>
+<td>Common in</td>
+<td>DevOps, cloud platforms</td>
+<td>Research, bioinformatics, academia</td>
+</tr>
+</tbody>
+</table>
+<p>Most High-Performance Computing (HPC) systems do not allow Docker because it requires root privileges.
+Instead, they use Singularity, which can pull Docker images and convert them into a format that’s safe for HPC environments.</p>
+<ol>
+<li>Why Use Containers in Bioinformatics?</li>
+</ol>
+<p>Bioinformatics tools often require:</p>
+<ul>
+<li>
+<p>Complex dependencies (e.g., different versions of glibc, python, boost, etc.)</p>
+</li>
+<li>
+<p>Conflicting library versions</p>
+</li>
+<li>
+<p>Long installation times</p>
+</li>
+</ul>
+<p>Using containers solves these issues. For example:</p>
+<ul>
+<li>
+<p>You can use Biocontainers — prebuilt containers with thousands of bioinformatics tools.</p>
+</li>
+<li>
+<p>Each container is tested and version-controlled.</p>
+</li>
+<li>
+<p>No need to install software manually.</p>
+</li>
+<li>
+<p>Example: Using Singularity to Run TrimGalore</p>
+</li>
+</ul>
+<p><code>TrimGalore</code> is a widely used tool for quality-control sequencing data. It combines Cutadapt and FastQC to trim adapters and assess read quality.</p>
+<p>Instead of manually installing it, we can use a pre-built Biocontainer.</p>
+<p>Step 1. Load Singularity on the HPC</p>
+<p>On most HPC systems, Singularity is provided as a module:</p>
+<pre><code>module load singularity
+</code></pre>
+<p>Step 2. Build a Singularity Image from a Docker Container</p>
+<p>The BioContainers project provides many pre-built Docker images for bioinformatics tools.
+Singularity can directly convert these Docker images into a Singularity Image File (.sif) suitable for HPC use:</p>
+<pre><code>singularity build trimgalore_v0.6.10.sif docker://quay.io/biocontainers/trim-galore:0.6.10--hdfd78af_0
+
+</code></pre>
+<p>This command downloads the Docker image from Quay.io and converts it into a local <code>.sif</code> file.</p>
+<p>Step 3. Run TrimGalore from the Container</p>
+<p>You can run commands inside the container using <code>singularity exec</code>. For example, to check that TrimGalore is available:</p>
+<pre><code>singularity exec  trimgalore_v0.6.10.sif  trim_galore --help
+</code></pre>
+<p>If you want to run the tool on data located in your project directory, bind-mount the directory so that it’s accessible inside the container:</p>
+<pre><code>singularity exec -B /scratch/zt1/project/bioi611/  trimgalore_v0.6.10.sif trim_galore --help
+</code></pre>
+<p>The <code>-B</code> option (short for <code>bind</code>) makes the specified directory available inside the container.</p>
+<p>Step 4. (Optional) Enter the Container for an Interactive Session</p>
+<pre><code>singularity exec -B /scratch/zt1/project/bioi611/  trimgalore_v0.6.10.sif /bin/bash
+</code></pre>
+<p>From there, you can directly run commands as if TrimGalore were installed on your system.</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Command Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Load Singularity</td>
+<td><code>module load singularity</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Build the image</td>
+<td><code>singularity build trimgalore_v0.6.10.sif docker://quay.io/biocontainers/trim-galore:0.6.10--hdfd78af_0</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Run the tool</td>
+<td><code>singularity exec trimgalore_v0.6.10.sif trim_galore --help</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Interactive mode</td>
+<td><code>singularity exec -B /scratch/... trimgalore_v0.6.10.sif /bin/bash</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="text-editor-in-linux">Text editor in Linux</h2>
+<p>In Linux, we sometimes need to create or edit a text file like writing a new perl script. So we need to use text editor. </p>
+<p>As a newbie, someone would prefer a basic, GUI-based text editor with menus and traditional CUA key bindings. Here we recommend <a href="https://www.sublimetext.com/">Sublime</a>, <a href="https://atom.io">ATOM</a> and <a href="https://notepad-plus-plus.org/">Notepad++</a>. </p>
+<p>But GUI-based text editor is not always available in Linux. </p>
+<p>A powerful screen text editor <code>vi</code> (pronounced “vee-eye”) is available on nearly all Linux system. We highly recommend <code>vi</code> as a text editor, because something we’ll have to edit a text file on a system without a friendlier text editor. Once we get familiar with <code>vi</code>, we’ll find that it’s very fast and powerful. </p>
+<p>But remember, it’s OK if you think this part is too difficult at the beginning. You can use either <code>Sublime</code>, <code>ATOM</code> or <code>Notepad++</code>. If you are connecting to a Linux system without <code>Sublime</code>, <code>ATOM</code> and <code>Notepad++</code>, you can write the file in a local computer and then upload the file onto Linux system. </p>
+<h3 id="basic-vi-skills">Basic <code>vi</code> skills</h3>
+<p>As <code>vi</code> uses a lot of combination of keystrokes, it may be not easy for newbies to remember all the combinations in one fell swoop. Considering this, we’ll first introduce the basic skills someone needs to know to use <code>vi</code>. We need to first understand how three modes of <code>vi</code> work and then try to remember a few basic <code>vi</code> commonds. Then we can use these skills to write Perl or R scripts in the following chaptors for Perl and R (Figure \@ref(fig:workingModeVi)). </p>
+<p>Three modes of <code>vi</code>:</p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/b131eb16-373a-4e68-b773-e5d3daa9f443" /></p>
+<h3 id="create-new-text-file-with-vi">Create new text file with <code>vi</code></h3>
+<pre><code>mkdir test_vi  ## generate a new folder
+cd test_vi     ## go into the new folder
+echo &quot;Using \`ls\` we don't expect files in this folder.&quot;
+ls 
+echo &quot;No file displayed!&quot;
+</code></pre>
+<p>Using the code above, we made a new directory named <code>test_vi</code>. We didn't see any file. </p>
+<p>If we type <code>vi test.py</code>, an empty file and screen are created into which you may enter text because the file does not exist((Figure \@ref(fig:ViNewFile))).</p>
+<pre><code>vi test.py
+</code></pre>
+<p>A screentshot of the <code>vi test.py</code>.</p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/c5340078-a488-4451-9ddf-b29091801304" /></p>
+<p>Now if you are in <code>vi mode</code>. To go to <code>Input mode</code>, you can type <code>i</code>, 'a' or 'o' (Figure \@ref(fig:ViInpuMode)). </p>
+<p>Now you can type the content (codes or other information) (\@ref(fig:ViInpuType)).</p>
+<p>Once you are done typing. You need to go to <code>Command mode</code>(Figure \@ref(fig:workingModeVi)) if you want to save and exit the file. To do this, you need to press <code>ESC</code> button on the keyboard. </p>
+<p>Now we just wrote a Perl script. We can run this script. </p>
+<pre><code>
+python test.py
+</code></pre>
+<h2 id="high-performance-computing-hpc-for-bioinformatics">High-Performance Computing (HPC) for Bioinformatics</h2>
+<p>HPC resources enable bioinformatics analyses that require significant computational power and memory.</p>
+<h3 id="basics-of-hpc-clusters-and-job-schedulers-slurm">Basics of HPC clusters and job schedulers (SLURM).</h3>
+<p>An example of an job file (<code>s1_star.sh</code>): </p>
+<pre><code>#!/bin/bash
+#SBATCH --partition=standard
+#SBATCH -t 40:00:00
+#SBATCH -n 1
+#SBATCH -c 20
+#SBATCH --job-name=s1_star_aln
+#SBATCH --mail-type=FAIL,BEGIN,END
+#SBATCH --error=%x-%J-%u.err
+#SBATCH --output=%x-%J-%u.out
+conda activate bioi611
+mkdir -p STAR_align/
+STAR --genomeDir STAR_ref \
+    --outSAMtype BAM SortedByCoordinate \
+    --twopassMode Basic \
+    --quantMode TranscriptomeSAM GeneCounts \
+    --readFilesCommand zcat \
+    --outFileNamePrefix STAR_align/N2_day1_rep1. \
+    --runThreadN 20 \
+    --readFilesIn raw_data/N2_day1_rep1.fastq.gz
+</code></pre>
+<p>To submit this job, run:</p>
+<pre><code>sbatch s1_star.sh
+</code></pre>
+<h3 id="check-quota-infomation">Check quota infomation</h3>
+<pre><code class="language-bash">%%bash
+scratch_quota
+# shell_quota
+</code></pre>
+<pre><code># Group quotas
+          Group name     Space used    Space quota   % quota used
+          zt-bioi611     285.811 MB       4.000 TB          0.01%
+      zt-bioi611_mgr      98.163 GB      unlimited              0
+               total      98.449 GB      unlimited              0
+# User quotas
+           User name     Space used    Space quota   % quota used  % of GrpTotal
+              xie186      98.449 GB      unlimited              0        100.00%
+</code></pre>
+<h3 id="view-information-about-slurm-nodes-and-partitions">View information about Slurm nodes and partitions.</h3>
+<pre><code class="language-bash">%%bash
+sinfo
+</code></pre>
+<pre><code>PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+debug        up      15:00      1  maint compute-b8-60
+debug        up      15:00      1   drng compute-b8-57
+debug        up      15:00      1    mix compute-b8-59
+debug        up      15:00      1  alloc compute-b8-58
+scavenger    up 14-00:00:0      1  inval compute-b8-48
+scavenger    up 14-00:00:0      4 drain$ compute-b8-[53-56]
+scavenger    up 14-00:00:0     84  maint compute-a7-[5,9,14-16,28,49],compute-a8-[2-4,8-9,15,18,22,24,29,37,44,51],compute-b5-[4,16,26,29-30,33,44,51-52],compute-b6-[7,12,21,28-29,32,34,43-46,50-51,59],compute-b7-[12-13,19-22,25,27,29,31,35,37,39,42,45-46,49-50,54,56-59],compute-b8-[16,19,21,23-24,29,32,35-37,39-45,60]
+scavenger    up 14-00:00:0      2 drain* compute-a7-[13,43]
+scavenger    up 14-00:00:0     13   drng compute-a8-[7,14],compute-b7-[14-15,18,38,43-44],compute-b8-[2,20,51,57],gpu-b9-5
+scavenger    up 14-00:00:0      2  drain compute-a7-8,gpu-b10-5
+scavenger    up 14-00:00:0    182    mix bigmem-a9-[1-2,4-5],compute-a5-[3-11],compute-a7-[2-3,6-7,10,12,17-19,21-22,30,38-40,45-46,48,54-56,60],compute-a8-[5-6,10-12,16-17,19-21,25,28,31-35,39,41,45,47,50,52,54,57-59],compute-b5-[1-3,5-8,11,13-15,17-25,27-28,31-32,34-43,45-50,53-55,57-58],compute-b6-[1-5,14-15,17-20,22-24,35-36,48-49,52,54],compute-b7-[1,7-8,16-17,23-24,26,28,30,32-34,36,40-41,47-48,51-52,55,60],compute-b8-[1,15,17-18,22,25-27,30-31,33,46-47,49-50,59],gpu-b9-[1-4,6-7],gpu-b10-[1-3,6-7],gpu-b11-[1-6]
+scavenger    up 14-00:00:0     93  alloc bigmem-a9-[3,6],compute-a7-[1,4,11,20,23-27,29,31-37,41-42,44,47,50-53,57-59],compute-a8-[1,13,23,26-27,30,36,38,40,42-43,46,48-49,53,55-56,60],compute-b5-[9-10,12,56,59-60],compute-b6-[6,8-11,13,16,27,30-31,58,60],compute-b7-[2-6,9-11,53],compute-b8-[3-14,28,34,38,52,58],gpu-b10-4
+scavenger    up 14-00:00:0     14   idle compute-b6-[25-26,33,37-42,47,53,55-57]
+standard*    up 7-00:00:00      1  inval compute-b8-48
+standard*    up 7-00:00:00      4 drain$ compute-b8-[53-56]
+standard*    up 7-00:00:00     82  maint compute-a7-[5,9,14-16,28,49],compute-a8-[2-4,8-9,15,18,22,24,29,37,44,51],compute-b5-[4,16,26,29-30,33,44,51-52],compute-b6-[7,12,21,28-29,32,34,43-46,50-51],compute-b7-[12-13,19-22,25,27,29,31,35,37,39,42,45-46,49-50,54,56-59],compute-b8-[16,19,21,23-24,29,32,35-37,39-45]
+standard*    up 7-00:00:00      2 drain* compute-a7-[13,43]
+standard*    up 7-00:00:00     11   drng compute-a8-[7,14],compute-b7-[14-15,18,38,43-44],compute-b8-[2,20,51]
+standard*    up 7-00:00:00      1  drain compute-a7-8
+standard*    up 7-00:00:00    159    mix compute-a5-[3-11],compute-a7-[2-3,6-7,10,12,17-19,21-22,30,38-40,45-46,48,54-56,60],compute-a8-[5-6,10-12,16-17,19-21,25,28,31-35,39,41,45,47,50,52,54,57-59],compute-b5-[1-3,5-8,11,13-15,17-25,27-28,31-32,34-43,45-50,53-55,57-58],compute-b6-[1-5,14-15,17-20,22-24,35-36,48-49,52],compute-b7-[1,7-8,16-17,23-24,26,28,30,32-34,36,40-41,47-48,51-52,55,60],compute-b8-[1,15,17-18,22,25-27,30-31,33,46-47,49-50]
+standard*    up 7-00:00:00     87  alloc compute-a7-[1,4,11,20,23-27,29,31-37,41-42,44,47,50-53,57-59],compute-a8-[1,13,23,26-27,30,36,38,40,42-43,46,48-49,53,55-56,60],compute-b5-[9-10,12,56,59-60],compute-b6-[6,8-11,13,16,27,30-31],compute-b7-[2-6,9-11,53],compute-b8-[3-14,28,34,38,52]
+standard*    up 7-00:00:00     10   idle compute-b6-[25-26,33,37-42,47]
+serial       up 14-00:00:0      1  maint compute-b6-59
+serial       up 14-00:00:0      1    mix compute-b6-54
+serial       up 14-00:00:0      2  alloc compute-b6-[58,60]
+serial       up 14-00:00:0      4   idle compute-b6-[53,55-57]
+gpu          up 7-00:00:00      1  down$ gpu-a6-3
+gpu          up 7-00:00:00      1   drng gpu-b9-5
+gpu          up 7-00:00:00      1  drain gpu-b10-5
+gpu          up 7-00:00:00     19    mix gpu-a6-[6,8],gpu-b9-[1-4,6-7],gpu-b10-[1-3,6-7],gpu-b11-[1-6]
+gpu          up 7-00:00:00      1  alloc gpu-b10-4
+gpu          up 7-00:00:00      6   idle gpu-a5-1,gpu-a6-[2,4-5,7,9]
+bigmem       up 7-00:00:00      4    mix bigmem-a9-[1-2,4-5]
+bigmem       up 7-00:00:00      2  alloc bigmem-a9-[3,6]
+</code></pre>
+<h3 id="check-partitial-information">Check partitial information</h3>
+<pre><code class="language-bash">%%bash
+scontrol show partition standard
+</code></pre>
+<pre><code>PartitionName=standard
+   AllowGroups=ALL AllowAccounts=ALL AllowQos=ALL
+   AllocNodes=ALL Default=YES QoS=N/A
+   DefaultTime=00:15:00 DisableRootJobs=NO ExclusiveUser=NO GraceTime=0 Hidden=NO
+   MaxNodes=UNLIMITED MaxTime=7-00:00:00 MinNodes=0 LLN=NO MaxCPUsPerNode=UNLIMITED MaxCPUsPerSocket=UNLIMITED
+   Nodes=compute-a5-[3-11],compute-a7-[1-60],compute-a8-[1-60],compute-b5-[1-60],compute-b6-[1-52],compute-b7-[1-60],compute-b8-[1-56]
+   PriorityJobFactor=1 PriorityTier=1 RootOnly=NO ReqResv=NO OverSubscribe=YES:4
+   OverTimeLimit=NONE PreemptMode=REQUEUE
+   State=UP TotalCPUs=45696 TotalNodes=357 SelectTypeParameters=NONE
+   JobDefaults=(null)
+   DefMemPerNode=UNLIMITED MaxMemPerNode=UNLIMITED
+   TRES=cpu=45696,mem=178500G,node=357,billing=45696
+   TRESBillingWeights=CPU=1.0,Mem=0.25G
+</code></pre>
+<h3 id="display-node-config-information">Display node config information</h3>
+<pre><code class="language-bash">%%bash
+scontrol show node compute-a5-3
+</code></pre>
+<pre><code>NodeName=compute-a5-3 Arch=x86_64 CoresPerSocket=64 
+   CPUAlloc=71 CPUEfctv=128 CPUTot=128 CPULoad=68.89
+   AvailableFeatures=rhel8,amd,epyc_7702,ib
+   ActiveFeatures=rhel8,amd,epyc_7702,ib
+   Gres=(null)
+   NodeAddr=compute-a5-3 NodeHostName=compute-a5-3 Version=23.11.9
+   OS=Linux 4.18.0-553.5.1.el8_10.x86_64 #1 SMP Tue May 21 03:13:04 EDT 2024 
+   RealMemory=512000 AllocMem=296960 FreeMem=326630 Sockets=2 Boards=1
+   State=MIXED ThreadsPerCore=1 TmpDisk=300000 Weight=1 Owner=N/A MCS_label=N/A
+   Partitions=scavenger,standard 
+   BootTime=2024-08-08T18:32:48 SlurmdStartTime=2024-08-12T17:43:23
+   LastBusyTime=2024-08-12T17:43:19 ResumeAfterTime=None
+   CfgTRES=cpu=128,mem=500G,billing=128
+   AllocTRES=cpu=71,mem=290G
+   CapWatts=n/a
+   CurrentWatts=630 AveWatts=294
+   ExtSensorsJoules=n/a ExtSensorsWatts=0 ExtSensorsTemp=n/a
+</code></pre>
+<p>CPU Details:
+* Total CPUs: 128
+* Allocated CPUs: 71</p>
+<p>Memory:
+* Total Memory: 500 GB
+* Allocated Memory: 290 GB
+* Free Memory: ~319 GB</p>
+<h3 id="view-information-about-jobs-located-in-the-slurm-scheduling-queue">View information about jobs located in the Slurm scheduling queue.</h3>
+<pre><code class="language-bash">%%bash
+squeue -u $USER
+</code></pre>
+<pre><code>             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           7563417  standard sys/dash   xie186  R      48:15      1 compute-a5-5
+</code></pre>
+<h3 id="cancel-a-job">Cancel a job</h3>
+<pre><code class="language-bash">%%bash
+scancel &lt;JOBID&gt;
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../bulkRNAseq_lab/" class="btn btn-neutral float-right" title="Read QC and alignment">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+    
+      <span><a href="../bulkRNAseq_lab/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

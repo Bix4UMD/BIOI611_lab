@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Long read transcriptome - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Long read transcriptome";
+        var mkdocs_page_input_path = "BIOI611_long_read_transcriptome.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Long read transcriptome</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#download-the-data">Download the data</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#analyze-the-data-using-wf-transcriptomes">Analyze the data using wf-transcriptomes</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#download-the-tool">Download the tool</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#install-conda">Install conda</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#run-wf-transcriptome-on-the-demo-datasets">Run wf-transcriptome on the demo datasets</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#run-wf-transcriptome-on-the-direct-rna-sequencing-data-from-c-elegans">Run wf-transcriptome on the direct RNA sequencing data from C. elegans</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#basecalling-optional">Basecalling [Optional]</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#basecalling-using-guppy">Basecalling using Guppy</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#find-the-corresponding-model">Find the corresponding model</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_1"></a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#basecalling-using-guppy_1">Basecalling using Guppy</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#quality-based-output-directories">Quality-Based Output Directories</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Bulk RNA-seq</li>
+      <li class="breadcrumb-item active">Long read transcriptome</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/BIOI611_long_read_transcriptome.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a href="https://colab.research.google.com/github/Bix4UMD/BIOI611_lab/blob/main/docs/BIOI611_long_read_transcriptome.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a></p>
+<h1 id="analysis-of-long-read-transcriptome-data">Analysis of long read transcriptome data</h1>
+<p>In this lab, you are going to analyze the direct RNA data published on Genome Research in 2020. The title of the paper is: <a href="https://genome.cshlp.org/content/30/2/299.full">The full-length transcriptome of C. elegans using direct RNA sequencing</a>.</p>
+<h2 id="download-the-data">Download the data</h2>
+<p>You can go the <code>Data access</code> section of the paper here: https://genome.cshlp.org/content/30/2/299.full</p>
+<ul>
+<li>
+<p>Go to: https://www.ncbi.nlm.nih.gov/</p>
+</li>
+<li>
+<p>Search <code>PRJEB31791</code></p>
+</li>
+<li>
+<p>Click <code>SRA</code> link</p>
+</li>
+<li>
+<p>Click the first item in the search results</p>
+</li>
+<li>
+<p>Click the link: <a href="https://trace.ncbi.nlm.nih.gov/Traces/?view=study&amp;acc=ERP114391">ERP114391</a></p>
+</li>
+<li>
+<p>Right click on the fastq files to obtain the FTP URL</p>
+</li>
+</ul>
+<p>Then you can use <code>wget</code> to download the fastq files.</p>
+<p>The data for <code>L1</code> and <code>adult male</code> samples has been downloaded and saved on the HPC cluster:</p>
+<pre><code>/scratch/zt1/project/bioi611/shared/raw_data/ONT_directRNA/L1_rep1.fastq.gz
+/scratch/zt1/project/bioi611/shared/raw_data/ONT_directRNA/L1_rep2.fastq.gz
+/scratch/zt1/project/bioi611/shared/raw_data/ONT_directRNA/male_rep1.fastq.gz
+/scratch/zt1/project/bioi611/shared/raw_data/ONT_directRNA/male_rep2.fastq.gz
+</code></pre>
+<h2 id="analyze-the-data-using-wf-transcriptomes">Analyze the data using <code>wf-transcriptomes</code></h2>
+<p><code>wf-transcriptomes</code> is a cDNA and RNA sequencing data analysis workflow that leverages long nanopore reads, providing a detailed view of the transcriptome.</p>
+<h3 id="download-the-tool">Download the tool</h3>
+<p>https://github.com/epi2me-labs/wf-transcriptomes</p>
+<p>Path: <code>/scratch/zt1/project/bioi611/shared/software/wf-transcriptomes-1.4.0/main.nf</code></p>
+<h3 id="install-conda">Install conda</h3>
+<p>Miniforge is a minimal installer for Conda specific to conda-forge. Miniforge allows users to install the conda package manager with the following features pre-configured: conda-forge set as the default (and only) channel.</p>
+<pre><code>rm -rf miniforge3
+wget &quot;https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh&quot;
+bash Miniforge3-$(uname)-$(uname -m).sh
+</code></pre>
+<h3 id="run-wf-transcriptome-on-the-demo-datasets">Run <code>wf-transcriptome</code> on the demo datasets</h3>
+<p>The workflow <code>wf-transcriptome</code> has a demo datasets. This demo datasets can be used to test the workflow and help you undestand the input and output.</p>
+<p>The demo data can be found here:</p>
+<pre><code>ls /scratch/zt1/project/bioi611/shared/raw_data/wf-transcriptomes-demo/ |cat
+chr20
+differential_expression_fastq
+gencode.v22.annotation.chr20.gff
+gencode.v22.annotation.chr20.gff3
+gencode.v22.annotation.chr20.gtf
+hg38_chr20.fa
+Homo_sapiens.GRCh38.109.gtf.gz
+Homo_sapiens.GRCh38.cdna.all.fa.gz
+Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+md5sums.txt
+nextflow.config
+ref_transcriptome.fasta
+sample_sheet.csv
+</code></pre>
+<p>You can analyze the demo data by submitting the job file below:</p>
+<pre><code># Takes around 8 minutes to finish
+sbatch /scratch/zt1/project/bioi611/shared/scripts/ONT_directRNA_wf_transcriptome_demo.sub
+</code></pre>
+<p>The output folder is:</p>
+<pre><code>/scratch/zt1/project/bioi611/user/$USER/ONT_directRNA_demo
+</code></pre>
+<p>The documentation for the output files can be found here:</p>
+<p>https://github.com/epi2me-labs/wf-transcriptomes?tab=readme-ov-file#outputs</p>
+<p>Output files may be aggregated including information for all samples or provided per sample. Per-sample files will be prefixed with respective aliases and represented below as {{ alias }}.</p>
+<table>
+<thead>
+<tr>
+<th>Title</th>
+<th>File path</th>
+<th>Description</th>
+<th>Per sample or aggregated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>workflow report</td>
+<td>wf-transcriptomes-report.html</td>
+<td>a HTML report document detailing the primary findings of the workflow</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Per file read stats</td>
+<td>fastq_ingress_results/reads/fastcat_stats/per-file-stats.tsv</td>
+<td>A TSV with per file read stats, including all samples.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Read stats</td>
+<td>fastq_ingress_results/reads/fastcat_stats/per-read-stats.tsv</td>
+<td>A TSV with per read stats, including all samples.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Run ID's</td>
+<td>fastq_ingress_results/reads/fastcat_stats/run_ids</td>
+<td>List of run IDs present in reads.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Meta map json</td>
+<td>fastq_ingress_results/reads/metamap.json</td>
+<td>Metadata used in workflow presented in a JSON.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Concatenated sequence data</td>
+<td>fastq_ingress_results/reads/{{ alias }}.fastq.gz</td>
+<td>Per sample reads concatenated in to one FASTQ file.</td>
+<td>per-sample</td>
+</tr>
+<tr>
+<td>Assembled transcriptome</td>
+<td>{{ alias }}_transcriptome.fas</td>
+<td>Per sample assembled transcriptome.</td>
+<td>per-sample</td>
+</tr>
+<tr>
+<td>Annotated assembled transcriptome</td>
+<td>{{ alias }}_merged_transcriptome.fas</td>
+<td>Per sample annotated assembled transcriptome.</td>
+<td>per-sample</td>
+</tr>
+<tr>
+<td>Alignment summary statistics</td>
+<td>{{ alias }}_read_aln_stats.tsv</td>
+<td>Per sample alignment summary statistics.</td>
+<td>per-sample</td>
+</tr>
+<tr>
+<td>GFF compare results.</td>
+<td>{{ alias }}_gffcompare</td>
+<td>All GFF compare output files.</td>
+<td>per-sample</td>
+</tr>
+<tr>
+<td>Differential gene expression results</td>
+<td>de_analysis/results_dge.tsv</td>
+<td>This is a gene-level result file that describes genes and their probability of showing differential expression between experimental conditions.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Differential gene expression report</td>
+<td>de_analysis/results_dge.pdf</td>
+<td>Summary report of differential gene expression analysis as a PDF.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Differential transcript usage gene TSV</td>
+<td>de_analysis/results_dtu_gene.tsv</td>
+<td>This is a gene-level result file from DEXSeq that lists annotated genes and their probabilities of differential expression.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Differential transcript usage report</td>
+<td>de_analysis/results_dtu.pdf</td>
+<td>Summary report of differential transcript usage results as a PDF.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Differential transcript usage TSV</td>
+<td>de_analysis/results_dtu_transcript.tsv</td>
+<td>This is a transcript-level result file from DEXSeq that lists annotated genes and their probabilities of differential expression.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Differential transcript usage stageR TSV</td>
+<td>de_analysis/results_dtu_stageR.tsv</td>
+<td>This is the output from StageR and it shows both gene and transcript probabilities of differential expression</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Differential transcript usage DEXSeq TSV</td>
+<td>de_analysis/results_dexseq.tsv</td>
+<td>The complete output from the DEXSeq-analysis, shows both gene and transcript probabilities of differential expression.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Gene counts</td>
+<td>de_analysis/all_gene_counts.tsv</td>
+<td>Raw gene counts created by the Salmon tool, before filtering.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Gene counts per million</td>
+<td>de_analysis/cpm_gene_counts.tsv</td>
+<td>This file shows counts per million (CPM) of the raw gene counts to facilitate comparisons across samples.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Transcript counts</td>
+<td>de_analysis/unfiltered_transcript_counts_with_genes.tsv</td>
+<td>Raw transcript counts created by the Salmon tool, before filtering. Includes reference to the associated gene ID.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Transcript per million counts</td>
+<td>de_analysis/unfiltered_tpm_transcript_counts.tsv</td>
+<td>This file shows transcripts per million (TPM) of the raw counts to facilitate comparisons across samples.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Transcript counts filtered</td>
+<td>de_analysis/filtered_transcript_counts_with_genes.tsv</td>
+<td>Filtered transcript counts, used for differential transcript usage analysis. Includes a reference to the associated gene ID.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Transcript info table</td>
+<td>{{ alias }}_transcripts_table.tsv</td>
+<td>This file details each isoform that was reconstructed from the input reads. It contains a subset of columns from the .tmap output from <a href="https://ccb.jhu.edu/software/stringtie/gffcompare.shtml">gffcompare</a></td>
+<td>per-sample</td>
+</tr>
+<tr>
+<td>Final non redundant transcriptome</td>
+<td>de_analysis/final_non_redundant_transcriptome.fasta</td>
+<td>Transcripts that were used for differential expression analysis including novel transcripts with the identifiers used for DE analysis.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>Index of reference FASTA file</td>
+<td>igv_reference/{{ ref_genome file }}.fai</td>
+<td>Reference genome index of the FASTA file required for IGV config.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>GZI index of the reference FASTA file</td>
+<td>igv_reference/{{ ref_genome file }}.gzi</td>
+<td>GZI Index of the reference FASTA file.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>JSON configuration file for IGV browser</td>
+<td>igv.json</td>
+<td>JSON configuration file to be loaded in IGV for visualising alignments against the reference.</td>
+<td>aggregated</td>
+</tr>
+<tr>
+<td>BAM file (minimap2)</td>
+<td>BAMS/{{ alias }}.reads_aln_sorted.bam</td>
+<td>BAM file generated from mapping input reads to the reference.</td>
+<td>per-sample</td>
+</tr>
+<tr>
+<td>BAM index file (minimap2)</td>
+<td>BAMS/{{ alias }}.reads_aln_sort.bam.bai</td>
+<td>Index file generated from mapping input reads to the reference.</td>
+<td>per-sample</td>
+</tr>
+</tbody>
+</table>
+<h3 id="run-wf-transcriptome-on-the-direct-rna-sequencing-data-from-c-elegans">Run <code>wf-transcriptome</code> on the direct RNA sequencing data from C. elegans</h3>
+<p>Based on the demo data, you can set up the input folder and run the workflow on the direct RNA from the Genome Research paper.</p>
+<pre><code># Takes around 14 minutes to finish
+sbatch /scratch/zt1/project/bioi611/shared/scripts/ONT_directRNA_wf_transcriptome.sub
+</code></pre>
+<p>You can find the output files here:</p>
+<pre><code>/scratch/zt1/project/bioi611/user/$USER/ONT_directRNA
+</code></pre>
+<h2 id="basecalling-optional">Basecalling [Optional]</h2>
+<ol>
+<li>Introduction to ONT Raw Data (FAST5/POD5)</li>
+</ol>
+<p>In Oxford Nanopore sequencing, raw data captures the electrical signal generated as DNA or RNA molecules pass through a nanopore. This signal reflects variations in ionic current caused by the unique properties of each nucleotide. Key points about raw data:</p>
+<ul>
+<li>
+<p>Ionic Current Signal: The primary measurement is the change in ionic current as each nucleotide interacts with the nanopore. This signal is captured continuously.</p>
+</li>
+<li>
+<p>MinKNOW Software: This software suite manages the sequencing process, capturing raw signals and translating them into "reads."</p>
+</li>
+<li>
+<p>File Formats:</p>
+</li>
+<li>
+<p>POD5: This is the primary file format used in recent ONT sequencing runs, replacing the older FAST5 format.</p>
+</li>
+<li>
+<p>Each read in these files corresponds to a single DNA or RNA strand.
+Understanding raw data is crucial because it represents the initial and most unprocessed form of information from ONT sequencing. However, it’s challenging to interpret without further processing.</p>
+</li>
+<li>
+<p>Base Calling and File Outputs (BAM/FASTQ)</p>
+</li>
+</ul>
+<p>After generating raw data, the next essential step is base calling, which translates the electrical signal into nucleotide sequences. This is where machine learning plays a critical role:</p>
+<ul>
+<li>
+<p>Base Calling Process:</p>
+</li>
+<li>
+<p>Signal Processing Techniques: ONT’s basecalling algorithms use advanced machine learning models to interpret the raw signal.</p>
+</li>
+<li>
+<p>Output: Each ionic current pattern is mapped to a sequence of nucleotide bases (A, T, C, or G).</p>
+</li>
+<li>
+<p>Output File Formats:</p>
+</li>
+<li>
+<p>BAM Files: These files contain sequence information along with potential modifications and alignment information. ONT typically structures BAM files with 4,000 reads per file by default.</p>
+</li>
+<li>
+<p>FASTQ Files: This is the widely-used format for storing nucleotide sequences and their associated quality scores. Similar to BAM, ONT defaults to 4,000 reads per file in FASTQ format.</p>
+</li>
+</ul>
+<h3 id="basecalling-using-guppy">Basecalling using Guppy</h3>
+<p>In Roach, et. al., 2020, RNA sequencing on the GridION platform was performed using ONT R9.4 flow cells and the standard MinKNOW protocol script (NC_48Hr_sequencing_FLO-MIN106_SQK-RNA001). The raw data is in FAST5 format.</p>
+<p>Guppy is a data processing toolkit that contains the Oxford Nanopore Technologies' production basecalling algorithms and several bioinformatic post-processing features.</p>
+<p>To basecall reads with <code>Guppy</code>, you will need to use the following commands:</p>
+<p><code>guppy_basecaller</code> (or the fully-qualified path if using the archive installer)</p>
+<p><code>--input_path</code>: Full or relative path to the directory where the raw read files are located. The folder can be absolute or a relative path to the current working directory.</p>
+<p><code>--save_path</code>: Full or relative path to the directory where the basecall results will be saved. The folder can be absolute or a relative path to the current working directory. This folder will be created if it does not exist using the path you provide. (e.g. if it is a relative path, it will be relative to the current working directory)</p>
+<p>Then either:</p>
+<ul>
+<li><code>--config</code>: configuration file containing Guppy parameters</li>
+</ul>
+<p>or</p>
+<ul>
+<li><code>--flowcell</code> flow cell version <code>--kit</code> sequencing kit version</li>
+</ul>
+<h4 id="find-the-corresponding-model">Find the corresponding model</h4>
+<p>The kit and flow cell information should be clearly labelled on the corresponding boxes. Flow cells almost always start with "FLO" and kits almost always start with "SQK" or "VSK".</p>
+<p>To see the supported flow cells and kits, run <code>Guppy</code> with the <code>--print_workflows</code> option:</p>
+<pre><code>/scratch/zt1/project/bioi611/shared/software/ont-guppy-cpu/bin/guppy_basecaller --print_workflows |grep 'FLO-M
+IN106' |grep 'SQK-RNA001'
+flowcell       kit               barcoding config_name                    model version
+FLO-MIN106     SQK-RNA001                  rna_r9.4.1_70bps_hac           2020-09-07_rna_r9.4.1_minion_256_8f8fc47b
+</code></pre>
+<h3 id="_1"></h3>
+<h3 id="basecalling-using-guppy_1">Basecalling using <code>Guppy</code></h3>
+<pre><code>/scratch/zt1/project/bioi611/shared/software/ont-guppy-cpu/bin/guppy_basecaller \
+ -i test_data/ \
+ --config  /scratch/zt1/project/bioi611/sha
+red/software/ont-guppy-cpu/data/rna_r9.4.1_70bps_hac.cfg \
+--save_path temp --recursive
+</code></pre>
+<h4 id="quality-based-output-directories">Quality-Based Output Directories</h4>
+<p>Guppy categorizes reads based on their quality scores, storing them in separate folders for easy access and downstream processing.</p>
+<ul>
+<li>
+<p>pass/: Contains reads with quality scores above a specified threshold (typically a Phred quality score of 7 or higher). These reads are considered high quality and are commonly used for downstream analyses.
+File Format: FASTQ files, each storing sequences and associated quality scores.</p>
+</li>
+<li>
+<p>fail/: Contains reads with quality scores below the specified threshold, indicating lower confidence in accuracy. These reads might be filtered out or re-processed depending on the study's goals.
+File Format: FASTQ files, similar to those in the pass directory, but typically excluded from final analyses.</p>
+</li>
+</ul>
+<p>Remember the data you basecalled here is only a test dataset. The number of reads in <code>pass/</code> and <code>fail/</code> doesn't reflect the acutual data.</p>
+<p>Software <a href="https://github.com/nanoporetech/dorado"><code>dorado</code></a> is now the recommended tool to perform basecalling on POD5 files.</p>
+<p>FAST5 files can be converted to POD5 files using the tool below:</p>
+<p>https://github.com/nanoporetech/pod5-file-format</p>
+<pre><code class="language-python">
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../BIOI611_bulkRNA_SE_ballgown/" class="btn btn-neutral float-left" title="DE analysis at isoform-leve using ballgown (C. ele data)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../BIOI611_analysis_10x_dataset_PBMC/" class="btn btn-neutral float-right" title="Initial analysis of 10x scRNA-seq data for human PBMC using cellranger">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../BIOI611_bulkRNA_SE_ballgown/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../BIOI611_analysis_10x_dataset_PBMC/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Pathway analysis using DAVID - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Pathway analysis using DAVID";
+        var mkdocs_page_input_path = "BIOI611_DAVID.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Pathway analysis using DAVID</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#a-typical-analysis-flow">A Typical Analysis Flow</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#understanding-the-statistical-test-in-david">Understanding the Statistical Test in DAVID</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#hypothetical-example">Hypothetical Example</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-about-the-ease-score-modified-fishers-test">What About the EASE Score? (Modified Fisher’s Test)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#functional-annotation-summary">Functional Annotation Summary</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#functional-annotation-chart-report">Functional Annotation Chart Report</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#functional-annotation-clustering">Functional Annotation Clustering</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#refernce">Refernce</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Bulk RNA-seq</li>
+      <li class="breadcrumb-item active">Pathway analysis using DAVID</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/BIOI611_DAVID.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a href="https://colab.research.google.com/github/Bix4UMD/BIOI611_lab/blob/main/docs/BIOI611_DAVID.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a></p>
+<h1 id="david-tool-suite-overview">DAVID Tool Suite Overview</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The original version of DAVID introduced a tool suite designed primarily for batch gene annotation and GO term enrichment analysis, enabling researchers to identify the most relevant biological processes associated with a given gene list. While the core enrichment algorithm has remained consistent across all versions, the annotation coverage has significantly expanded. Initially limited to GO terms, DAVID now supports a wide range of annotation categories, including:</p>
+<ul>
+<li>
+<p>Gene Ontology (GO) terms</p>
+</li>
+<li>
+<p>Protein–protein interactions</p>
+</li>
+<li>
+<p>Protein functional domains</p>
+</li>
+<li>
+<p>Disease associations</p>
+</li>
+<li>
+<p>Biological pathways (e.g., KEGG, BioCarta)</p>
+</li>
+<li>
+<p>Sequence features</p>
+</li>
+<li>
+<p>Functional summaries</p>
+</li>
+<li>
+<p>Tissue expression</p>
+</li>
+<li>
+<p>Literature references, and more</p>
+</li>
+</ul>
+<p>This expanded coverage allows researchers to explore their gene lists from multiple biological perspectives — all within a single platform. Results can be viewed as individual annotation chart reports or as combined summary reports, offering flexibility depending on the analysis goals.</p>
+<p>A notable feature of DAVID is its ability to accept custom gene backgrounds, which is rarely available in other web-based enrichment tools. This option enables more tailored and accurate analyses, particularly when comparing against a relevant experimental or platform-specific background rather than the whole genome.</p>
+<h2 id="a-typical-analysis-flow">A Typical Analysis Flow</h2>
+<p>Load Gene List → View Summary Page → Explore details through Chart Report, Table Report, Clustering Report, etc. → Export and Save Results.</p>
+<h2 id="understanding-the-statistical-test-in-david">Understanding the Statistical Test in DAVID</h2>
+<p>In DAVID, Fisher’s Exact Test is used to determine whether a particular biological function or pathway (annotation term) contains more genes from your input list than would be expected by random chance.</p>
+<p>Why Fisher’s Exact Test?</p>
+<p>We compare two groups:</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Your gene list</strong></td>
+<td>e.g., DEG list / experimental genes</td>
+</tr>
+<tr>
+<td><strong>All other genes</strong></td>
+<td>the rest of the genome (background)</td>
+</tr>
+</tbody>
+</table>
+<p>And we check whether genes in your list are over-represented in a specific biological category — such as p53 signaling pathway, cell division, etc.</p>
+<p>Contingency Table (2 × 2)</p>
+<p>Each analysis builds a table like this:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Your gene list</strong></th>
+<th><strong>Background genes</strong></th>
+<th><strong>Total</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>In pathway</strong></td>
+<td>a</td>
+<td>c</td>
+<td>a + c</td>
+</tr>
+<tr>
+<td><strong>Not in pathway</strong></td>
+<td>b</td>
+<td>d</td>
+<td>b + d</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td>a + b</td>
+<td>c + d</td>
+<td>n</td>
+</tr>
+</tbody>
+</table>
+<p>The (1,1) cell — “a” — is the number of genes both in your list and in the pathway.</p>
+<p>This value is called n₁₁.</p>
+<p>How the p-value Is Calculated</p>
+<p>Fisher’s Exact Test asks:</p>
+<p>Is the number of genes in our list that fall into this pathway (n₁₁) higher than we would expect just by chance?</p>
+<p>So it calculates the probability of observing this table and all other tables that are even more extreme (i.e., with higher values of n₁₁).</p>
+<p>Mathematically:</p>
+<div class="arithmatex">\[P\left(X \geq n_{11}\right)=\sum_A p(\text { table })\]</div>
+<p>Where:</p>
+<ul>
+<li>
+<p>A = all possible tables where (1,1) ≥ observed n₁₁</p>
+</li>
+<li>
+<p>Each table’s probability is computed under the null hypothesis of independence.</p>
+</li>
+</ul>
+<p>Meaning:</p>
+<blockquote>
+<p>The probability that the observed overlap (or more) happens just by chance.</p>
+</blockquote>
+<p>Small p-value (&lt; 0.05) → unlikely to happen by chance → strong enrichment!</p>
+<p>In Simple Words</p>
+<p>DAVID asks:</p>
+<blockquote>
+<p>“Did we find more genes in this pathway than we would expect if we randomly picked genes from the genome?”</p>
+</blockquote>
+<ul>
+<li>If yes → significant enrichment</li>
+<li>If no → random noise</li>
+</ul>
+<h2 id="hypothetical-example">Hypothetical Example</h2>
+<p>Consider the Human genome as the background, containing 30,000 genes — this is the Population Total (PT). Among these genes, 40 are known to participate in the p53 signaling pathway, referred to as the Population Hits (PH).</p>
+<p>Now assume that, in your experimental gene list of 300 genes — the List Total (LT) — three genes (List Hits, LH) are found to be associated with the p53 signaling pathway.</p>
+<p>The question is:</p>
+<p>➡️ Is the proportion 3/300 in our list significantly higher than the background proportion of 40/30,000?
+In other words, is this enrichment more than what would be expected by random chance?</p>
+<p>Fisher’s Exact Test is used in DAVID to statistically evaluate whether the observed enrichment of p53-related genes in the list is significant compared with the genomic background.</p>
+<p><img width="406" height="164" alt="Image" src="https://github.com/user-attachments/assets/9eeefb7e-5246-4f75-a96c-e50683a7e728" /></p>
+<pre><code class="language-R">LH &lt;- 3      # List Hits
+LT &lt;- 300    # List Total
+PH &lt;- 40     # Population Hits
+PT &lt;- 30000  # Population Total
+# Contingency table for Fisher's test
+table_fisher &lt;- matrix(c(LH,
+                         LT - LH,
+                         PH - LH,
+                         PT - LT - (PH - LH)),
+                       nrow = 2,
+                       byrow = TRUE)
+
+# Fisher's Exact Test (right-sided)
+fisher.test(table_fisher, alternative = &quot;greater&quot;)
+
+
+</code></pre>
+<pre><code>    Fisher's Exact Test for Count Data
+
+data:  table_fisher
+p-value = 0.007443
+alternative hypothesis: true odds ratio is greater than 1
+95 percent confidence interval:
+ 2.105361      Inf
+sample estimates:
+odds ratio 
+  8.096268
+</code></pre>
+<p>What Does a Small p-value Mean?</p>
+<p>If the p-value is small (e.g., 0.007):</p>
+<p>✔ Genes from your list appear in that pathway more often than expected by random chance → significant enrichment</p>
+<p>✔ Suggests biological association</p>
+<p>✔ That pathway is important for your experiment</p>
+<p>If p &gt; 0.05 → there is no strong evidence of enrichment.</p>
+<h2 id="what-about-the-ease-score-modified-fishers-test">What About the EASE Score? (Modified Fisher’s Test)</h2>
+<p>The EASE Score is a more conservative variant of Fisher’s Exact Test used by DAVID.</p>
+<p>It works by subtracting one gene from the List Hits (LH) before computing the p-value.</p>
+<p>Why subtract one?</p>
+<p>It penalizes weak evidence — especially when enrichment is supported by only one or a few genes.</p>
+<p>This helps to avoid false positives and ensures that the association is strong and reliable.</p>
+<p><img width="406" height="164" alt="Image" src="https://github.com/user-attachments/assets/891a4490-b2a4-4fc3-875c-2ceeee6eb2a8" /></p>
+<pre><code class="language-R"># Adjusted List Hits for EASE Score
+LH_ease &lt;- LH - 1
+
+# Contingency table for EASE Score
+table_ease &lt;- matrix(c(LH_ease,
+                       LT - LH_ease,
+                       PH - LH_ease,
+                       PT - LT - (PH - LH_ease)),
+                     nrow = 2,
+                     byrow = TRUE)
+
+# EASE Score = Modified Fisher’s Exact Test
+fisher.test(table_ease, alternative = &quot;greater&quot;)
+
+</code></pre>
+<pre><code>    Fisher's Exact Test for Count Data
+
+data:  table_ease
+p-value = 0.06063
+alternative hypothesis: true odds ratio is greater than 1
+95 percent confidence interval:
+ 0.8956195       Inf
+sample estimates:
+odds ratio 
+  5.238625
+</code></pre>
+<h2 id="functional-annotation-summary">Functional Annotation Summary</h2>
+<p><img width="730" height="360" alt="Image" src="https://github.com/user-attachments/assets/2067a7d9-ca83-4016-84de-77d28c34e2be" /></p>
+<h2 id="functional-annotation-chart-report">Functional Annotation Chart Report</h2>
+<p><img width="730" height="508" alt="Image" src="https://github.com/user-attachments/assets/cd82e373-0d43-4a6b-9d0a-1499d931c6fd" /></p>
+<h2 id="functional-annotation-clustering">Functional Annotation Clustering</h2>
+<p>Because many annotation terms are biologically related, the Functional Annotation Chart often shows multiple similar annotations repeatedly. This redundancy can make it difficult to focus on the key biological themes.</p>
+<p>To address this issue, DAVID provides the Functional Annotation Clustering feature. Instead of listing terms individually, this tool groups similar annotations together, allowing researchers to interpret results more clearly and at a higher biological level than with a traditional chart report.</p>
+<p>The clustering method is based on the principle that similar annotation terms tend to share similar gene members. DAVID uses:</p>
+<p>Kappa statistics to quantify the similarity between annotation terms by measuring the degree of shared genes.</p>
+<p>Fuzzy heuristic clustering (previously used in the Gene Functional Classification Tool) to group annotation terms according to their Kappa values.</p>
+<p>In essence, the more genes two annotations share, the more likely they are placed in the same cluster.</p>
+<p>Interpretation of Results</p>
+<ul>
+<li>
+<p>The p-values for each annotation term within a cluster are identical to those shown in the regular Functional Annotation Chart (e.g., Fisher’s Exact Test / EASE Score).</p>
+</li>
+<li>
+<p>Each annotation cluster is assigned a Group Enrichment Score, calculated as the geometric mean of the member p-values (in –log₁₀ scale).</p>
+</li>
+<li>
+<p>Clusters with higher Enrichment Scores indicate that their member terms consistently have lower p-values, reflecting stronger biological relevance.</p>
+</li>
+</ul>
+<p><img width="730" height="716" alt="Image" src="https://github.com/user-attachments/assets/b125529b-49e7-42a8-a425-bdc20dd5f6c2" /></p>
+<h2 id="refernce">Refernce</h2>
+<p>https://davidbioinformatics.nih.gov/helps/functional_annotation.html</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../BIOI611_DESeq2_analysis/" class="btn btn-neutral float-left" title="DEG analysis using DESeq2"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../BIOI611_ballgown_example/" class="btn btn-neutral float-right" title="DE analysis at isoform-leve using ballgown (example data)">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../BIOI611_DESeq2_analysis/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../BIOI611_ballgown_example/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
