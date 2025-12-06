@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Minimal R Introduction - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Minimal R Introduction";
+        var mkdocs_page_input_path = "BIOI611_introR.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Minimal R Introduction</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#what-is-r">What is R</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#essetnial-concepts-for-programming-languages">Essetnial concepts for programming languages</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#variables">Variables</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#basic-data-types">Basic data types</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#basic-data-structure">Basic data structure</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dealing-with-text-files">Dealing with text files</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Bulk RNA-seq</li>
+      <li class="breadcrumb-item active">Minimal R Introduction</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/BIOI611_introR.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a href="https://colab.research.google.com/github/Bix4UMD/BIOI611_lab/blob/main/docs/BIOI611_introR.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a></p>
+<h2 id="introduction-to-r">Introduction to R</h2>
+<h3 id="what-is-r">What is R</h3>
+<p>R is a language and environment for statistical computing and graphics.</p>
+<ul>
+<li>
+<p>Runs on a variaty of operation systerms: Windows, Linux and MacOS</p>
+</li>
+<li>
+<p>Generates publication-ready plots</p>
+</li>
+<li>
+<p>Owns a large open-source community</p>
+</li>
+<li>
+<p>Extends functions as packages</p>
+</li>
+</ul>
+<h3 id="essetnial-concepts-for-programming-languages">Essetnial concepts for programming languages</h3>
+<h4 id="variables">Variables</h4>
+<p>Variable names can have letters, dots and undercores (e.g. <code>gene_name</code>, "csvfile.1" and <code>chr1</code>).</p>
+<h4 id="functions">Functions</h4>
+<p>A function is a structured, reusable segment of code designed to carry out a specific set of operations. It can accept zero or more inputs (parameters) and can produce an output (result).</p>
+<p><code>INPUT --function--&gt; OUTPUT</code></p>
+<p>The way to define a function is:</p>
+<pre><code>read_star_file &lt;- function(file_path){
+    ...code goes here...
+    return(df)
+}
+</code></pre>
+<p>The way to use a function in R is:</p>
+<pre><code>read_star_file(paths)
+</code></pre>
+<h3 id="basic-data-types">Basic data types</h3>
+<pre><code class="language-R"># assign a number to variable gene_count
+gene1 &lt;- 150
+gene2 &lt;- 200
+gene1
+gene2
+</code></pre>
+<p>150</p>
+<p>200</p>
+<pre><code class="language-R"># Examples of character value
+gene_name1 &lt;- &quot;KRAS&quot;
+gene_name1
+</code></pre>
+<p>'KRAS'</p>
+<pre><code class="language-R"># Examples of character value
+&quot;RAS&quot; -&gt; gene_name2
+gene_name2
+</code></pre>
+<p>'RAS'</p>
+<pre><code class="language-R"># Examples of character value
+gene_name3 &lt;- &quot;KRAS&quot;
+gene_name3
+</code></pre>
+<p>'KRAS'</p>
+<pre><code class="language-R"># Logical value
+gene1 &gt; gene2
+gene1 &lt; gene2
+bool_val = gene1 &lt; gene2
+bool_val
+</code></pre>
+<p>FALSE</p>
+<p>TRUE</p>
+<p>TRUE</p>
+<pre><code class="language-R">class(gene1)
+class(gene_name)
+class()
+</code></pre>
+<p>'numeric'</p>
+<p>'character'</p>
+<h3 id="basic-data-structure">Basic data structure</h3>
+<p>An atomic vector is a collection of multiple values (numeric, character, or logical) stored in a single object. You can create an atomic vector using the c() function.</p>
+<pre><code class="language-R">sample_names &lt;- c(&quot;N2_day1_rep1&quot;,   &quot;N2_day1_rep2&quot;, &quot;N2_day1_rep3&quot;,
+                  &quot;N2_day7_rep1&quot;, &quot;N2_day7_rep2&quot;, &quot;N2_day7_rep3&quot;)
+sample_names
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'N2_day1_rep1'</li><li>'N2_day1_rep2'</li><li>'N2_day1_rep3'</li><li>'N2_day7_rep1'</li><li>'N2_day7_rep2'</li><li>'N2_day7_rep3'</li></ol>
+
+<pre><code class="language-R">group &lt;- gsub(&quot;_rep\\d&quot;, &quot;&quot;, sample_names)
+group
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'N2_day1'</li><li>'N2_day1'</li><li>'N2_day1'</li><li>'N2_day7'</li><li>'N2_day7'</li><li>'N2_day7'</li></ol>
+
+<pre><code class="language-R">rep &lt;- gsub(&quot;N2_day\\d_rep&quot;, &quot;&quot;, sample_names)
+rep
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'1'</li><li>'2'</li><li>'3'</li><li>'1'</li><li>'2'</li><li>'3'</li></ol>
+
+<pre><code class="language-R">coldata_df &lt;- cbind(group = gsub(&quot;_rep\\d&quot;, &quot;&quot;, sample_names))
+coldata_df
+</code></pre>
+<table class="dataframe">
+<caption>A matrix: 6 × 1 of type chr</caption>
+<thead>
+    <tr><th scope=col>group</th></tr>
+</thead>
+<tbody>
+    <tr><td>N2_day1</td></tr>
+    <tr><td>N2_day1</td></tr>
+    <tr><td>N2_day1</td></tr>
+    <tr><td>N2_day7</td></tr>
+    <tr><td>N2_day7</td></tr>
+    <tr><td>N2_day7</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">coldata_df &lt;- cbind(group = gsub(&quot;_rep\\d&quot;, &quot;&quot;, sample_names), rep = gsub(&quot;N2_day\\d_rep&quot;, &quot;&quot;, sample_names))
+coldata_df
+</code></pre>
+<table class="dataframe">
+<caption>A matrix: 6 × 2 of type chr</caption>
+<thead>
+    <tr><th scope=col>group</th><th scope=col>rep</th></tr>
+</thead>
+<tbody>
+    <tr><td>N2_day1</td><td>1</td></tr>
+    <tr><td>N2_day1</td><td>2</td></tr>
+    <tr><td>N2_day1</td><td>3</td></tr>
+    <tr><td>N2_day7</td><td>1</td></tr>
+    <tr><td>N2_day7</td><td>2</td></tr>
+    <tr><td>N2_day7</td><td>3</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">rownames(coldata_df)
+</code></pre>
+<pre><code>NULL
+</code></pre>
+<pre><code class="language-R">rownames(coldata_df) = sample_names
+coldata_df
+</code></pre>
+<table class="dataframe">
+<caption>A matrix: 6 × 2 of type chr</caption>
+<thead>
+    <tr><th></th><th scope=col>group</th><th scope=col>rep</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>N2_day1_rep1</th><td>N2_day1</td><td>1</td></tr>
+    <tr><th scope=row>N2_day1_rep2</th><td>N2_day1</td><td>2</td></tr>
+    <tr><th scope=row>N2_day1_rep3</th><td>N2_day1</td><td>3</td></tr>
+    <tr><th scope=row>N2_day7_rep1</th><td>N2_day7</td><td>1</td></tr>
+    <tr><th scope=row>N2_day7_rep2</th><td>N2_day7</td><td>2</td></tr>
+    <tr><th scope=row>N2_day7_rep3</th><td>N2_day7</td><td>3</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">t(coldata_df)
+</code></pre>
+<table class="dataframe">
+<caption>A matrix: 2 × 6 of type chr</caption>
+<thead>
+    <tr><th></th><th scope=col>N2_day1_rep1</th><th scope=col>N2_day1_rep2</th><th scope=col>N2_day1_rep3</th><th scope=col>N2_day7_rep1</th><th scope=col>N2_day7_rep2</th><th scope=col>N2_day7_rep3</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>group</th><td>N2_day1</td><td>N2_day1</td><td>N2_day1</td><td>N2_day7</td><td>N2_day7</td><td>N2_day7</td></tr>
+    <tr><th scope=row>rep</th><td>1      </td><td>2      </td><td>3      </td><td>1      </td><td>2      </td><td>3      </td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">is.matrix(coldata_df)
+coldata_df &lt;- as.data.frame(coldata_df)
+is.data.frame(coldata_df)
+</code></pre>
+<p>TRUE</p>
+<p>TRUE</p>
+<p>A matrix can contain either character or numeric columns and a dataframe can contain both numeric and character columns.</p>
+<p>A list is an ordered collection of objects, which can be any type of R objects (vectors, matrices, data frames, even lists).</p>
+<pre><code class="language-R">count_files = list(&quot;sample&quot; = 'N2_day1_rep1.ReadsPerGene.out.tab', &quot;sample2&quot;='N2_day1_rep2.ReadsPerGene.out.tab')
+count_files
+</code></pre>
+<dl>
+    <dt>$sample</dt>
+        <dd>'N2_day1_rep1.ReadsPerGene.out.tab'</dd>
+    <dt>$sample2</dt>
+        <dd>'N2_day1_rep2.ReadsPerGene.out.tab'</dd>
+</dl>
+
+<pre><code class="language-R">gene_count = list(&quot;gene1&quot; = 10, &quot;gene2&quot;=20)
+</code></pre>
+<pre><code class="language-R">lapply(gene_count, function(x){log2(x+1)})
+</code></pre>
+<dl>
+    <dt>$gene1</dt>
+        <dd>3.4594316186373</dd>
+    <dt>$gene2</dt>
+        <dd>4.39231742277876</dd>
+</dl>
+
+<pre><code class="language-R">log2_transform &lt;- function(x){
+    log2(x+1)
+}
+lapply(gene_count, log2_transform)
+</code></pre>
+<dl>
+    <dt>$gene1</dt>
+        <dd>3.4594316186373</dd>
+    <dt>$gene2</dt>
+        <dd>4.39231742277876</dd>
+</dl>
+
+<pre><code class="language-R">
+</code></pre>
+<h3 id="dealing-with-text-files">Dealing with text files</h3>
+<pre><code class="language-R">getwd()
+#setwd()
+</code></pre>
+<p>'/content'</p>
+<pre><code class="language-R">list.files()
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'N2_day1_rep1.ReadsPerGene.out.tab'</li><li>'N2_day1_rep2.ReadsPerGene.out.tab'</li><li>'N2_day1_rep3.ReadsPerGene.out.tab'</li><li>'N2_day7_rep1.ReadsPerGene.out.tab'</li><li>'N2_day7_rep2.ReadsPerGene.out.tab'</li><li>'N2_day7_rep3.ReadsPerGene.out.tab'</li><li>'sample_data'</li></ol>
+
+<pre><code class="language-R">file_paths &lt;- list.files(pattern = &quot;*..ReadsPerGene.out.tab&quot;)
+file_paths
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'N2_day1_rep1.ReadsPerGene.out.tab'</li><li>'N2_day1_rep2.ReadsPerGene.out.tab'</li><li>'N2_day1_rep3.ReadsPerGene.out.tab'</li><li>'N2_day7_rep1.ReadsPerGene.out.tab'</li><li>'N2_day7_rep2.ReadsPerGene.out.tab'</li><li>'N2_day7_rep3.ReadsPerGene.out.tab'</li></ol>
+
+<pre><code class="language-R">tab_N2_day1_rep1 &lt;- read.table('N2_day1_rep1.ReadsPerGene.out.tab')
+head(tab_N2_day1_rep1, 5)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 5 × 4</caption>
+<thead>
+    <tr><th></th><th scope=col>V1</th><th scope=col>V2</th><th scope=col>V3</th><th scope=col>V4</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>N_unmapped    </td><td>1332776</td><td> 1332776</td><td> 1332776</td></tr>
+    <tr><th scope=row>2</th><td>N_multimapping</td><td>1540190</td><td> 1540190</td><td> 1540190</td></tr>
+    <tr><th scope=row>3</th><td>N_noFeature   </td><td> 157102</td><td>19017455</td><td>18933214</td></tr>
+    <tr><th scope=row>4</th><td>N_ambiguous   </td><td> 536422</td><td>  128854</td><td>  120342</td></tr>
+    <tr><th scope=row>5</th><td>WBGene00000003</td><td>    341</td><td>     161</td><td>     180</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">tab_N2_day1_rep2 &lt;- read.table('N2_day1_rep2.ReadsPerGene.out.tab')
+head(tab_N2_day1_rep2,5)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 5 × 4</caption>
+<thead>
+    <tr><th></th><th scope=col>V1</th><th scope=col>V2</th><th scope=col>V3</th><th scope=col>V4</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>N_unmapped    </td><td>1400596</td><td> 1400596</td><td> 1400596</td></tr>
+    <tr><th scope=row>2</th><td>N_multimapping</td><td>1305129</td><td> 1305129</td><td> 1305129</td></tr>
+    <tr><th scope=row>3</th><td>N_noFeature   </td><td> 152183</td><td>15009786</td><td>14975925</td></tr>
+    <tr><th scope=row>4</th><td>N_ambiguous   </td><td> 439830</td><td>  104631</td><td>   98489</td></tr>
+    <tr><th scope=row>5</th><td>WBGene00000003</td><td>    415</td><td>     198</td><td>     217</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">tab_N2_day1_rep3 &lt;- read.table('N2_day1_rep3.ReadsPerGene.out.tab')
+head(tab_N2_day1_rep3,5)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 5 × 4</caption>
+<thead>
+    <tr><th></th><th scope=col>V1</th><th scope=col>V2</th><th scope=col>V3</th><th scope=col>V4</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>N_unmapped    </td><td>5887223</td><td> 5887223</td><td> 5887223</td></tr>
+    <tr><th scope=row>2</th><td>N_multimapping</td><td>1557570</td><td> 1557570</td><td> 1557570</td></tr>
+    <tr><th scope=row>3</th><td>N_noFeature   </td><td> 184441</td><td>17612359</td><td>17574940</td></tr>
+    <tr><th scope=row>4</th><td>N_ambiguous   </td><td> 514559</td><td>  122385</td><td>  115498</td></tr>
+    <tr><th scope=row>5</th><td>WBGene00000003</td><td>    411</td><td>     175</td><td>     236</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">library(dplyr)
+</code></pre>
+<pre><code>Attaching package: ‘dplyr’
+
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+</code></pre>
+<pre><code class="language-R">tab_N2_day1_rep1 &lt;- tab_N2_day1_rep1 %&gt;% select(V1, V2)
+head(tab_N2_day1_rep1, 5)
+tab_N2_day1_rep2 &lt;- tab_N2_day1_rep2[, c(&quot;V1&quot;, &quot;V2&quot;)]
+head(tab_N2_day1_rep2, 5)
+tab_N2_day1_rep3 &lt;- tab_N2_day1_rep3[, c(&quot;V1&quot;, &quot;V2&quot;)]
+head(tab_N2_day1_rep3, 5)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 5 × 2</caption>
+<thead>
+    <tr><th></th><th scope=col>V1</th><th scope=col>V2</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>N_unmapped    </td><td>1332776</td></tr>
+    <tr><th scope=row>2</th><td>N_multimapping</td><td>1540190</td></tr>
+    <tr><th scope=row>3</th><td>N_noFeature   </td><td> 157102</td></tr>
+    <tr><th scope=row>4</th><td>N_ambiguous   </td><td> 536422</td></tr>
+    <tr><th scope=row>5</th><td>WBGene00000003</td><td>    341</td></tr>
+</tbody>
+</table>
+
+<table class="dataframe">
+<caption>A data.frame: 5 × 2</caption>
+<thead>
+    <tr><th></th><th scope=col>V1</th><th scope=col>V2</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>N_unmapped    </td><td>1400596</td></tr>
+    <tr><th scope=row>2</th><td>N_multimapping</td><td>1305129</td></tr>
+    <tr><th scope=row>3</th><td>N_noFeature   </td><td> 152183</td></tr>
+    <tr><th scope=row>4</th><td>N_ambiguous   </td><td> 439830</td></tr>
+    <tr><th scope=row>5</th><td>WBGene00000003</td><td>    415</td></tr>
+</tbody>
+</table>
+
+<table class="dataframe">
+<caption>A data.frame: 5 × 2</caption>
+<thead>
+    <tr><th></th><th scope=col>V1</th><th scope=col>V2</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>N_unmapped    </td><td>5887223</td></tr>
+    <tr><th scope=row>2</th><td>N_multimapping</td><td>1557570</td></tr>
+    <tr><th scope=row>3</th><td>N_noFeature   </td><td> 184441</td></tr>
+    <tr><th scope=row>4</th><td>N_ambiguous   </td><td> 514559</td></tr>
+    <tr><th scope=row>5</th><td>WBGene00000003</td><td>    411</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">df_merged &lt;- merge(tab_N2_day1_rep1, tab_N2_day1_rep2, by = &quot;V1&quot;)
+head(df_merged)
+df_merged &lt;- merge(df_merged, tab_N2_day1_rep3, by = &quot;V1&quot;)
+head(df_merged)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 3</caption>
+<thead>
+    <tr><th></th><th scope=col>V1</th><th scope=col>V2.x</th><th scope=col>V2.y</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>N_ambiguous   </td><td> 536422</td><td> 439830</td></tr>
+    <tr><th scope=row>2</th><td>N_multimapping</td><td>1540190</td><td>1305129</td></tr>
+    <tr><th scope=row>3</th><td>N_noFeature   </td><td> 157102</td><td> 152183</td></tr>
+    <tr><th scope=row>4</th><td>N_unmapped    </td><td>1332776</td><td>1400596</td></tr>
+    <tr><th scope=row>5</th><td>WBGene00000001</td><td>   3227</td><td>   2168</td></tr>
+    <tr><th scope=row>6</th><td>WBGene00000002</td><td>    270</td><td>    203</td></tr>
+</tbody>
+</table>
+
+<table class="dataframe">
+<caption>A data.frame: 6 × 4</caption>
+<thead>
+    <tr><th></th><th scope=col>V1</th><th scope=col>V2.x</th><th scope=col>V2.y</th><th scope=col>V2</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>N_ambiguous   </td><td> 536422</td><td> 439830</td><td> 514559</td></tr>
+    <tr><th scope=row>2</th><td>N_multimapping</td><td>1540190</td><td>1305129</td><td>1557570</td></tr>
+    <tr><th scope=row>3</th><td>N_noFeature   </td><td> 157102</td><td> 152183</td><td> 184441</td></tr>
+    <tr><th scope=row>4</th><td>N_unmapped    </td><td>1332776</td><td>1400596</td><td>5887223</td></tr>
+    <tr><th scope=row>5</th><td>WBGene00000001</td><td>   3227</td><td>   2168</td><td>   2589</td></tr>
+    <tr><th scope=row>6</th><td>WBGene00000002</td><td>    270</td><td>    203</td><td>    266</td></tr>
+</tbody>
+</table>
+
+<p>The <code>Reduce()</code> function in R allows us to apply a function repeatedly to a list of elements. Here, we are applying <code>merge()</code> iteratively to a list of data frames.</p>
+<pre><code class="language-R">df_mer_red &lt;- Reduce(function(x, y) merge(x, y, by = &quot;V1&quot;),
+                        list(&quot;tab_N2_day1_rep1&quot; = tab_N2_day1_rep1,
+                             &quot;tab_N2_day1_rep2&quot; = tab_N2_day1_rep2,
+                             &quot;tab_N2_day1_rep3&quot; = tab_N2_day1_rep3))
+head(df_mer_red, 5)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 5 × 4</caption>
+<thead>
+    <tr><th></th><th scope=col>V1</th><th scope=col>V2.x</th><th scope=col>V2.y</th><th scope=col>V2</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>N_ambiguous   </td><td> 536422</td><td> 439830</td><td> 514559</td></tr>
+    <tr><th scope=row>2</th><td>N_multimapping</td><td>1540190</td><td>1305129</td><td>1557570</td></tr>
+    <tr><th scope=row>3</th><td>N_noFeature   </td><td> 157102</td><td> 152183</td><td> 184441</td></tr>
+    <tr><th scope=row>4</th><td>N_unmapped    </td><td>1332776</td><td>1400596</td><td>5887223</td></tr>
+    <tr><th scope=row>5</th><td>WBGene00000001</td><td>   3227</td><td>   2168</td><td>   2589</td></tr>
+</tbody>
+</table>
+
+<h2 id="producing-graphs-with-r">Producing Graphs with R</h2>
+<h3 id="producing-graphs-using-basic">Producing Graphs using basic</h3>
+<h4 id="line-charts">Line charts</h4>
+<pre><code class="language-R"># Define the cars vector with 5 values
+cars &lt;- c(1, 3, 6, 4, 9)
+
+# Graph the cars vector with all defaults
+plot(cars)
+</code></pre>
+<p><img alt="png" src="../BIOI611_introR_files/BIOI611_introR_43_0.png" /></p>
+<p>Let's add a title, a line to connect the points, and some color:</p>
+<pre><code class="language-R"># Define the cars vector with 5 values
+cars &lt;- c(1, 3, 6, 4, 9)
+
+# Graph cars using blue points overlayed by a line
+plot(cars, type=&quot;o&quot;, col=&quot;blue&quot;)
+
+# Create a title with a red, bold/italic font
+title(main=&quot;Autos&quot;, col.main=&quot;red&quot;, font.main=4)
+</code></pre>
+<p><img alt="png" src="../BIOI611_introR_files/BIOI611_introR_45_0.png" /></p>
+<pre><code class="language-R"># Define 2 vectors
+cars &lt;- c(1, 3, 6, 4, 9)
+trucks &lt;- c(2, 5, 4, 5, 12)
+
+# Graph cars using a y axis that ranges from 0 to 12
+plot(cars, type=&quot;o&quot;, col=&quot;blue&quot;, ylim=c(0,12))
+
+# Graph trucks with red dashed line and square points
+lines(trucks, type=&quot;o&quot;, pch=22, lty=2, col=&quot;red&quot;)
+
+# Create a title with a red, bold/italic font
+title(main=&quot;Autos&quot;, col.main=&quot;red&quot;, font.main=4)
+</code></pre>
+<p><img alt="png" src="../BIOI611_introR_files/BIOI611_introR_47_0.png" /></p>
+<pre><code class="language-R">csv_url &lt;- &quot;https://gist.githubusercontent.com/seankross/a412dfbd88b3db70b74b/raw/5f23f993cd87c283ce766e7ac6b329ee7cc2e1d1/mtcars.csv&quot;
+</code></pre>
+<pre><code class="language-R">mtcars &lt;- read.csv(csv_url)
+mtcars
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 32 × 12</caption>
+<thead>
+    <tr><th scope=col>model</th><th scope=col>mpg</th><th scope=col>cyl</th><th scope=col>disp</th><th scope=col>hp</th><th scope=col>drat</th><th scope=col>wt</th><th scope=col>qsec</th><th scope=col>vs</th><th scope=col>am</th><th scope=col>gear</th><th scope=col>carb</th></tr>
+    <tr><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><td>Mazda RX4          </td><td>21.0</td><td>6</td><td>160.0</td><td>110</td><td>3.90</td><td>2.620</td><td>16.46</td><td>0</td><td>1</td><td>4</td><td>4</td></tr>
+    <tr><td>Mazda RX4 Wag      </td><td>21.0</td><td>6</td><td>160.0</td><td>110</td><td>3.90</td><td>2.875</td><td>17.02</td><td>0</td><td>1</td><td>4</td><td>4</td></tr>
+    <tr><td>Datsun 710         </td><td>22.8</td><td>4</td><td>108.0</td><td> 93</td><td>3.85</td><td>2.320</td><td>18.61</td><td>1</td><td>1</td><td>4</td><td>1</td></tr>
+    <tr><td>Hornet 4 Drive     </td><td>21.4</td><td>6</td><td>258.0</td><td>110</td><td>3.08</td><td>3.215</td><td>19.44</td><td>1</td><td>0</td><td>3</td><td>1</td></tr>
+    <tr><td>Hornet Sportabout  </td><td>18.7</td><td>8</td><td>360.0</td><td>175</td><td>3.15</td><td>3.440</td><td>17.02</td><td>0</td><td>0</td><td>3</td><td>2</td></tr>
+    <tr><td>Valiant            </td><td>18.1</td><td>6</td><td>225.0</td><td>105</td><td>2.76</td><td>3.460</td><td>20.22</td><td>1</td><td>0</td><td>3</td><td>1</td></tr>
+    <tr><td>Duster 360         </td><td>14.3</td><td>8</td><td>360.0</td><td>245</td><td>3.21</td><td>3.570</td><td>15.84</td><td>0</td><td>0</td><td>3</td><td>4</td></tr>
+    <tr><td>Merc 240D          </td><td>24.4</td><td>4</td><td>146.7</td><td> 62</td><td>3.69</td><td>3.190</td><td>20.00</td><td>1</td><td>0</td><td>4</td><td>2</td></tr>
+    <tr><td>Merc 230           </td><td>22.8</td><td>4</td><td>140.8</td><td> 95</td><td>3.92</td><td>3.150</td><td>22.90</td><td>1</td><td>0</td><td>4</td><td>2</td></tr>
+    <tr><td>Merc 280           </td><td>19.2</td><td>6</td><td>167.6</td><td>123</td><td>3.92</td><td>3.440</td><td>18.30</td><td>1</td><td>0</td><td>4</td><td>4</td></tr>
+    <tr><td>Merc 280C          </td><td>17.8</td><td>6</td><td>167.6</td><td>123</td><td>3.92</td><td>3.440</td><td>18.90</td><td>1</td><td>0</td><td>4</td><td>4</td></tr>
+    <tr><td>Merc 450SE         </td><td>16.4</td><td>8</td><td>275.8</td><td>180</td><td>3.07</td><td>4.070</td><td>17.40</td><td>0</td><td>0</td><td>3</td><td>3</td></tr>
+    <tr><td>Merc 450SL         </td><td>17.3</td><td>8</td><td>275.8</td><td>180</td><td>3.07</td><td>3.730</td><td>17.60</td><td>0</td><td>0</td><td>3</td><td>3</td></tr>
+    <tr><td>Merc 450SLC        </td><td>15.2</td><td>8</td><td>275.8</td><td>180</td><td>3.07</td><td>3.780</td><td>18.00</td><td>0</td><td>0</td><td>3</td><td>3</td></tr>
+    <tr><td>Cadillac Fleetwood </td><td>10.4</td><td>8</td><td>472.0</td><td>205</td><td>2.93</td><td>5.250</td><td>17.98</td><td>0</td><td>0</td><td>3</td><td>4</td></tr>
+    <tr><td>Lincoln Continental</td><td>10.4</td><td>8</td><td>460.0</td><td>215</td><td>3.00</td><td>5.424</td><td>17.82</td><td>0</td><td>0</td><td>3</td><td>4</td></tr>
+    <tr><td>Chrysler Imperial  </td><td>14.7</td><td>8</td><td>440.0</td><td>230</td><td>3.23</td><td>5.345</td><td>17.42</td><td>0</td><td>0</td><td>3</td><td>4</td></tr>
+    <tr><td>Fiat 128           </td><td>32.4</td><td>4</td><td> 78.7</td><td> 66</td><td>4.08</td><td>2.200</td><td>19.47</td><td>1</td><td>1</td><td>4</td><td>1</td></tr>
+    <tr><td>Honda Civic        </td><td>30.4</td><td>4</td><td> 75.7</td><td> 52</td><td>4.93</td><td>1.615</td><td>18.52</td><td>1</td><td>1</td><td>4</td><td>2</td></tr>
+    <tr><td>Toyota Corolla     </td><td>33.9</td><td>4</td><td> 71.1</td><td> 65</td><td>4.22</td><td>1.835</td><td>19.90</td><td>1</td><td>1</td><td>4</td><td>1</td></tr>
+    <tr><td>Toyota Corona      </td><td>21.5</td><td>4</td><td>120.1</td><td> 97</td><td>3.70</td><td>2.465</td><td>20.01</td><td>1</td><td>0</td><td>3</td><td>1</td></tr>
+    <tr><td>Dodge Challenger   </td><td>15.5</td><td>8</td><td>318.0</td><td>150</td><td>2.76</td><td>3.520</td><td>16.87</td><td>0</td><td>0</td><td>3</td><td>2</td></tr>
+    <tr><td>AMC Javelin        </td><td>15.2</td><td>8</td><td>304.0</td><td>150</td><td>3.15</td><td>3.435</td><td>17.30</td><td>0</td><td>0</td><td>3</td><td>2</td></tr>
+    <tr><td>Camaro Z28         </td><td>13.3</td><td>8</td><td>350.0</td><td>245</td><td>3.73</td><td>3.840</td><td>15.41</td><td>0</td><td>0</td><td>3</td><td>4</td></tr>
+    <tr><td>Pontiac Firebird   </td><td>19.2</td><td>8</td><td>400.0</td><td>175</td><td>3.08</td><td>3.845</td><td>17.05</td><td>0</td><td>0</td><td>3</td><td>2</td></tr>
+    <tr><td>Fiat X1-9          </td><td>27.3</td><td>4</td><td> 79.0</td><td> 66</td><td>4.08</td><td>1.935</td><td>18.90</td><td>1</td><td>1</td><td>4</td><td>1</td></tr>
+    <tr><td>Porsche 914-2      </td><td>26.0</td><td>4</td><td>120.3</td><td> 91</td><td>4.43</td><td>2.140</td><td>16.70</td><td>0</td><td>1</td><td>5</td><td>2</td></tr>
+    <tr><td>Lotus Europa       </td><td>30.4</td><td>4</td><td> 95.1</td><td>113</td><td>3.77</td><td>1.513</td><td>16.90</td><td>1</td><td>1</td><td>5</td><td>2</td></tr>
+    <tr><td>Ford Pantera L     </td><td>15.8</td><td>8</td><td>351.0</td><td>264</td><td>4.22</td><td>3.170</td><td>14.50</td><td>0</td><td>1</td><td>5</td><td>4</td></tr>
+    <tr><td>Ferrari Dino       </td><td>19.7</td><td>6</td><td>145.0</td><td>175</td><td>3.62</td><td>2.770</td><td>15.50</td><td>0</td><td>1</td><td>5</td><td>6</td></tr>
+    <tr><td>Maserati Bora      </td><td>15.0</td><td>8</td><td>301.0</td><td>335</td><td>3.54</td><td>3.570</td><td>14.60</td><td>0</td><td>1</td><td>5</td><td>8</td></tr>
+    <tr><td>Volvo 142E         </td><td>21.4</td><td>4</td><td>121.0</td><td>109</td><td>4.11</td><td>2.780</td><td>18.60</td><td>1</td><td>1</td><td>4</td><td>2</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">plot(mtcars$wt,mtcars$mpg, main=&quot;Scatterplot in Base R&quot;,
+   xlab=&quot;Car Weight&quot;, ylab=&quot;MPG&quot;,
+   pch=4, col = &quot;blue&quot;, lwd=1, cex = 2)
+abline(lm(mtcars$mpg~mtcars$wt), col=&quot;red&quot;)
+text(mtcars$wt, mtcars$mpg, labels=rownames(mtcars), cex=0.5, font=2)
+</code></pre>
+<p><img alt="png" src="../BIOI611_introR_files/BIOI611_introR_50_0.png" /></p>
+<pre><code class="language-R">hist(mtcars$hp,
+      prob = TRUE)
+lines(density(mtcars$hp), # density plot
+     lwd = 2, # thickness of line
+     col = &quot;red&quot;)
+abline(v=mean(mtcars$hp),
+     lty=&quot;dashed&quot;,
+     col=&quot;blue&quot;)
+</code></pre>
+<p><img alt="png" src="../BIOI611_introR_files/BIOI611_introR_51_0.png" /></p>
+<p><code>Probability Density</code>: It tells you how the data is distributed over different ranges (or bins) of values. The height of each bar shows how densely the data is packed in that range of horsepower values.</p>
+<h4 id="producing-graphs-using-ggplot2">Producing graphs using ggplot2</h4>
+<pre><code class="language-R">library(ggplot2)
+</code></pre>
+<pre><code class="language-R">ggplot(mtcars, aes(x=wt, y=mpg)) +
+  geom_point(size=5, shape=4, color=&quot;blue&quot;, stroke=1) +
+  geom_smooth(method=lm, color=&quot;red&quot;) +
+  ggtitle(&quot;Scatterplot in ggplot2&quot;) +
+  xlab(&quot;Car Weight&quot;) + # for the x axis label
+  geom_text(label=rownames(mtcars),cex=3)
+</code></pre>
+<pre><code>[1m[22m`geom_smooth()` using formula = 'y ~ x'
+</code></pre>
+<p><img alt="png" src="../BIOI611_introR_files/BIOI611_introR_55_1.png" /></p>
+<pre><code class="language-R">ggplot(mtcars, aes(x = hp)) +
+  geom_histogram(aes(y = ..density..),
+                 bins = 6, # You can adjust the number of bins
+                 fill = &quot;lightblue&quot;,
+                 color = &quot;black&quot;) +  # Histogram with probability density
+  geom_density(color = &quot;red&quot;, size = 1.5) +  # Add the density plot
+  geom_vline(aes(xintercept = mean(hp)),
+             linetype = &quot;dashed&quot;,
+             color = &quot;blue&quot;,
+             size = 1.2) +  # Add dashed blue vertical line at the mean
+  labs(title = &quot;Distribution of Horsepower in mtcars Dataset&quot;,
+       x = &quot;Horsepower&quot;,
+       y = &quot;Density&quot;) +  # Add axis labels and title
+  theme_minimal() # Use a clean theme for the plot
+
+</code></pre>
+<p><img alt="png" src="../BIOI611_introR_files/BIOI611_introR_56_0.png" /></p>
+<h2 id="reference">Reference</h2>
+<p>https://sites.harding.edu/fmccown/R/</p>
+<p>https://jtr13.github.io/cc21fall2/base-r-vs.-ggplot2-visualization.html#base-r-vs.-ggplot2-visualization</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../Phred_FQ/" class="btn btn-neutral float-left" title="Phred score in FASTQ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../BIOI611_DESeq2_analysis/" class="btn btn-neutral float-right" title="DEG analysis using DESeq2">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../Phred_FQ/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../BIOI611_DESeq2_analysis/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

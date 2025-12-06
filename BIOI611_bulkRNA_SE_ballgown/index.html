@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>DE analysis at isoform-leve using ballgown (C. ele data) - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "DE analysis at isoform-leve using ballgown (C. ele data)";
+        var mkdocs_page_input_path = "BIOI611_bulkRNA_SE_ballgown.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#install-r-package">Install R package</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#accessing-assembly-data">Accessing assembly data</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#expr">expr</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#indexes">Indexes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#plotting-transcript-structures">Plotting transcript structures</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#differential-expression-analysis">Differential expression analysis</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#reference">Reference</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Bulk RNA-seq</li>
+      <li class="breadcrumb-item active">DE analysis at isoform-leve using ballgown (C. ele data)</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/BIOI611_bulkRNA_SE_ballgown.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a href="https://colab.research.google.com/github/Bix4UMD/BIOI611_lab/blob/main/docs/BIOI611_bulkRNA_SE_ballgown.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a></p>
+<h1 id="isoform-level-differential-expression-analysis-with-ballgown">Isoform-level differential expression analysis with Ballgown.</h1>
+<h2 id="install-r-package">Install R package</h2>
+<pre><code class="language-R">if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+
+BiocManager::install(&quot;ballgown&quot;)
+</code></pre>
+<pre><code>Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+
+'getOption("repos")' replaces Bioconductor standard repositories, see
+'help("repositories", package = "BiocManager")' for details.
+Replacement repositories:
+    CRAN: https://cran.rstudio.com
+
+Bioconductor version 3.19 (BiocManager 1.30.25), R 4.4.1 (2024-06-14)
+
+Installing package(s) 'BiocVersion', 'ballgown'
+
+also installing the dependencies ‘plogr’, ‘png’, ‘formatR’, ‘abind’, ‘SparseArray’, ‘RSQLite’, ‘KEGGREST’, ‘lambda.r’, ‘futile.options’, ‘S4Arrays’, ‘DelayedArray’, ‘MatrixGenerics’, ‘AnnotationDbi’, ‘annotate’, ‘futile.logger’, ‘snow’, ‘BH’, ‘locfit’, ‘bitops’, ‘Rhtslib’, ‘SummarizedExperiment’, ‘RCurl’, ‘rjson’, ‘BiocGenerics’, ‘XVector’, ‘genefilter’, ‘BiocParallel’, ‘matrixStats’, ‘edgeR’, ‘statmod’, ‘XML’, ‘Biostrings’, ‘zlibbioc’, ‘Rsamtools’, ‘GenomicAlignments’, ‘BiocIO’, ‘restfulr’, ‘UCSC.utils’, ‘GenomeInfoDbData’, ‘GenomicRanges’, ‘IRanges’, ‘S4Vectors’, ‘sva’, ‘limma’, ‘rtracklayer’, ‘Biobase’, ‘GenomeInfoDb’
+
+
+Old packages: 'gtable'
+</code></pre>
+<pre><code class="language-R">library(ballgown)
+
+</code></pre>
+<pre><code>Attaching package: ‘ballgown’
+
+
+The following object is masked from ‘package:base’:
+
+    structure
+</code></pre>
+<blockquote>
+<p><img src="https://github.com/user-attachments/assets/0c96db06-eddd-4a81-8876-c357edaef7c2" width=5% height=5%>
+Please upload your data generated by `tablemaker. Please refer to the section <strong>Running Tablemaker</strong> the link <a href="https://www.bioconductor.org/packages/release/bioc/vignettes/ballgown/inst/doc/ballgown.html">here</a> for details.</p>
+</blockquote>
+<p>You can also download a copy from the path below:</p>
+<pre><code>/scratch/zt1/project/bioi611/shared/output/bulkRNA_SE_tablemaker.tar.gz
+</code></pre>
+<p>Or you can download a copy via the link below:</p>
+<p>https://umd0-my.sharepoint.com/:u:/g/personal/xie186_umd_edu/EYLz8khnMeRCmyK_YFDDXaQBP_4hzpAgs_nN-TNXghdQMQ?e=5By9ct</p>
+<pre><code class="language-R">getwd()
+</code></pre>
+<p>'/content'</p>
+<pre><code class="language-R">
+system(&quot;tar zxvf bulkRNA_SE_tablemaker.tar.gz&quot;)
+</code></pre>
+<pre><code class="language-R">data_directory = file.path(getwd(), &quot;bulkRNA_SE_tablemaker&quot;)
+data_directory
+</code></pre>
+<p>'/content/bulkRNA_SE_tablemaker'</p>
+<pre><code class="language-R"># make the ballgown object:
+bg = ballgown(dataDir = data_directory, samplePattern='N2_day', meas='all')
+bg
+</code></pre>
+<pre><code>Mon Oct 28 10:28:23 2024
+
+Mon Oct 28 10:28:23 2024: Reading linking tables
+
+Mon Oct 28 10:28:24 2024: Reading intron data files
+
+Mon Oct 28 10:28:27 2024: Merging intron data
+
+Mon Oct 28 10:28:27 2024: Reading exon data files
+
+Mon Oct 28 10:28:33 2024: Merging exon data
+
+Mon Oct 28 10:28:34 2024: Reading transcript data files
+
+Mon Oct 28 10:28:38 2024: Merging transcript data
+
+Wrapping up the results
+
+Mon Oct 28 10:28:38 2024
+
+
+
+
+ballgown instance with 60032 transcripts and 6 samples
+</code></pre>
+<h2 id="accessing-assembly-data">Accessing assembly data</h2>
+<p>A ballgown object has six slots: structure, expr, indexes, dirs, mergedDate, and meas.</p>
+<p>Exon, intron, and transcript structures are easily extracted from the main ballgown object:</p>
+<pre><code class="language-R">structure(bg)$exon
+
+</code></pre>
+<pre><code>GRanges object with 178766 ranges and 2 metadata columns:
+           seqnames      ranges strand |        id transcripts
+              &lt;Rle&gt;   &lt;IRanges&gt;  &lt;Rle&gt; | &lt;integer&gt; &lt;character&gt;
+       [1]        I   3747-3909      - |         1           1
+       [2]        I   4116-4358      - |         2           2
+       [3]        I   5195-5296      - |         3           2
+       [4]        I   6037-6327      - |         4           2
+       [5]        I   9727-9846      - |         5           2
+       ...      ...         ...    ... .       ...         ...
+  [178762]    MtDNA 10348-10401      + |    178762       60028
+  [178763]    MtDNA 10403-11354      + |    178763       60029
+  [178764]    MtDNA 11356-11691      + |    178764       60030
+  [178765]    MtDNA 11691-13272      + |    178765       60031
+  [178766]    MtDNA 13275-13327      + |    178766       60032
+  -------
+  seqinfo: 7 sequences from an unspecified genome; no seqlengths
+</code></pre>
+<pre><code class="language-R">structure(bg)$intron
+
+</code></pre>
+<pre><code>GRanges object with 116284 ranges and 2 metadata columns:
+           seqnames            ranges strand |        id transcripts
+              &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; | &lt;integer&gt; &lt;character&gt;
+       [1]        I         4359-5194      - |         1           2
+       [2]        I         5297-6036      - |         2           2
+       [3]        I         6328-9726      - |         3           2
+       [4]        I        9847-10094      - |         4           2
+       [5]        I       11562-11617      + |         5         3:4
+       ...      ...               ...    ... .       ...         ...
+  [116280]        X 17715112-17716973      + |    116280 59995:59996
+  [116281]        X 17717088-17717170      + |    116281 59995:59996
+  [116282]        X 17717279-17717327      + |    116282 59995:59996
+  [116283]        X 17717444-17718427      + |    116283       59995
+  [116284]        X 17717444-17718434      + |    116284       59996
+  -------
+  seqinfo: 6 sequences from an unspecified genome; no seqlengths
+</code></pre>
+<pre><code class="language-R">structure(bg)$trans
+
+</code></pre>
+<pre><code>GRangesList object of length 60032:
+$`1`
+GRanges object with 1 range and 2 metadata columns:
+      seqnames    ranges strand |        id transcripts
+         &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;integer&gt; &lt;character&gt;
+  [1]        I 3747-3909      - |         1           1
+  -------
+  seqinfo: 7 sequences from an unspecified genome; no seqlengths
+
+$`2`
+GRanges object with 5 ranges and 2 metadata columns:
+      seqnames      ranges strand |        id transcripts
+         &lt;Rle&gt;   &lt;IRanges&gt;  &lt;Rle&gt; | &lt;integer&gt; &lt;character&gt;
+  [1]        I   4116-4358      - |         2           2
+  [2]        I   5195-5296      - |         3           2
+  [3]        I   6037-6327      - |         4           2
+  [4]        I   9727-9846      - |         5           2
+  [5]        I 10095-10230      - |         6           2
+  -------
+  seqinfo: 7 sequences from an unspecified genome; no seqlengths
+
+$`3`
+GRanges object with 5 ranges and 2 metadata columns:
+      seqnames      ranges strand |        id transcripts
+         &lt;Rle&gt;   &lt;IRanges&gt;  &lt;Rle&gt; | &lt;integer&gt; &lt;character&gt;
+  [1]        I 11495-11561      + |         7         3:4
+  [2]        I 11618-11689      + |         8         3:5
+  [3]        I 14951-15160      + |         9         3:5
+  [4]        I 16473-16585      + |        10     c(3, 6)
+  [5]        I 16702-16793      + |        11           3
+  -------
+  seqinfo: 7 sequences from an unspecified genome; no seqlengths
+
+...
+&lt;60029 more elements&gt;
+</code></pre>
+<h3 id="expr">expr</h3>
+<p>The expr slot is a list that contains tables of expression data for the genomic features. These tables are very similar to the *_data.ctab Tablemaker output files. Ballgown implements the following syntax to access components of the expr slot:</p>
+<pre><code>*expr(ballgown_object_name, &lt;EXPRESSION_MEASUREMENT&gt;)
+</code></pre>
+<p>where * is either e for exon, i for intron, t for transcript, or g for gene, and is an expression-measurement column name from the appropriate .ctab file. Gene-level measurements are calculated by aggregating the transcript-level measurements for that gene. All of the following are valid ways to extract expression data from the bg ballgown object:</p>
+<pre><code class="language-R">transcript_fpkm = texpr(bg, 'FPKM')
+transcript_cov = texpr(bg, 'cov')
+whole_tx_table = texpr(bg, 'all')
+exon_mcov = eexpr(bg, 'mcov')
+junction_rcount = iexpr(bg)
+whole_intron_table = iexpr(bg, 'all')
+gene_expression = gexpr(bg)
+</code></pre>
+<pre><code>Warning message in .normarg_f(f, x):
+“'NROW(x)' is not a multiple of split factor length”
+Warning message in tlengths * tmeas:
+“longer object length is not a multiple of shorter object length”
+</code></pre>
+<h3 id="indexes">Indexes</h3>
+<pre><code class="language-R">sampleNames(bg)
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'N2_day1_rep1'</li><li>'N2_day1_rep2'</li><li>'N2_day1_rep3'</li><li>'N2_day7_rep1'</li><li>'N2_day7_rep2'</li><li>'N2_day7_rep3'</li></ol>
+
+<pre><code class="language-R">pData(bg) = data.frame(id=sampleNames(bg), group=rep(c(&quot;young&quot;,&quot;old&quot;), each=3))
+</code></pre>
+<pre><code class="language-R">pData(bg)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 2</caption>
+<thead>
+    <tr><th scope=col>id</th><th scope=col>group</th></tr>
+    <tr><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><td>N2_day1_rep1</td><td>young</td></tr>
+    <tr><td>N2_day1_rep2</td><td>young</td></tr>
+    <tr><td>N2_day1_rep3</td><td>young</td></tr>
+    <tr><td>N2_day7_rep1</td><td>old  </td></tr>
+    <tr><td>N2_day7_rep2</td><td>old  </td></tr>
+    <tr><td>N2_day7_rep3</td><td>old  </td></tr>
+</tbody>
+</table>
+
+<h3 id="plotting-transcript-structures">Plotting transcript structures</h3>
+<pre><code class="language-R">plotTranscripts(gene='WBGene00002054', gown=bg, samples='N2_day1_rep1',
+    meas='FPKM', colorby='transcript',
+    main='transcripts from gene XLOC_000454: sample 12, FPKM')
+</code></pre>
+<p><img alt="png" src="../BIOI611_bulkRNA_SE_ballgown_files/BIOI611_bulkRNA_SE_ballgown_22_0.png" /></p>
+<p>It is also possible to plot several samples at once:</p>
+<pre><code class="language-R">plotTranscripts('WBGene00002054', bg,
+    samples=c('N2_day1_rep1', 'N2_day7_rep1'),
+    meas='FPKM', colorby='transcript')
+</code></pre>
+<p><img alt="png" src="../BIOI611_bulkRNA_SE_ballgown_files/BIOI611_bulkRNA_SE_ballgown_24_0.png" /></p>
+<pre><code class="language-R">
+</code></pre>
+<p>You can also make side-by-side plots comparing mean abundances between groups (here, 0 and 1):</p>
+<pre><code class="language-R">plotMeans('WBGene00002054', bg, groupvar='group', meas='FPKM', colorby='transcript')
+</code></pre>
+<p><img alt="png" src="../BIOI611_bulkRNA_SE_ballgown_files/BIOI611_bulkRNA_SE_ballgown_27_0.png" /></p>
+<h2 id="differential-expression-analysis">Differential expression analysis</h2>
+<p>Ballgown provides a wide selection of simple, fast statistical methods for testing whether transcripts are differentially expressed between experimental conditions or across a continuous covariate (such as time).</p>
+<pre><code class="language-R">stat_results = stattest(bg, feature='transcript',
+                   meas='FPKM', covariate='group',
+                   getFC=TRUE)
+
+</code></pre>
+<pre><code class="language-R">results_transcripts &lt;- data.frame(geneNames = geneNames(bg),
+                                  geneIDs = geneIDs(bg),
+                                  transcriptNames = transcriptNames(bg),
+                                  stat_results)
+</code></pre>
+<pre><code class="language-R">head(results_transcripts)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 8</caption>
+<thead>
+    <tr><th></th><th scope=col>geneNames</th><th scope=col>geneIDs</th><th scope=col>transcriptNames</th><th scope=col>feature</th><th scope=col>id</th><th scope=col>fc</th><th scope=col>pval</th><th scope=col>qval</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1</th><td>Y74C9A.6</td><td>WBGene00023193</td><td>Y74C9A.6   </td><td>transcript</td><td>1</td><td>0.3087935</td><td>0.313759448</td><td>0.52196762</td></tr>
+    <tr><th scope=row>2</th><td>homt-1  </td><td>WBGene00022277</td><td>Y74C9A.3.1 </td><td>transcript</td><td>2</td><td>0.6960674</td><td>0.006886113</td><td>0.08724496</td></tr>
+    <tr><th scope=row>3</th><td>nlp-40  </td><td>WBGene00022276</td><td>Y74C9A.2a.3</td><td>transcript</td><td>3</td><td>0.9999961</td><td>0.948535319</td><td>0.96924051</td></tr>
+    <tr><th scope=row>4</th><td>nlp-40  </td><td>WBGene00022276</td><td>Y74C9A.2a.1</td><td>transcript</td><td>4</td><td>0.4248382</td><td>0.040862773</td><td>0.16836530</td></tr>
+    <tr><th scope=row>5</th><td>nlp-40  </td><td>WBGene00022276</td><td>Y74C9A.2a.2</td><td>transcript</td><td>5</td><td>4.8007011</td><td>0.050336942</td><td>0.18664213</td></tr>
+    <tr><th scope=row>6</th><td>nlp-40  </td><td>WBGene00022276</td><td>Y74C9A.2b.1</td><td>transcript</td><td>6</td><td>0.6299300</td><td>0.112477785</td><td>0.29368625</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">results_transcripts &lt;- results_transcripts[order(results_transcripts$qval), ]
+</code></pre>
+<pre><code class="language-R">head(results_transcripts, 10)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 10 × 8</caption>
+<thead>
+    <tr><th></th><th scope=col>geneNames</th><th scope=col>geneIDs</th><th scope=col>transcriptNames</th><th scope=col>feature</th><th scope=col>id</th><th scope=col>fc</th><th scope=col>pval</th><th scope=col>qval</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>1940</th><td>F48C1.8   </td><td>WBGene00018600</td><td>F48C1.8.1   </td><td>transcript</td><td>1940 </td><td> 2.1012606</td><td>5.213184e-06</td><td>0.01647351</td></tr>
+    <tr><th scope=row>3643</th><td>F32H2.15  </td><td>WBGene00284858</td><td>F32H2.15    </td><td>transcript</td><td>3643 </td><td> 0.1912040</td><td>1.087705e-06</td><td>0.01647351</td></tr>
+    <tr><th scope=row>3811</th><td>lin-41    </td><td>WBGene00003026</td><td>C12C8.3a.1  </td><td>transcript</td><td>3811 </td><td>12.1472453</td><td>2.940965e-06</td><td>0.01647351</td></tr>
+    <tr><th scope=row>6887</th><td>          </td><td>WBGene00044425</td><td>F54D12.11   </td><td>transcript</td><td>6887 </td><td> 0.8775027</td><td>7.411872e-06</td><td>0.01647351</td></tr>
+    <tr><th scope=row>8957</th><td>ifb-2     </td><td>WBGene00002054</td><td>F10C1.7a.1  </td><td>transcript</td><td>8957 </td><td> 4.5625027</td><td>1.180041e-06</td><td>0.01647351</td></tr>
+    <tr><th scope=row>20015</th><td>Y69A2AR.28</td><td>WBGene00022099</td><td>Y69A2AR.28.1</td><td>transcript</td><td>20015</td><td> 0.6076403</td><td>7.905547e-06</td><td>0.01647351</td></tr>
+    <tr><th scope=row>20798</th><td>str-185   </td><td>WBGene00006228</td><td>R08C7.7.1   </td><td>transcript</td><td>20798</td><td> 0.9668631</td><td>8.516315e-06</td><td>0.01647351</td></tr>
+    <tr><th scope=row>23441</th><td>unc-44    </td><td>WBGene00006780</td><td>B0350.2a.1  </td><td>transcript</td><td>23441</td><td> 3.3319026</td><td>5.919439e-06</td><td>0.01647351</td></tr>
+    <tr><th scope=row>25280</th><td>plp-1     </td><td>WBGene00004046</td><td>F45E4.2.1   </td><td>transcript</td><td>25280</td><td> 0.7053267</td><td>7.087841e-06</td><td>0.01647351</td></tr>
+    <tr><th scope=row>25710</th><td>          </td><td>WBGene00023488</td><td>T26A8.5     </td><td>transcript</td><td>25710</td><td> 0.9632862</td><td>8.470675e-06</td><td>0.01647351</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">results_transcripts[results_transcripts$geneIDs == &quot;WBGene00002054&quot;, ]
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 3 × 8</caption>
+<thead>
+    <tr><th></th><th scope=col>geneNames</th><th scope=col>geneIDs</th><th scope=col>transcriptNames</th><th scope=col>feature</th><th scope=col>id</th><th scope=col>fc</th><th scope=col>pval</th><th scope=col>qval</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>8957</th><td>ifb-2</td><td>WBGene00002054</td><td>F10C1.7a.1</td><td>transcript</td><td>8957</td><td>4.562503</td><td>1.180041e-06</td><td>0.01647351</td></tr>
+    <tr><th scope=row>8956</th><td>ifb-2</td><td>WBGene00002054</td><td>F10C1.7c.1</td><td>transcript</td><td>8956</td><td>3.554543</td><td>3.838807e-04</td><td>0.04612121</td></tr>
+    <tr><th scope=row>8958</th><td>ifb-2</td><td>WBGene00002054</td><td>F10C1.7e.1</td><td>transcript</td><td>8958</td><td>1.009672</td><td>8.838138e-01</td><td>0.93058010</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">plotMeans('WBGene00002054', bg, groupvar='group', meas='FPKM', colorby='transcript')
+</code></pre>
+<p><img alt="png" src="../BIOI611_bulkRNA_SE_ballgown_files/BIOI611_bulkRNA_SE_ballgown_36_0.png" /></p>
+<pre><code class="language-R">write.csv(results_transcripts,
+   file = &quot;BIOI611_bulkRNA_SE_ballgown.csv&quot;,
+   row.names = FALSE)
+</code></pre>
+<pre><code class="language-R">sessionInfo()
+</code></pre>
+<pre><code>R version 4.4.1 (2024-06-14)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.3 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base
+
+other attached packages:
+[1] ballgown_2.36.0
+
+loaded via a namespace (and not attached):
+ [1] IRdisplay_1.1               blob_1.2.4                 
+ [3] Biostrings_2.72.1           bitops_1.0-9               
+ [5] fastmap_1.2.0               RCurl_1.98-1.16            
+ [7] GenomicAlignments_1.40.0    XML_3.99-0.17              
+ [9] digest_0.6.37               lifecycle_1.0.4            
+[11] survival_3.7-0              statmod_1.5.0              
+[13] KEGGREST_1.44.1             RSQLite_2.3.7              
+[15] genefilter_1.86.0           compiler_4.4.1             
+[17] rlang_1.1.4                 tools_4.4.1                
+[19] utf8_1.2.4                  yaml_2.3.10                
+[21] rtracklayer_1.64.0          S4Arrays_1.4.1             
+[23] bit_4.5.0                   curl_5.2.3                 
+[25] DelayedArray_0.30.1         repr_1.1.7                 
+[27] RColorBrewer_1.1-3          abind_1.4-8                
+[29] BiocParallel_1.38.0         pbdZMQ_0.3-13              
+[31] BiocGenerics_0.50.0         grid_4.4.1                 
+[33] stats4_4.4.1                fansi_1.0.6                
+[35] xtable_1.8-4                edgeR_4.2.2                
+[37] SummarizedExperiment_1.34.0 cli_3.6.3                  
+[39] crayon_1.5.3                httr_1.4.7                 
+[41] rjson_0.2.23                DBI_1.2.3                  
+[43] cachem_1.1.0                zlibbioc_1.50.0            
+[45] splines_4.4.1               parallel_4.4.1             
+[47] AnnotationDbi_1.66.0        BiocManager_1.30.25        
+[49] XVector_0.44.0              restfulr_0.0.15            
+[51] matrixStats_1.4.1           base64enc_0.1-3            
+[53] vctrs_0.6.5                 Matrix_1.7-1               
+[55] jsonlite_1.8.9              sva_3.52.0                 
+[57] IRanges_2.38.1              S4Vectors_0.42.1           
+[59] bit64_4.5.2                 locfit_1.5-9.10            
+[61] limma_3.60.6                annotate_1.82.0            
+[63] glue_1.8.0                  codetools_0.2-20           
+[65] GenomeInfoDb_1.40.1         BiocIO_1.14.0              
+[67] GenomicRanges_1.56.2        UCSC.utils_1.0.0           
+[69] pillar_1.9.0                htmltools_0.5.8.1          
+[71] IRkernel_1.3.2              GenomeInfoDbData_1.2.12    
+[73] R6_2.5.1                    evaluate_1.0.1             
+[75] lattice_0.22-6              Biobase_2.64.0             
+[77] png_0.1-8                   Rsamtools_2.20.0           
+[79] memoise_2.0.1               Rcpp_1.0.13                
+[81] uuid_1.2-1                  SparseArray_1.4.8          
+[83] nlme_3.1-166                mgcv_1.9-1                 
+[85] MatrixGenerics_1.16.0
+</code></pre>
+<h2 id="reference">Reference</h2>
+<p>https://www.bioconductor.org/packages/release/bioc/vignettes/ballgown/inst/doc/ballgown.html</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../BIOI611_ballgown_example/" class="btn btn-neutral float-left" title="DE analysis at isoform-leve using ballgown (example data)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../BIOI611_long_read_transcriptome/" class="btn btn-neutral float-right" title="Long read transcriptome">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../BIOI611_ballgown_example/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../BIOI611_long_read_transcriptome/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

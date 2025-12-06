@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat";
+        var mkdocs_page_input_path = "BIOI611_scRNA.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#install-required-r-packages">Install required R packages</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#load-required-r-packages">Load required R packages</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#understand-seurat-object">Understand Seurat object</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#access-seurat-object">Access Seurat object</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#data-preprocessing">Data preprocessing</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#how-to-read-the-violin-plot">How to read the Violin Plot</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#how-to-interpret-qc-plot">How to interpret QC plot</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#filter-out-potential-doublets-empty-droplets-and-dying-cells">Filter out potential doublets, empty droplets and dying cells</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#normalization-and-scaling-of-the-data">Normalization and Scaling of the data</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#normalization">Normalization</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#scaling-the-data">Scaling the data</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#perform-linear-dimensional-reduction">Perform linear dimensional reduction</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#determine-the-dimensionality-of-the-dataset">Determine the ‘dimensionality’ of the dataset</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cluster-the-cells">Cluster the cells</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#run-non-linear-dimensional-reduction-umaptsne">Run non-linear dimensional reduction (UMAP/tSNE)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#finding-differentially-expressed-features-cluster-biomarkers">Finding differentially expressed features (cluster biomarkers)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cell-type-annotation-using-singler">Cell type annotation using SingleR</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#manual-annotation">Manual annotation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#save-the-seurat-object">Save the Seurat object</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#use-loupe-browser-to-visualize-and-analyze-the-data">Use Loupe Browser to visualize and analyze the data</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#step-1-convert-the-seurat-object-to-cloupe-file">Step 1: convert the seurat object to cloupe file</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-2-load-the-cloupe-file-into-loupe-browser">Step 2: Load the cloupe file into Loupe Browser</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#reference">Reference</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">scRNA-seq</li>
+      <li class="breadcrumb-item active">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/BIOI611_scRNA.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a href="https://colab.research.google.com/github/Bix4UMD/BIOI611_lab/blob/main/docs/BIOI611_scRNA.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a></p>
+<h1 id="_1"></h1>
+<h2 id="install-required-r-packages">Install required R packages</h2>
+<pre><code class="language-R"># # Install the remotes package
+# if (!requireNamespace(&quot;remotes&quot;, quietly = TRUE)) {
+#   install.packages(&quot;remotes&quot;)
+# }
+# # Install Seurat
+# if (!requireNamespace(&quot;Seurat&quot;, quietly = TRUE)) {
+#     remotes::install_github(&quot;satijalab/seurat&quot;, &quot;seurat5&quot;, quiet = TRUE)
+# }
+# # Install BiocManager
+# if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+#     install.packages(&quot;BiocManager&quot;)
+
+# # Install SingleR package
+# if (!require(&quot;hdf5r&quot;, quietly = TRUE)){
+#     BiocManager::install(&quot;hdf5r&quot;)
+# }
+# # Install SingleR package
+# if (!require(&quot;presto&quot;, quietly = TRUE)){
+#     remotes::install_github(&quot;immunogenomics/presto&quot;)
+# }
+# # Install SingleR package
+# if (!require(&quot;SingleR&quot;, quietly = TRUE)){
+#     BiocManager::install(&quot;SingleR&quot;)
+# }
+# if (!require(&quot;celldex&quot;, quietly = TRUE)){
+#     BiocManager::install(&quot;celldex&quot;)
+# }
+# if (!require(&quot;SingleCellExperiment&quot;, quietly = TRUE)){
+#     BiocManager::install(&quot;SingleCellExperiment&quot;)
+# }
+# if (!require(&quot;scater&quot;, quietly = TRUE)){
+#     BiocManager::install(&quot;scater&quot;)
+# }
+</code></pre>
+<pre><code class="language-R">## Installing the R packages could take around 51 minutes
+## To speed up this process, you can download the R lib files
+## saved from a working Google Colab session
+## https://drive.google.com/file/d/1eN-Raj3Hlnml68ACZQ36VQRGZxFclneL/view?usp=sharing
+system(&quot;gdown 1eN-Raj3Hlnml68ACZQ36VQRGZxFclneL&quot;, intern = TRUE)
+</code></pre>
+<pre><code class="language-R">system(&quot;md5sum BIOI611_custom_R_lib_Nov_2025.tar.gz&quot;, intern = TRUE)
+</code></pre>
+<p><span style=white-space:pre-wrap>'fcfbd50c028468ec37d8654fda0eaec6  BIOI611_custom_R_lib_Nov_2025.tar.gz'</span></p>
+<pre><code class="language-R">## required by scater package
+system(&quot;apt-get install libx11-dev libcairo2-dev&quot;, intern = TRUE)
+system(&quot;tar zxvf BIOI611_custom_R_lib_Nov_2025.tar.gz&quot;)
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'Reading package lists...'</li><li>'Building dependency tree...'</li><li>'Reading state information...'</li><li>'libcairo2-dev is already the newest version (1.16.0-5ubuntu2).'</li><li>'libx11-dev is already the newest version (2:1.7.5-1ubuntu0.3).'</li><li>'libx11-dev set to manually installed.'</li><li>'0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.'</li></ol>
+
+<pre><code class="language-R">
+</code></pre>
+<pre><code class="language-R">.libPaths(c(&quot;/content/usr/local/lib/R/site-library&quot;, .libPaths()))
+.libPaths()
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'/content/usr/local/lib/R/site-library'</li><li>'/usr/local/lib/R/site-library'</li><li>'/usr/lib/R/site-library'</li><li>'/usr/lib/R/library'</li></ol>
+
+<h2 id="load-required-r-packages">Load required R packages</h2>
+<pre><code class="language-R">library(Seurat)
+library(dplyr)
+library(SingleR)
+library(celldex)
+library(scater)
+library(SingleCellExperiment)
+</code></pre>
+<pre><code>Loading required package: SeuratObject
+
+Loading required package: sp
+
+
+Attaching package: ‘SeuratObject’
+
+
+The following objects are masked from ‘package:base’:
+
+    intersect, t
+
+
+
+Attaching package: ‘dplyr’
+
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+
+Loading required package: SummarizedExperiment
+
+Loading required package: MatrixGenerics
+
+Loading required package: matrixStats
+
+
+Attaching package: ‘matrixStats’
+
+
+The following object is masked from ‘package:dplyr’:
+
+    count
+
+
+
+Attaching package: ‘MatrixGenerics’
+
+
+The following objects are masked from ‘package:matrixStats’:
+
+    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
+    colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
+    colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
+    colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
+    colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
+    colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
+    colWeightedMeans, colWeightedMedians, colWeightedSds,
+    colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
+    rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
+    rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
+    rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
+    rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
+    rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
+    rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
+    rowWeightedSds, rowWeightedVars
+
+
+Loading required package: GenomicRanges
+
+Loading required package: stats4
+
+Loading required package: BiocGenerics
+
+Loading required package: generics
+
+
+Attaching package: ‘generics’
+
+
+The following object is masked from ‘package:dplyr’:
+
+    explain
+
+
+The following objects are masked from ‘package:base’:
+
+    as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,
+    setequal, union
+
+
+
+Attaching package: ‘BiocGenerics’
+
+
+The following object is masked from ‘package:dplyr’:
+
+    combine
+
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,
+    order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,
+    unsplit, which.max, which.min
+
+
+Loading required package: S4Vectors
+
+
+Attaching package: ‘S4Vectors’
+
+
+The following objects are masked from ‘package:dplyr’:
+
+    first, rename
+
+
+The following object is masked from ‘package:utils’:
+
+    findMatches
+
+
+The following objects are masked from ‘package:base’:
+
+    expand.grid, I, unname
+
+
+Loading required package: IRanges
+
+
+Attaching package: ‘IRanges’
+
+
+The following objects are masked from ‘package:dplyr’:
+
+    collapse, desc, slice
+
+
+The following object is masked from ‘package:sp’:
+
+    %over%
+
+
+Loading required package: Seqinfo
+
+Loading required package: Biobase
+
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+
+
+Attaching package: ‘Biobase’
+
+
+The following object is masked from ‘package:MatrixGenerics’:
+
+    rowMedians
+
+
+The following objects are masked from ‘package:matrixStats’:
+
+    anyMissing, rowMedians
+
+
+
+Attaching package: ‘SummarizedExperiment’
+
+
+The following object is masked from ‘package:Seurat’:
+
+    Assays
+
+
+The following object is masked from ‘package:SeuratObject’:
+
+    Assays
+
+
+
+Attaching package: ‘celldex’
+
+
+The following objects are masked from ‘package:SingleR’:
+
+    BlueprintEncodeData, DatabaseImmuneCellExpressionData,
+    HumanPrimaryCellAtlasData, ImmGenData, MonacoImmuneData,
+    MouseRNAseqData, NovershternHematopoieticData
+
+
+Loading required package: SingleCellExperiment
+
+Loading required package: scuttle
+
+Loading required package: ggplot2
+</code></pre>
+<pre><code class="language-R">list.files()
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'BIOI611_custom_R_lib_Nov_2025.tar.gz'</li><li>'sample_data'</li><li>'sessionInfo.txt'</li><li>'usr'</li></ol>
+
+<pre><code class="language-R"># https://drive.google.com/file/d/1-CvmcLvKMYW-OcLuGfFuGQMK2b5_VMFk/view?usp=drive_link
+# Download &quot;filtered_feature_bc_matrix.h5&quot;
+# Output of cellranger
+system(&quot;gdown 1-CvmcLvKMYW-OcLuGfFuGQMK2b5_VMFk&quot;, intern = TRUE)
+</code></pre>
+<pre><code class="language-R">system(&quot;md5sum filtered_feature_bc_matrix.h5&quot;, intern = TRUE)
+</code></pre>
+<p><span style=white-space:pre-wrap>'360fc0760ebb9e6dd253d808a427b20d  filtered_feature_bc_matrix.h5'</span></p>
+<pre><code class="language-R">count_mtx_scrna &lt;- Read10X_h5(&quot;filtered_feature_bc_matrix.h5&quot;)
+# If you have the filtered_feature_bc_matrix/ folder, you can use
+# Read10X to create 'count_mtx_scrna'
+# system(&quot;mkdir filtered_feature_bc_matrix/; mv filtered_feature_bc_matrix.zip filtered_feature_bc_matrix&quot;)
+# system(&quot;cd filtered_feature_bc_matrix; unzip filtered_feature_bc_matrix.zip&quot;)
+# count_mtx_scrna &lt;- Read10X(&quot;filtered_feature_bc_matrix/&quot;)
+</code></pre>
+<pre><code class="language-R">class(count_mtx_scrna)
+</code></pre>
+<p>'dgCMatrix'</p>
+<p>The dgCMatrix class is a specific data structure in R's Matrix package, designed to store sparse matrices in a memory-efficient format. Sparse matrices are those with many zeros, making them ideal for high-dimensional data in applications like bioinformatics, where gene expression matrices often contain a lot of zeroes.</p>
+<blockquote>
+<p>Why Use dgCMatrix?</p>
+</blockquote>
+<ul>
+<li><strong>Memory Efficiency</strong>: Storing only non-zero values saves memory, especially in high-dimensional matrices.</li>
+<li><strong>Computational Speed</strong>: Some operations on sparse matrices can be faster, as computations are limited to non-zero entries.</li>
+</ul>
+<pre><code class="language-R">print(format(object.size(count_mtx_scrna), units = &quot;MB&quot;))
+</code></pre>
+<pre><code>[1] "168.7 Mb"
+</code></pre>
+<pre><code class="language-R"># Check a few genes in the first 20 cells
+count_mtx_scrna[c(&quot;CD3D&quot;, &quot;TCL1A&quot;, &quot;MS4A1&quot;), 100:140]
+</code></pre>
+<pre><code>  [[ suppressing 41 column names ‘AACCATGCACTCAAGT-1’, ‘AACCATGGTAGCTTGT-1’, ‘AACCATGTCAATCCGA-1’ ... ]]
+
+
+
+
+3 x 41 sparse Matrix of class "dgCMatrix"
+
+CD3D  8 1 . . . 3 . 2 10  . 3 . . . 2 7 1 . . . 1 1  . 8 . . 2 4 . . . 12 11 .
+TCL1A . . . . . . 6 .  .  . . . . . . . . . . . . . 10 . . . . . . . .  .  . .
+MS4A1 . . . . . . 9 .  . 16 . . . . . . . . . . . .  5 . . . . . . . .  .  . .
+
+CD3D   . 5 . .  . 3 .
+TCL1A  . . . .  . . .
+MS4A1 20 . . . 39 . .
+</code></pre>
+<pre><code class="language-R"># non-normalized da# Initialize the Seurat object with the raw count matrix
+pbmc &lt;- CreateSeuratObject(counts = count_mtx_scrna,
+                        project = &quot;pbmc5k&quot;,
+                        min.cells = 3, min.features = 200)
+pbmc
+</code></pre>
+<pre><code>An object of class Seurat 
+24785 features across 4884 samples within 1 assay 
+Active assay: RNA (24785 features, 0 variable features)
+ 1 layer present: counts
+</code></pre>
+<h2 id="understand-seurat-object">Understand Seurat object</h2>
+<blockquote>
+<p>Seurat slots
+https://github.com/satijalab/seurat/wiki/seurat</p>
+</blockquote>
+<pre><code class="language-R">str(pbmc)
+</code></pre>
+<pre><code>Formal class 'Seurat' [package "SeuratObject"] with 13 slots
+  ..@ assays      :List of 1
+  .. ..$ RNA:Formal class 'Assay5' [package "SeuratObject"] with 8 slots
+  .. .. .. ..@ layers    :List of 1
+  .. .. .. .. ..$ counts:Formal class 'dgCMatrix' [package "Matrix"] with 6 slots
+  .. .. .. .. .. .. ..@ i       : int [1:14449622] 6 17 42 62 79 83 85 94 100 109 ...
+  .. .. .. .. .. .. ..@ p       : int [1:4885] 0 3378 5344 5581 8581 10897 13921 16902 20299 22669 ...
+  .. .. .. .. .. .. ..@ Dim     : int [1:2] 24785 4884
+  .. .. .. .. .. .. ..@ Dimnames:List of 2
+  .. .. .. .. .. .. .. ..$ : NULL
+  .. .. .. .. .. .. .. ..$ : NULL
+  .. .. .. .. .. .. ..@ x       : num [1:14449622] 1 1 4 1 1 2 1 1 1 1 ...
+  .. .. .. .. .. .. ..@ factors : list()
+  .. .. .. ..@ cells     :Formal class 'LogMap' [package "SeuratObject"] with 1 slot
+  .. .. .. .. .. ..@ .Data: logi [1:4884, 1] TRUE TRUE TRUE TRUE TRUE TRUE ...
+  .. .. .. .. .. .. ..- attr(*, "dimnames")=List of 2
+  .. .. .. .. .. .. .. ..$ : chr [1:4884] "AAACCCATCAGATGCT-1" "AAACGAAAGTGCTACT-1" "AAACGAAGTCGTAATC-1" "AAACGAAGTTGCCAAT-1" ...
+  .. .. .. .. .. .. .. ..$ : chr "counts"
+  .. .. .. .. .. ..$ dim     : int [1:2] 4884 1
+  .. .. .. .. .. ..$ dimnames:List of 2
+  .. .. .. .. .. .. ..$ : chr [1:4884] "AAACCCATCAGATGCT-1" "AAACGAAAGTGCTACT-1" "AAACGAAGTCGTAATC-1" "AAACGAAGTTGCCAAT-1" ...
+  .. .. .. .. .. .. ..$ : chr "counts"
+  .. .. .. ..@ features  :Formal class 'LogMap' [package "SeuratObject"] with 1 slot
+  .. .. .. .. .. ..@ .Data: logi [1:24785, 1] TRUE TRUE TRUE TRUE TRUE TRUE ...
+  .. .. .. .. .. .. ..- attr(*, "dimnames")=List of 2
+  .. .. .. .. .. .. .. ..$ : chr [1:24785] "ENSG00000238009" "ENSG00000241860" "ENSG00000290385" "ENSG00000291215" ...
+  .. .. .. .. .. .. .. ..$ : chr "counts"
+  .. .. .. .. .. ..$ dim     : int [1:2] 24785 1
+  .. .. .. .. .. ..$ dimnames:List of 2
+  .. .. .. .. .. .. ..$ : chr [1:24785] "ENSG00000238009" "ENSG00000241860" "ENSG00000290385" "ENSG00000291215" ...
+  .. .. .. .. .. .. ..$ : chr "counts"
+  .. .. .. ..@ default   : int 1
+  .. .. .. ..@ assay.orig: chr(0) 
+  .. .. .. ..@ meta.data :'data.frame': 24785 obs. of  0 variables
+  .. .. .. ..@ misc      :List of 1
+  .. .. .. .. ..$ calcN: logi TRUE
+  .. .. .. ..@ key       : chr "rna_"
+  ..@ meta.data   :'data.frame':    4884 obs. of  3 variables:
+  .. ..$ orig.ident  : Factor w/ 1 level "pbmc5k": 1 1 1 1 1 1 1 1 1 1 ...
+  .. ..$ nCount_RNA  : num [1:4884] 11578 5655 14728 10903 6174 ...
+  .. ..$ nFeature_RNA: int [1:4884] 3378 1966 237 3000 2316 3024 2981 3397 2370 2811 ...
+  ..@ active.assay: chr "RNA"
+  ..@ active.ident: Factor w/ 1 level "pbmc5k": 1 1 1 1 1 1 1 1 1 1 ...
+  .. ..- attr(*, "names")= chr [1:4884] "AAACCCATCAGATGCT-1" "AAACGAAAGTGCTACT-1" "AAACGAAGTCGTAATC-1" "AAACGAAGTTGCCAAT-1" ...
+  ..@ graphs      : list()
+  ..@ neighbors   : list()
+  ..@ reductions  : list()
+  ..@ images      : list()
+  ..@ project.name: chr "pbmc5k"
+  ..@ misc        : list()
+  ..@ version     :Classes 'package_version', 'numeric_version'  hidden list of 1
+  .. ..$ : int [1:3] 5 2 0
+  ..@ commands    : list()
+  ..@ tools       : list()
+</code></pre>
+<pre><code class="language-R">
+</code></pre>
+<pre><code class="language-R">slotNames(pbmc)
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'assays'</li><li>'meta.data'</li><li>'active.assay'</li><li>'active.ident'</li><li>'graphs'</li><li>'neighbors'</li><li>'reductions'</li><li>'images'</li><li>'project.name'</li><li>'misc'</li><li>'version'</li><li>'commands'</li><li>'tools'</li></ol>
+
+<pre><code class="language-R">
+</code></pre>
+<h3 id="access-seurat-object">Access Seurat object</h3>
+<pre><code class="language-R">pbmc@active.assay
+</code></pre>
+<p>'RNA'</p>
+<pre><code class="language-R">class(pbmc@meta.data)
+head(pbmc@meta.data, 4)
+</code></pre>
+<p>'data.frame'</p>
+<table class="dataframe">
+<caption>A data.frame: 4 × 3</caption>
+<thead>
+    <tr><th></th><th scope=col>orig.ident</th><th scope=col>nCount_RNA</th><th scope=col>nFeature_RNA</th></tr>
+    <tr><th></th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>AAACCCATCAGATGCT-1</th><td>pbmc5k</td><td>11578</td><td>3378</td></tr>
+    <tr><th scope=row>AAACGAAAGTGCTACT-1</th><td>pbmc5k</td><td> 5655</td><td>1966</td></tr>
+    <tr><th scope=row>AAACGAAGTCGTAATC-1</th><td>pbmc5k</td><td>14728</td><td> 237</td></tr>
+    <tr><th scope=row>AAACGAAGTTGCCAAT-1</th><td>pbmc5k</td><td>10903</td><td>3000</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">colSums(pbmc@assays$RNA$counts)[1:3]
+</code></pre>
+<style>
+.dl-inline {width: auto; margin:0; padding: 0}
+.dl-inline>dt, .dl-inline>dd {float: none; width: auto; display: inline-block}
+.dl-inline>dt::after {content: ":\0020"; padding-right: .5ex}
+.dl-inline>dt:not(:first-of-type) {padding-left: .5ex}
+</style>
+<dl class=dl-inline><dt>AAACCCATCAGATGCT-1</dt><dd>11578</dd><dt>AAACGAAAGTGCTACT-1</dt><dd>5655</dd><dt>AAACGAAGTCGTAATC-1</dt><dd>14728</dd></dl>
+
+<pre><code class="language-R">Layers(pbmc)
+</code></pre>
+<p>'counts'</p>
+<h2 id="data-preprocessing">Data preprocessing</h2>
+<pre><code class="language-R"># Use $ operator to add columns to object metadata.
+pbmc$percent.mt &lt;- PercentageFeatureSet(pbmc,
+                           pattern = &quot;^MT-&quot;)
+
+</code></pre>
+<pre><code class="language-R">colnames(pbmc@meta.data)
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'orig.ident'</li><li>'nCount_RNA'</li><li>'nFeature_RNA'</li><li>'percent.mt'</li></ol>
+
+<pre><code class="language-R">head(pbmc, 4)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 4 × 4</caption>
+<thead>
+    <tr><th></th><th scope=col>orig.ident</th><th scope=col>nCount_RNA</th><th scope=col>nFeature_RNA</th><th scope=col>percent.mt</th></tr>
+    <tr><th></th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>AAACCCATCAGATGCT-1</th><td>pbmc5k</td><td>11578</td><td>3378</td><td>3.62756953</td></tr>
+    <tr><th scope=row>AAACGAAAGTGCTACT-1</th><td>pbmc5k</td><td> 5655</td><td>1966</td><td>4.29708223</td></tr>
+    <tr><th scope=row>AAACGAAGTCGTAATC-1</th><td>pbmc5k</td><td>14728</td><td> 237</td><td>0.02715915</td></tr>
+    <tr><th scope=row>AAACGAAGTTGCCAAT-1</th><td>pbmc5k</td><td>10903</td><td>3000</td><td>4.89773457</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">pbmc
+</code></pre>
+<pre><code>An object of class Seurat 
+24785 features across 4884 samples within 1 assay 
+Active assay: RNA (24785 features, 0 variable features)
+ 1 layer present: counts
+</code></pre>
+<pre><code class="language-R">NewVlnPlot &lt;- function(seurat_obj, col = 3){
+  # Use violin plot to visualize QC metrics
+  tem_plots &lt;- VlnPlot(
+    seurat_obj,
+    features = c(&quot;nFeature_RNA&quot;, &quot;nCount_RNA&quot;, &quot;percent.mt&quot;),
+    combine = FALSE  # return list of ggplot objects
+  )
+  # Apply theme to each plot
+  tem_plots &lt;- lapply(tem_plots, function(x) x + NoLegend())   # OR + theme_bw()
+  # Combine again
+  patchwork::wrap_plots(tem_plots, ncol = 3)
+}
+</code></pre>
+<pre><code class="language-R"># VlnPlot(
+#     pbmc,
+#     features = c(&quot;nFeature_RNA&quot;, &quot;nCount_RNA&quot;, &quot;percent.mt&quot;),
+#     col = 3
+#   )
+
+NewVlnPlot(pbmc, col = 3)
+</code></pre>
+<pre><code>Warning message:
+“Default search for "data" layer in "RNA" assay yielded no results; utilizing "counts" layer instead.”
+Warning message:
+“[1m[22mThe `slot` argument of `FetchData()` is deprecated as of SeuratObject 5.0.0.
+[36mℹ[39m Please use the `layer` argument instead.
+[36mℹ[39m The deprecated feature was likely used in the [34mSeurat[39m package.
+  Please report the issue at [3m[34m&lt;https://github.com/satijalab/seurat/issues&gt;[39m[23m.”
+Warning message:
+“[1m[22m`PackageCheck()` was deprecated in SeuratObject 5.0.0.
+[36mℹ[39m Please use `rlang::check_installed()` instead.
+[36mℹ[39m The deprecated feature was likely used in the [34mSeurat[39m package.
+  Please report the issue at [3m[34m&lt;https://github.com/satijalab/seurat/issues&gt;[39m[23m.”
+Warning message:
+“[1m[22m`aes_string()` was deprecated in ggplot2 3.0.0.
+[36mℹ[39m Please use tidy evaluation idioms with `aes()`.
+[36mℹ[39m See also `vignette("ggplot2-in-packages")` for more information.
+[36mℹ[39m The deprecated feature was likely used in the [34mSeurat[39m package.
+  Please report the issue at [3m[34m&lt;https://github.com/satijalab/seurat/issues&gt;[39m[23m.”
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_35_1.png" /></p>
+<h3 id="how-to-read-the-violin-plot">How to read the Violin Plot</h3>
+<ul>
+<li>
+<p>Shape: Each violin plot shows the distribution of values for each feature across the cells in your dataset. The shape of the plot indicates the density of cells with particular values for that feature.</p>
+<p>Wider sections indicate more cells with those values.
+Narrow sections indicate fewer cells with those values.</p>
+</li>
+<li>
+<p>Vertical Axis: Represents the range of values for each feature. For instance:</p>
+</li>
+</ul>
+<p><code>nFeature_RNA</code> and <code>nCount_RNA</code>: Higher values suggest more gene diversity and RNA content, respectively.</p>
+<p><code>percent.mt</code>: Higher values indicate higher mitochondrial content, which may point to stressed or dying cells.</p>
+<ul>
+<li>Horizontal Axis (Groups): If your dataset is separated into clusters or groups (e.g., cell types or conditions), each group will have its own violin, allowing you to compare distributions between groups.</li>
+</ul>
+<h3 id="how-to-interpret-qc-plot">How to interpret QC plot</h3>
+<p><code>nFeature_RNA</code>: The number of unique features (genes) detected per cell.</p>
+<p>Extremely high values could suggest potential doublets (two cells mistakenly captured as one), as two cells would have more unique genes combined.</p>
+<p>Low number of detected genes - potential ambient mRNA (not real cells)</p>
+<p><code>nCount_RNA</code>: The total number of RNA molecules (or unique molecular identifiers, UMIs) detected per cell.</p>
+<p>Higher counts generally indicate higher RNA content, but they could also result from cell doublets.
+Cells with very low nCount_RNA might represent poor-quality cells with low RNA capture, while very high counts may also suggest doublets.</p>
+<p><code>percent.mt</code>: The percentage of reads mapping to mitochondrial genes.</p>
+<p>High mitochondrial content often indicates cell stress or apoptosis, as damaged cells tend to release mitochondrial RNA.</p>
+<p>Filtering cells with high <code>percent.mt</code> values is common to exclude potentially dying cells.</p>
+<pre><code class="language-R"># FeatureScatter is typically used to visualize feature-feature relationships, but can be used
+# for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
+
+plot1 &lt;- FeatureScatter(pbmc, feature1 = &quot;nCount_RNA&quot;, feature2 = &quot;percent.mt&quot;)
+plot2 &lt;- FeatureScatter(pbmc, feature1 = &quot;nCount_RNA&quot;, feature2 = &quot;nFeature_RNA&quot;)
+plot1 + plot2
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_38_0.png" /></p>
+<pre><code class="language-R"># Load necessary libraries
+library(Seurat)
+library(ggplot2)
+
+# Define the function to calculate median and MAD values
+calculate_thresholds &lt;- function(seurat_obj) {
+  # Extract relevant columns
+  nFeature_values &lt;- seurat_obj@meta.data$nFeature_RNA
+  nCount_values &lt;- seurat_obj@meta.data$nCount_RNA
+  percent_mt_values &lt;- seurat_obj@meta.data$percent.mt
+
+  # Calculate medians and MADs
+  nFeature_median &lt;- median(nFeature_values, na.rm = TRUE)
+  nFeature_mad &lt;- mad(nFeature_values, constant = 1, na.rm = TRUE)
+
+  nCount_median &lt;- median(nCount_values, na.rm = TRUE)
+  nCount_mad &lt;- mad(nCount_values, constant = 1, na.rm = TRUE)
+
+  percent_mt_median &lt;- median(percent_mt_values, na.rm = TRUE)
+  percent_mt_mad &lt;- mad(percent_mt_values, constant = 1, na.rm = TRUE)
+
+  # Calculate thresholds for horizontal lines
+  thresholds &lt;- list(
+    nFeature_upper = nFeature_median + 4 * nFeature_mad,
+    nFeature_lower = nFeature_median - 4 * nFeature_mad,
+    nCount_upper = nCount_median + 4 * nCount_mad,
+    nCount_lower = nCount_median - 4 * nCount_mad,
+    percent_mt_upper = percent_mt_median + 4 * percent_mt_mad
+  )
+
+  return(thresholds)
+}
+
+# Calculate thresholds
+thresholds &lt;- calculate_thresholds(pbmc)
+
+</code></pre>
+<pre><code class="language-R">thresholds
+</code></pre>
+<dl>
+    <dt>$nFeature_upper</dt>
+        <dd>5243.5</dd>
+    <dt>$nFeature_lower</dt>
+        <dd>583.5</dd>
+    <dt>$nCount_upper</dt>
+        <dd>19044</dd>
+    <dt>$nCount_lower</dt>
+        <dd>-1224</dd>
+    <dt>$percent_mt_upper</dt>
+        <dd>8.44783722411371</dd>
+</dl>
+
+<pre><code class="language-R">vplot1 &lt;- VlnPlot(pbmc, features = c(&quot;nFeature_RNA&quot;), ncol = 2) +
+   geom_hline(yintercept = thresholds$nFeature_upper,
+              color = &quot;blue&quot;, linetype = &quot;solid&quot;) +
+   geom_hline(yintercept = thresholds$nFeature_lower,
+              color = &quot;blue&quot;, linetype = &quot;solid&quot;) +
+              theme(legend.position=&quot;none&quot;)
+vplot2 &lt;- VlnPlot(pbmc, features = c(&quot;percent.mt&quot;), ncol = 2) +
+   geom_hline(yintercept = thresholds$percent_mt_upper,
+              color = &quot;blue&quot;, linetype = &quot;solid&quot;) +
+              theme(legend.position=&quot;none&quot;)
+vplot1 + vplot2
+</code></pre>
+<pre><code>Warning message:
+“Default search for "data" layer in "RNA" assay yielded no results; utilizing "counts" layer instead.”
+Warning message:
+“Default search for "data" layer in "RNA" assay yielded no results; utilizing "counts" layer instead.”
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_41_1.png" /></p>
+<h3 id="filter-out-potential-doublets-empty-droplets-and-dying-cells">Filter out potential doublets, empty droplets and dying cells</h3>
+<pre><code class="language-R">pbmc &lt;- subset(pbmc,
+                subset =  nFeature_RNA &gt; thresholds$nCount_lower &amp;
+                nFeature_RNA &lt; thresholds$nFeature_upper &amp;
+                percent.mt &lt; thresholds$percent_mt_upper)
+
+</code></pre>
+<pre><code class="language-R"># Use violin plot to visualize QC metrics after QC
+# VlnPlot(pbmc,
+#         features = c(&quot;nFeature_RNA&quot;, &quot;nCount_RNA&quot;, &quot;percent.mt&quot;),
+#         ncol = 3)
+NewVlnPlot(pbmc, col = 3)
+</code></pre>
+<pre><code>Warning message:
+“Default search for "data" layer in "RNA" assay yielded no results; utilizing "counts" layer instead.”
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_44_1.png" /></p>
+<p>Instead of using an arbitrary number, you can also use statistical algorithm to predict doublets and empty droplets to filter the cells, such as <code>DoubletFinder</code> and <code>EmptyDrops</code>.</p>
+<h3 id="normalization-and-scaling-of-the-data">Normalization and Scaling of the data</h3>
+<h3 id="normalization">Normalization</h3>
+<p>After removing unwanted cells from the dataset, the next step is to normalize the data. By default, a global-scaling normalization method “LogNormalize” that normalizes the feature expression measurements for each cell by the total expression, multiplies this by a scale factor (10,000 by default), and log-transforms the result. In Seurat v5, Normalized values are stored in <code>pbmc[["RNA"]]$data</code>.</p>
+<pre><code class="language-R">pbmc &lt;- NormalizeData(pbmc) # normalization.method = &quot;LogNormalize&quot;, scale.factor = 10000
+</code></pre>
+<pre><code>Normalizing layer: counts
+</code></pre>
+<p>While this method of normalization is standard and widely used in scRNA-seq analysis, global-scaling relies on an assumption that each cell originally contains the same number of RNA molecules.</p>
+<p>Next, we identify a subset of features that show high variation across cells in the dataset—meaning they are highly expressed in some cells and lowly expressed in others. Prior work, including our own, has shown that focusing on these variable genes in downstream analyses can enhance the detection of biological signals in single-cell datasets.</p>
+<p>The approach used in Seurat improves upon previous versions by directly modeling the inherent mean-variance relationship in single-cell data. This method is implemented in the FindVariableFeatures() function, which, by default, selects 2,000 variable features per dataset. These features will then be used in downstream analyses, such as PCA.</p>
+<pre><code class="language-R">pbmc &lt;- FindVariableFeatures(pbmc,
+                selection.method = &quot;vst&quot;,
+                nfeatures = 2000)
+
+</code></pre>
+<pre><code>Finding variable features for layer counts
+</code></pre>
+<pre><code class="language-R"># Identify the 10 most highly variable genes
+top10 &lt;- head(VariableFeatures(pbmc), 10)
+options(repr.plot.width=10, repr.plot.height= 6)
+
+# plot variable features with and without labels
+plot1 &lt;- VariableFeaturePlot(pbmc)
+plot2 &lt;- LabelPoints(plot = plot1, points = top10, repel = TRUE)
+print(plot1)
+print(plot2)
+</code></pre>
+<pre><code>When using repel, set xnudge and ynudge to 0 for optimal results
+
+Warning message in scale_x_log10():
+“[1m[22m[32mlog-10[39m transformation introduced infinite values.”
+Warning message in scale_x_log10():
+“[1m[22m[32mlog-10[39m transformation introduced infinite values.”
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_53_1.png" /></p>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_53_2.png" /></p>
+<h3 id="scaling-the-data">Scaling the data</h3>
+<p>Next, we apply a linear transformation (<code>scaling</code>) that is a standard pre-processing step prior to dimensional reduction techniques like PCA. The <code>ScaleData()</code> function:</p>
+<p>Shifts the expression of each gene, so that the mean expression across cells is 0
+Scales the expression of each gene, so that the variance across cells is 1</p>
+<p>This step gives equal weight in downstream analyses, so that highly-expressed genes do not dominate</p>
+<p>The results of this are stored in <code>pbmc[["RNA"]]$scale.data</code></p>
+<p>By default, only variable features are scaled.
+You can specify the features argument to scale additional features.</p>
+<pre><code class="language-R">all.genes &lt;- rownames(pbmc)
+pbmc &lt;- ScaleData(pbmc, features = all.genes)
+</code></pre>
+<pre><code>Centering and scaling data matrix
+</code></pre>
+<h2 id="perform-linear-dimensional-reduction">Perform linear dimensional reduction</h2>
+<pre><code class="language-R">pbmc &lt;- RunPCA(pbmc, features = VariableFeatures(object = pbmc))
+</code></pre>
+<pre><code>PC_ 1 
+Positive:  CD247, IL32, IL7R, RORA, CAMK4, LTB, INPP4B, STAT4, BCL2, ANK3 
+       ZEB1, LEF1, TRBC1, CARD11, THEMIS, BACH2, MLLT3, RNF125, RASGRF2, NR3C2 
+       NELL2, PDE3B, LINC01934, ENSG00000290067, PRKCA, TAFA1, PYHIN1, CTSW, CSGALNACT1, SAMD3 
+Negative:  LYZ, FCN1, IRAK3, SLC8A1, CLEC7A, PLXDC2, IFI30, S100A9, SPI1, CYBB 
+       MNDA, LRMDA, FGL2, VCAN, CTSS, RBM47, CSF3R, MCTP1, NCF2, TYMP 
+       CYRIA, CST3, HCK, SLC11A1, WDFY3, S100A8, MS4A6A, MPEG1, LST1, CSTA 
+PC_ 2 
+Positive:  CD247, S100A4, STAT4, NKG7, CST7, CTSW, GZMA, SYTL3, RNF125, SAMD3 
+       NCALD, MYO1F, MYBL1, KLRD1, PLCB1, TGFBR3, PRF1, GNLY, RAP1GAP2, RORA 
+       CCL5, HOPX, FGFBP2, YES1, PYHIN1, FNDC3B, GNG2, SYNE1, KLRF1, SPON2 
+Negative:  BANK1, MS4A1, CD79A, FCRL1, PAX5, IGHM, AFF3, LINC00926, NIBAN3, EBF1 
+       IGHD, BLK, CD22, OSBPL10, HLA-DQA1, COL19A1, GNG7, KHDRBS2, RUBCNL, TNFRSF13C 
+       COBLL1, RALGPS2, TCL1A, BCL11A, CDK14, CD79B, PLEKHG1, HLA-DQB1, IGKC, BLNK 
+PC_ 3 
+Positive:  TUBB1, GP9, GP1BB, PF4, CAVIN2, GNG11, NRGN, PPBP, RGS18, PRKAR2B 
+       H2AC6, ACRBP, PTCRA, TMEM40, TREML1, CLU, LEF1, GPX1, CMTM5, SMANTIS 
+       MPIG6B, CAMK4, MPP1, SPARC, ENSG00000289621, ITGB3, MYL9, MYL4, ITGA2B, F13A1 
+Negative:  NKG7, CST7, GNLY, PRF1, KLRD1, GZMA, KLRF1, MCTP2, GZMB, FGFBP2 
+       HOPX, SPON2, C1orf21, TGFBR3, VAV3, MYBL1, CTSW, SYNE1, NCALD, IL2RB 
+       SAMD3, GNG2, BNC2, CEP78, YES1, RAP1GAP2, PDGFD, LINC02384, CARD11, CLIC3 
+PC_ 4 
+Positive:  CAMK4, INPP4B, IL7R, LEF1, PRKCA, PDE3B, MAML2, LTB, ANK3, PLCL1 
+       BCL2, CDC14A, THEMIS, FHIT, NELL2, VIM, ENSG00000290067, MLLT3, TSHZ2, NR3C2 
+       IL32, CMTM8, ENSG00000249806, ZEB1, SESN3, CSGALNACT1, TAFA1, LEF1-AS1, SLC16A10, LDLRAD4 
+Negative:  GP1BB, GP9, TUBB1, PF4, CAVIN2, GNG11, PPBP, H2AC6, PTCRA, NRGN 
+       ACRBP, TMEM40, PRKAR2B, RGS18, TREML1, MPIG6B, SMANTIS, CMTM5, CLU, SPARC 
+       ITGA2B, ITGB3, ENSG00000289621, MYL9, CAPN1-AS1, MYL4, ENSG00000288758, DAB2, PDGFA-DT, CTTN 
+PC_ 5 
+Positive:  CDKN1C, HES4, FCGR3A, PELATON, CSF1R, IFITM3, SIGLEC10, TCF7L2, ZNF703, MS4A7 
+       UICLM, ENSG00000287682, NEURL1, RHOC, FMNL2, CKB, FTL, CALHM6, HMOX1, BATF3 
+       ACTB, MYOF, CCDC26, IFITM2, PAPSS2, RRAS, LST1, VMO1, SERPINA1, LRRC25 
+Negative:  LINC02458, AKAP12, CA8, ENSG00000250696, SLC24A3, HDC, IL3RA, EPAS1, ENPP3, OSBPL1A 
+       TRPM6, CCR3, CSF2RB, SEMA3C, THSD7A, ATP10D, DACH1, CRPPA, ATP8B4, TMEM164 
+       ABHD5, CLC, CR1, ITGB8, LIN7A, TAFA2, MBOAT2, GATA2, DAPK2, GCSAML
+</code></pre>
+<p>You have several useful ways to visualize both cells and features that define the PCA, including <code>VizDimReduction()</code>, <code>DimPlot()</code>, and <code>DimHeatmap()</code>.</p>
+<pre><code class="language-R">DimPlot(pbmc, reduction = &quot;pca&quot;) + NoLegend()
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_59_0.png" /></p>
+<p><code>DimHeatmap()</code> draws a heatmap focusing on a principal component. Both cells and genes are sorted by their principal component scores</p>
+<pre><code class="language-R">DimHeatmap(pbmc, dims = 1:3, cells = 500, balanced = TRUE)
+DimHeatmap(pbmc, dims = 20:22, cells = 500, balanced = TRUE)
+
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_61_0.png" /></p>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_61_1.png" /></p>
+<pre><code class="language-R">
+</code></pre>
+<h2 id="determine-the-dimensionality-of-the-dataset">Determine the ‘dimensionality’ of the dataset</h2>
+<p>The elbow plot is a useful tool for determining the number of principal components (PCs) needed to capture the majority of variation in the data. It displays the standard deviation of each PC, with the "elbow" point typically serving as the threshold for selecting the most informative PCs. However, identifying the exact location of the elbow can be somewhat subjective.</p>
+<pre><code class="language-R">ElbowPlot(pbmc,  ndims = 50)
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_64_0.png" /></p>
+<pre><code class="language-R"># Determine the percentage of variation associated with each PC
+pct_var &lt;- pbmc[[&quot;pca&quot;]]@stdev / sum(pbmc[[&quot;pca&quot;]]@stdev) * 100
+
+# Calculate cumulative percentages for each PC
+cumu_pct &lt;- cumsum(pct_var)
+
+# Identify the first PC where cumulative percentage exceeds 90% and individual variance is less than 5%
+pc_number &lt;- which(cumu_pct &gt; 90 &amp; pct_var &lt; 5)[1]
+
+pc_number
+</code></pre>
+<p>41</p>
+<pre><code class="language-R">
+</code></pre>
+<h2 id="cluster-the-cells">Cluster the cells</h2>
+<p>Seurat embeds cells in a graph structure - for example a K-nearest neighbor (KNN) graph, with edges drawn between cells with similar feature expression patterns, and then attempt to partition this graph into highly interconnected <code>quasi-cliques</code> or <code>communities</code>.</p>
+<p>Seurat first constructs a KNN graph based on the euclidean distance in PCA space, and refine the edge weights between any two cells based on the shared overlap in their local neighborhoods (Jaccard similarity). This step is performed using the <code>FindNeighbors()</code> function, and takes as input the previously defined dimensionality of the dataset.</p>
+<p>To cluster the cells, Seurat next applies modularity optimization techniques such as the Louvain algorithm (default) or SLM [SLM, Blondel et al., Journal of Statistical Mechanics], to iteratively group cells together, with the goal of optimizing the standard modularity function. The FindClusters() function implements this procedure, and contains a resolution parameter that sets the <code>granularity</code> of the downstream clustering, with increased values leading to a greater number of clusters. We find that setting this parameter between 1 typically returns good results for single-cell datasets of around 5k cells. Optimal resolution often increases for larger datasets. The clusters can be found using the <code>Idents()</code> function.</p>
+<pre><code class="language-R">pbmc &lt;- FindNeighbors(pbmc, dims = 1:pc_number)
+pbmc &lt;- FindClusters(pbmc, resolution = 0.2)
+</code></pre>
+<pre><code>Computing nearest neighbor graph
+
+Computing SNN
+
+
+
+Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 4559
+Number of edges: 184776
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.9568
+Number of communities: 12
+Elapsed time: 0 seconds
+</code></pre>
+<pre><code class="language-R"># Look at cluster IDs of the first 5 cells
+head(Idents(pbmc), 5)
+</code></pre>
+<style>
+.dl-inline {width: auto; margin:0; padding: 0}
+.dl-inline>dt, .dl-inline>dd {float: none; width: auto; display: inline-block}
+.dl-inline>dt::after {content: ":\0020"; padding-right: .5ex}
+.dl-inline>dt:not(:first-of-type) {padding-left: .5ex}
+</style>
+<dl class=dl-inline><dt>AAACCCATCAGATGCT-1</dt><dd>0</dd><dt>AAACGAAAGTGCTACT-1</dt><dd>1</dd><dt>AAACGAAGTCGTAATC-1</dt><dd>8</dd><dt>AAACGAAGTTGCCAAT-1</dt><dd>6</dd><dt>AAACGAATCCGAGGCT-1</dt><dd>4</dd></dl>
+
+<details>
+    <summary style=display:list-item;cursor:pointer>
+        <strong>Levels</strong>:
+    </summary>
+    <style>
+    .list-inline {list-style: none; margin:0; padding: 0}
+    .list-inline>li {display: inline-block}
+    .list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+    </style>
+    <ol class=list-inline><li>'0'</li><li>'1'</li><li>'2'</li><li>'3'</li><li>'4'</li><li>'5'</li><li>'6'</li><li>'7'</li><li>'8'</li><li>'9'</li><li>'10'</li><li>'11'</li></ol>
+</details>
+
+<h2 id="run-non-linear-dimensional-reduction-umaptsne">Run non-linear dimensional reduction (UMAP/tSNE)</h2>
+<p>To visualize and explore these datasets, Seurat  offers several non-linear dimensional reduction techniques, such as tSNE and UMAP.</p>
+<p>The goal of tSNE/UMAP is to learn underlying structure in the dataset, in order to place similar cells together in low-dimensional space. Therefore, cells that are grouped together within graph-based clusters determined above should co-localize on these dimension reduction plots.</p>
+<pre><code class="language-R">pbmc &lt;- RunUMAP(pbmc, dims = 1:pc_number)
+
+</code></pre>
+<pre><code>Warning message:
+“The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'
+This message will be shown once per session”
+02:29:57 UMAP embedding parameters a = 0.9922 b = 1.112
+
+02:29:57 Read 4559 rows and found 41 numeric columns
+
+02:29:57 Using Annoy for neighbor search, n_neighbors = 30
+
+02:29:57 Building Annoy index with metric = cosine, n_trees = 50
+
+0%   10   20   30   40   50   60   70   80   90   100%
+
+[----|----|----|----|----|----|----|----|----|----|
+
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+|
+
+02:29:58 Writing NN index file to temp file /tmp/Rtmp3eevui/file1b11856069c
+
+02:29:58 Searching Annoy index using 1 thread, search_k = 3000
+
+02:30:00 Annoy recall = 100%
+
+02:30:01 Commencing smooth kNN distance calibration using 1 thread
+ with target n_neighbors = 30
+
+02:30:03 Found 2 connected components, 
+falling back to 'spca' initialization with init_sdev = 1
+
+02:30:03 Using 'irlba' for PCA
+
+02:30:03 PCA: 2 components explained 46.09% variance
+
+02:30:03 Scaling init to sdev = 1
+
+02:30:03 Commencing optimization for 500 epochs, with 188320 positive edges
+
+02:30:03 Using rng type: pcg
+
+02:30:11 Optimization finished
+</code></pre>
+<pre><code class="language-R">DimPlot(pbmc, reduction = &quot;umap&quot;)
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_72_0.png" /></p>
+<h2 id="finding-differentially-expressed-features-cluster-biomarkers">Finding differentially expressed features (cluster biomarkers)</h2>
+<pre><code class="language-R"># find markers for every cluster compared to all remaining cells, report only the positive
+# ones
+pbmc.markers &lt;- FindAllMarkers(pbmc, only.pos = TRUE)
+pbmc.markers %&gt;%
+    group_by(cluster) %&gt;%
+    dplyr::filter(avg_log2FC &gt; 1)
+</code></pre>
+<pre><code>Calculating cluster 0
+
+Warning message:
+“[1m[22mThe `slot` argument of `GetAssayData()` is deprecated as of SeuratObject 5.0.0.
+[36mℹ[39m Please use the `layer` argument instead.
+[36mℹ[39m The deprecated feature was likely used in the [34mSeurat[39m package.
+  Please report the issue at [3m[34m&lt;https://github.com/satijalab/seurat/issues&gt;[39m[23m.”
+Calculating cluster 1
+
+Calculating cluster 2
+
+Calculating cluster 3
+
+Calculating cluster 4
+
+Calculating cluster 5
+
+Calculating cluster 6
+
+Calculating cluster 7
+
+Calculating cluster 8
+
+Calculating cluster 9
+
+Calculating cluster 10
+
+Calculating cluster 11
+</code></pre>
+<table class="dataframe">
+<caption>A grouped_df: 17315 × 7</caption>
+<thead>
+    <tr><th scope=col>p_val</th><th scope=col>avg_log2FC</th><th scope=col>pct.1</th><th scope=col>pct.2</th><th scope=col>p_val_adj</th><th scope=col>cluster</th><th scope=col>gene</th></tr>
+    <tr><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;chr&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><td> 0.000000e+00</td><td>2.612691</td><td>0.944</td><td>0.313</td><td> 0.000000e+00</td><td>0</td><td>FHIT     </td></tr>
+    <tr><td> 0.000000e+00</td><td>2.516684</td><td>0.952</td><td>0.254</td><td> 0.000000e+00</td><td>0</td><td>LEF1     </td></tr>
+    <tr><td> 0.000000e+00</td><td>2.237676</td><td>0.935</td><td>0.304</td><td> 0.000000e+00</td><td>0</td><td>PRKCQ-AS1</td></tr>
+    <tr><td> 0.000000e+00</td><td>1.184164</td><td>0.998</td><td>0.940</td><td> 0.000000e+00</td><td>0</td><td>RPS3A    </td></tr>
+    <tr><td>2.242224e-316</td><td>1.149238</td><td>0.998</td><td>0.933</td><td>5.557352e-312</td><td>0</td><td>RPS13    </td></tr>
+    <tr><td>6.085058e-316</td><td>1.088689</td><td>0.998</td><td>0.948</td><td>1.508182e-311</td><td>0</td><td>RPS14    </td></tr>
+    <tr><td>8.659285e-311</td><td>1.094210</td><td>0.999</td><td>0.948</td><td>2.146204e-306</td><td>0</td><td>RPL30    </td></tr>
+    <tr><td>2.055343e-308</td><td>1.086214</td><td>0.999</td><td>0.944</td><td>5.094168e-304</td><td>0</td><td>RPL34    </td></tr>
+    <tr><td>2.282344e-307</td><td>1.099268</td><td>0.998</td><td>0.938</td><td>5.656789e-303</td><td>0</td><td>RPL9     </td></tr>
+    <tr><td>8.931130e-306</td><td>1.991463</td><td>0.976</td><td>0.360</td><td>2.213581e-301</td><td>0</td><td>CAMK4    </td></tr>
+    <tr><td>1.918803e-305</td><td>1.036297</td><td>0.999</td><td>0.960</td><td>4.755752e-301</td><td>0</td><td>RPL21    </td></tr>
+    <tr><td>1.396057e-302</td><td>1.154045</td><td>0.998</td><td>0.945</td><td>3.460128e-298</td><td>0</td><td>RPL32    </td></tr>
+    <tr><td>7.395468e-297</td><td>1.153411</td><td>0.997</td><td>0.939</td><td>1.832967e-292</td><td>0</td><td>RPS6     </td></tr>
+    <tr><td>3.766783e-296</td><td>1.148444</td><td>0.999</td><td>0.966</td><td>9.335970e-292</td><td>0</td><td>RPS12    </td></tr>
+    <tr><td>7.405330e-296</td><td>1.058430</td><td>0.999</td><td>0.947</td><td>1.835411e-291</td><td>0</td><td>RPL35A   </td></tr>
+    <tr><td>6.849496e-295</td><td>1.108384</td><td>0.998</td><td>0.938</td><td>1.697647e-290</td><td>0</td><td>RPS25    </td></tr>
+    <tr><td>5.810357e-294</td><td>1.039329</td><td>0.998</td><td>0.935</td><td>1.440097e-289</td><td>0</td><td>RPS23    </td></tr>
+    <tr><td>3.301385e-293</td><td>2.280375</td><td>0.819</td><td>0.199</td><td>8.182482e-289</td><td>0</td><td>MAL      </td></tr>
+    <tr><td>1.125193e-291</td><td>1.923380</td><td>0.980</td><td>0.457</td><td>2.788792e-287</td><td>0</td><td>PRKCA    </td></tr>
+    <tr><td>1.551987e-289</td><td>1.021773</td><td>1.000</td><td>0.943</td><td>3.846601e-285</td><td>0</td><td>RPS15A   </td></tr>
+    <tr><td>3.591209e-289</td><td>1.039366</td><td>0.998</td><td>0.929</td><td>8.900811e-285</td><td>0</td><td>RPS16    </td></tr>
+    <tr><td>2.927609e-288</td><td>1.010351</td><td>0.997</td><td>0.935</td><td>7.256080e-284</td><td>0</td><td>RPL7     </td></tr>
+    <tr><td>1.236189e-286</td><td>1.000003</td><td>0.998</td><td>0.947</td><td>3.063895e-282</td><td>0</td><td>RPS27A   </td></tr>
+    <tr><td>2.934025e-286</td><td>1.031792</td><td>0.998</td><td>0.943</td><td>7.271982e-282</td><td>0</td><td>RPL11    </td></tr>
+    <tr><td>3.006967e-286</td><td>1.078095</td><td>0.998</td><td>0.927</td><td>7.452768e-282</td><td>0</td><td>RPS20    </td></tr>
+    <tr><td>4.044675e-285</td><td>1.094725</td><td>0.998</td><td>0.924</td><td>1.002473e-280</td><td>0</td><td>RPL22    </td></tr>
+    <tr><td>2.179611e-283</td><td>3.093953</td><td>0.643</td><td>0.110</td><td>5.402167e-279</td><td>0</td><td>TSHZ2    </td></tr>
+    <tr><td>1.224196e-280</td><td>1.028954</td><td>0.998</td><td>0.937</td><td>3.034170e-276</td><td>0</td><td>RPL38    </td></tr>
+    <tr><td>1.691321e-280</td><td>2.519016</td><td>0.739</td><td>0.168</td><td>4.191939e-276</td><td>0</td><td>CCR7     </td></tr>
+    <tr><td>2.787511e-279</td><td>1.000468</td><td>0.998</td><td>0.951</td><td>6.908846e-275</td><td>0</td><td>RPS27    </td></tr>
+    <tr><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td></tr>
+    <tr><td>0.009116629</td><td>3.631680</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>H4C1           </td></tr>
+    <tr><td>0.009116629</td><td>3.608558</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>ENSG00000289291</td></tr>
+    <tr><td>0.009116629</td><td>3.605235</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>VAMP1-AS1      </td></tr>
+    <tr><td>0.009116629</td><td>3.591495</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>ENSG00000249328</td></tr>
+    <tr><td>0.009116629</td><td>3.567020</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>ERICH2-DT      </td></tr>
+    <tr><td>0.009116629</td><td>3.550000</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>NLRP10         </td></tr>
+    <tr><td>0.009116629</td><td>3.518027</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>ENSG00000270087</td></tr>
+    <tr><td>0.009116629</td><td>3.496166</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>ENSG00000253593</td></tr>
+    <tr><td>0.009116629</td><td>3.393207</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>ADAM11         </td></tr>
+    <tr><td>0.009116629</td><td>3.272524</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>ENSG00000228150</td></tr>
+    <tr><td>0.009116629</td><td>3.266281</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>LINC03065      </td></tr>
+    <tr><td>0.009116629</td><td>3.221456</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>STARD13-AS     </td></tr>
+    <tr><td>0.009116629</td><td>3.109640</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>FGGY-DT        </td></tr>
+    <tr><td>0.009116629</td><td>2.116185</td><td>0.021</td><td>0.002</td><td>1</td><td>11</td><td>ENSG00000285751</td></tr>
+    <tr><td>0.009353183</td><td>1.486986</td><td>0.146</td><td>0.057</td><td>1</td><td>11</td><td>TRPM2          </td></tr>
+    <tr><td>0.009560927</td><td>1.198107</td><td>0.083</td><td>0.024</td><td>1</td><td>11</td><td>SYCP3          </td></tr>
+    <tr><td>0.009563781</td><td>1.367524</td><td>0.062</td><td>0.015</td><td>1</td><td>11</td><td>MAP7           </td></tr>
+    <tr><td>0.009595402</td><td>1.283987</td><td>0.083</td><td>0.024</td><td>1</td><td>11</td><td>PPP1R13L       </td></tr>
+    <tr><td>0.009686754</td><td>2.584749</td><td>0.042</td><td>0.008</td><td>1</td><td>11</td><td>PRRG2          </td></tr>
+    <tr><td>0.009706714</td><td>2.407445</td><td>0.042</td><td>0.008</td><td>1</td><td>11</td><td>LINC02185      </td></tr>
+    <tr><td>0.009746744</td><td>2.473951</td><td>0.042</td><td>0.008</td><td>1</td><td>11</td><td>LINC02901      </td></tr>
+    <tr><td>0.009766814</td><td>2.300928</td><td>0.042</td><td>0.008</td><td>1</td><td>11</td><td>WNK3           </td></tr>
+    <tr><td>0.009766814</td><td>1.640083</td><td>0.042</td><td>0.008</td><td>1</td><td>11</td><td>CALCRL-AS1     </td></tr>
+    <tr><td>0.009786921</td><td>2.434878</td><td>0.042</td><td>0.008</td><td>1</td><td>11</td><td>ENSG00000272112</td></tr>
+    <tr><td>0.009786922</td><td>2.438294</td><td>0.042</td><td>0.008</td><td>1</td><td>11</td><td>ENSG00000277589</td></tr>
+    <tr><td>0.009847464</td><td>2.262934</td><td>0.042</td><td>0.008</td><td>1</td><td>11</td><td>PCDH15         </td></tr>
+    <tr><td>0.009847464</td><td>2.064514</td><td>0.042</td><td>0.008</td><td>1</td><td>11</td><td>CIBAR1         </td></tr>
+    <tr><td>0.009888011</td><td>2.173570</td><td>0.042</td><td>0.008</td><td>1</td><td>11</td><td>SEZ6           </td></tr>
+    <tr><td>0.009908340</td><td>1.746860</td><td>0.042</td><td>0.008</td><td>1</td><td>11</td><td>RTKN           </td></tr>
+    <tr><td>0.009993542</td><td>1.340809</td><td>0.146</td><td>0.059</td><td>1</td><td>11</td><td>ENSG00000287100</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R"># find all markers distinguishing cluster 5 from clusters 0 and 3
+cluster5.markers &lt;- FindMarkers(pbmc, ident.1 = 5, ident.2 = c(0, 3))
+head(cluster5.markers, n = 5)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 5 × 5</caption>
+<thead>
+    <tr><th></th><th scope=col>p_val</th><th scope=col>avg_log2FC</th><th scope=col>pct.1</th><th scope=col>pct.2</th><th scope=col>p_val_adj</th></tr>
+    <tr><th></th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>CST7</th><td> 0.000000e+00</td><td>8.454013</td><td>0.946</td><td>0.010</td><td> 0.000000e+00</td></tr>
+    <tr><th scope=row>GZMA</th><td> 0.000000e+00</td><td>7.631713</td><td>0.950</td><td>0.019</td><td> 0.000000e+00</td></tr>
+    <tr><th scope=row>NKG7</th><td> 0.000000e+00</td><td>7.541945</td><td>0.991</td><td>0.064</td><td> 0.000000e+00</td></tr>
+    <tr><th scope=row>CCL5</th><td> 0.000000e+00</td><td>7.416700</td><td>0.989</td><td>0.053</td><td> 0.000000e+00</td></tr>
+    <tr><th scope=row>MYBL1</th><td>2.644088e-288</td><td>5.930514</td><td>0.853</td><td>0.055</td><td>6.553373e-284</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">VlnPlot(pbmc, features = c(&quot;PTPRK&quot;, &quot;NRCAM&quot;))
+
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_76_0.png" /></p>
+<pre><code class="language-R">VlnPlot(pbmc, features = c(&quot;NKG7&quot;, &quot;PF4&quot;), slot = &quot;counts&quot;, log = TRUE)
+
+</code></pre>
+<pre><code>Warning message:
+“[1m[22mThe `slot` argument of `VlnPlot()` is deprecated as of Seurat 5.0.0.
+[36mℹ[39m Please use the `layer` argument instead.”
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_77_1.png" /></p>
+<pre><code class="language-R">FeaturePlot(pbmc, features = c(&quot;MS4A1&quot;, &quot;GNLY&quot;, &quot;CD3E&quot;, &quot;CD14&quot;, &quot;FCER1A&quot;, &quot;FCGR3A&quot;, &quot;LYZ&quot;, &quot;PPBP&quot;,
+    &quot;CD8A&quot;))
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_78_0.png" /></p>
+<pre><code class="language-R">pbmc.markers %&gt;%
+    group_by(cluster) %&gt;%
+    dplyr::filter(avg_log2FC &gt; 1) %&gt;%
+    slice_head(n = 10) %&gt;%
+    ungroup() -&gt; top10
+DoHeatmap(pbmc, features = top10$gene) + NoLegend()
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_79_0.png" /></p>
+<h2 id="cell-type-annotation-using-singler">Cell type annotation using <code>SingleR</code></h2>
+<pre><code class="language-R">library(SingleCellExperiment )
+</code></pre>
+<pre><code class="language-R">sce &lt;- as.SingleCellExperiment(pbmc)
+sce &lt;- scater::logNormCounts(sce)
+
+</code></pre>
+<pre><code>Found more than one class "package_version" in cache; using the first, from namespace 'SeuratObject'
+
+Also defined by ‘alabaster.base’
+
+Found more than one class "package_version" in cache; using the first, from namespace 'SeuratObject'
+
+Also defined by ‘alabaster.base’
+
+Found more than one class "package_version" in cache; using the first, from namespace 'SeuratObject'
+
+Also defined by ‘alabaster.base’
+
+Found more than one class "package_version" in cache; using the first, from namespace 'SeuratObject'
+
+Also defined by ‘alabaster.base’
+
+Found more than one class "package_version" in cache; using the first, from namespace 'SeuratObject'
+
+Also defined by ‘alabaster.base’
+
+Found more than one class "package_version" in cache; using the first, from namespace 'SeuratObject'
+
+Also defined by ‘alabaster.base’
+</code></pre>
+<pre><code class="language-R">sce
+</code></pre>
+<pre><code>Found more than one class "package_version" in cache; using the first, from namespace 'SeuratObject'
+
+Also defined by ‘alabaster.base’
+
+Found more than one class "package_version" in cache; using the first, from namespace 'SeuratObject'
+
+Also defined by ‘alabaster.base’
+
+
+
+
+class: SingleCellExperiment 
+dim: 24785 4559 
+metadata(0):
+assays(3): counts logcounts scaledata
+rownames(24785): ENSG00000238009 ENSG00000241860 ... ENSG00000276345
+  ENSG00000278817
+rowData names(0):
+colnames(4559): AAACCCATCAGATGCT-1 AAACGAAAGTGCTACT-1 ...
+  TTTGTTGTCGAAGTGG-1 TTTGTTGTCGCATAGT-1
+colData names(8): orig.ident nCount_RNA ... ident sizeFactor
+reducedDimNames(2): PCA UMAP
+mainExpName: RNA
+altExpNames(0):
+</code></pre>
+<pre><code class="language-R"># Download and cache the normalized expression values of the data
+# stored in the Human Primary Cell Atlas. The data will be
+#  downloaded from ExperimentHub, returning a SummarizedExperiment
+# object for further use.
+hpca &lt;- HumanPrimaryCellAtlasData()
+
+# Obtain human bulk RNA-seq data from Blueprint and ENCODE
+blueprint &lt;- BlueprintEncodeData()
+
+</code></pre>
+<pre><code class="language-R">pred.hpca &lt;- SingleR(test = sce,
+      ref = hpca, labels = hpca$label.main)
+tab_hpca &lt;- table(pred.hpca$pruned.labels)
+write.csv(sort(tab_hpca, decreasing=TRUE), 'pbmc_annotations_HPCA_general.csv', row.names=FALSE)
+</code></pre>
+<pre><code class="language-R">tab_hpca
+</code></pre>
+<pre><code>           B_cell                BM                DC Endothelial_cells 
+              451                30                 1                 1 
+     Erythroblast               GMP        HSC_-G-CSF         HSC_CD34+ 
+               60                 2                11                 1 
+         Monocyte       Neutrophils           NK_cell         Platelets 
+              759                39               677                93 
+ Pre-B_cell_CD34-           T_cells 
+                2              2350
+</code></pre>
+<p>Each row of the output DataFrame contains prediction results for a single cell. Labels are shown before (labels) and after pruning (pruned.labels), along with the associated scores.</p>
+<pre><code class="language-R">head(pred.hpca)
+</code></pre>
+<pre><code>DataFrame with 6 rows and 4 columns
+                                             scores       labels delta.next
+                                           &lt;matrix&gt;  &lt;character&gt;  &lt;numeric&gt;
+AAACCCATCAGATGCT-1 0.1409902:0.3257687:0.281000:...      T_cells  0.0708860
+AAACGAAAGTGCTACT-1 0.1407268:0.3072562:0.264148:...      T_cells  0.6026772
+AAACGAAGTCGTAATC-1 0.0604399:0.0725122:0.184863:... Erythroblast  0.1268946
+AAACGAAGTTGCCAAT-1 0.1585486:0.3228307:0.278787:...      T_cells  0.6492489
+AAACGAATCCGAGGCT-1 0.1166524:0.3565152:0.277855:...       B_cell  0.0505309
+AAACGAATCGAACGCC-1 0.1437411:0.3427680:0.299201:...      NK_cell  0.3155681
+                   pruned.labels
+                     &lt;character&gt;
+AAACCCATCAGATGCT-1       T_cells
+AAACGAAAGTGCTACT-1       T_cells
+AAACGAAGTCGTAATC-1  Erythroblast
+AAACGAAGTTGCCAAT-1       T_cells
+AAACGAATCCGAGGCT-1        B_cell
+AAACGAATCGAACGCC-1       NK_cell
+</code></pre>
+<pre><code class="language-R">pred.blueprint &lt;- SingleR(test = sce,
+      ref = blueprint, labels = blueprint$label.main)
+tab_blueprint &lt;- table(pred.blueprint$pruned.labels)
+  write.csv(sort(tab_blueprint, decreasing=TRUE), 'pbmc_annotations_BlueprintENCODE_general.csv', row.names=FALSE)
+</code></pre>
+<pre><code class="language-R">tab_blueprint
+</code></pre>
+<pre><code>          B-cells      CD4+ T-cells      CD8+ T-cells                DC 
+              455              1749               576                 3 
+Endothelial cells       Eosinophils      Erythrocytes               HSC 
+                1                50               128                 4 
+        Monocytes       Neutrophils          NK cells 
+              768                 3               692
+</code></pre>
+<pre><code class="language-R">head(pred.blueprint)
+</code></pre>
+<pre><code>DataFrame with 6 rows and 4 columns
+                                             scores       labels delta.next
+                                           &lt;matrix&gt;  &lt;character&gt;  &lt;numeric&gt;
+AAACCCATCAGATGCT-1 0.2145648:0.1136181:0.437872:... CD4+ T-cells  0.0512150
+AAACGAAAGTGCTACT-1 0.2311086:0.1664737:0.393066:... CD4+ T-cells  0.3283657
+AAACGAAGTCGTAATC-1 0.0977069:0.0728724:0.100641:... Erythrocytes  0.0757261
+AAACGAAGTTGCCAAT-1 0.2289000:0.1565938:0.423090:... CD8+ T-cells  0.0620951
+AAACGAATCCGAGGCT-1 0.2353403:0.1291495:0.500443:...      B-cells  0.1276654
+AAACGAATCGAACGCC-1 0.2308036:0.1288775:0.417440:...     NK cells  0.1486502
+                   pruned.labels
+                     &lt;character&gt;
+AAACCCATCAGATGCT-1  CD4+ T-cells
+AAACGAAAGTGCTACT-1  CD4+ T-cells
+AAACGAAGTCGTAATC-1  Erythrocytes
+AAACGAAGTTGCCAAT-1  CD8+ T-cells
+AAACGAATCCGAGGCT-1       B-cells
+AAACGAATCGAACGCC-1      NK cells
+</code></pre>
+<pre><code class="language-R">pbmc$singleR_hpca = pred.hpca$pruned.labels
+pbmc$singleR_blueprint = pred.blueprint$pruned.labels
+</code></pre>
+<pre><code class="language-R">Idents(pbmc) = pbmc$singleR_hpca
+DimPlot(pbmc, reduction = &quot;umap&quot;,
+         label = TRUE, pt.size = 0.5,
+          repel = TRUE) + NoLegend()
+# Change back to cluster snn_res.0.1
+Idents(pbmc) = pbmc$`RNA_snn_res.0.2`
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_93_0.png" /></p>
+<pre><code class="language-R">Idents(pbmc) = pbmc$singleR_blueprint
+DimPlot(pbmc, reduction = &quot;umap&quot;,
+         label = TRUE, pt.size = 0.5,
+          repel = TRUE) + NoLegend()
+# Change back to cluster snn_res.0.2
+Idents(pbmc) = pbmc$`RNA_snn_res.0.2`
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_94_0.png" /></p>
+<pre><code class="language-R">
+</code></pre>
+<h2 id="manual-annotation">Manual annotation</h2>
+<table>
+<thead>
+<tr>
+<th>Markers</th>
+<th>Cell Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IL7R, CCR7</td>
+<td>Naive CD4+ T</td>
+</tr>
+<tr>
+<td>CD14, LYZ</td>
+<td>CD14+ Mono</td>
+</tr>
+<tr>
+<td>IL7R, S100A4</td>
+<td>Memory CD4+</td>
+</tr>
+<tr>
+<td>MS4A1</td>
+<td>B</td>
+</tr>
+<tr>
+<td>CD8A</td>
+<td>CD8+ T</td>
+</tr>
+<tr>
+<td>FCGR3A, MS4A7</td>
+<td>FCGR3A+ Mono</td>
+</tr>
+<tr>
+<td>GNLY, NKG7</td>
+<td>NK</td>
+</tr>
+<tr>
+<td>FCER1A, CST3</td>
+<td>DC</td>
+</tr>
+<tr>
+<td>PPBP</td>
+<td>Platelet</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-R">table(Idents(pbmc))
+</code></pre>
+<pre><code>  0   1   2   3   4   5   6   7   8   9  10  11 
+934 777 662 604 465 442 224 157  98  94  54  48
+</code></pre>
+<pre><code class="language-R">
+</code></pre>
+<pre><code class="language-R">options(repr.plot.width=12, repr.plot.height= 10)
+FeaturePlot(pbmc, features = c(&quot;IL7R&quot;, &quot;CCR7&quot;, &quot;CD14&quot;, &quot;LYZ&quot;, &quot;S100A4&quot;, &quot;MS4A1&quot;))
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_100_0.png" /></p>
+<pre><code class="language-R"># CD8A            CD8+ T
+# FCGR3A, MS4A7   FCGR3A+ Mono
+# GNLY, NKG7        NK
+# FCER1A, CST3    DC
+# PPBP            Platelet
+FeaturePlot(pbmc, features = c(&quot;CD8A&quot;, &quot;GNLY&quot;, &quot;FCGR3A&quot;, &quot;MS4A7&quot;, &quot;GNLY&quot;, &quot;NKG7&quot;,  &quot;FCER1A&quot;, &quot;CST3&quot;, &quot;PPBP&quot;))
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_101_0.png" /></p>
+<pre><code class="language-R">options(repr.plot.width=8, repr.plot.height= 8)
+DimPlot(pbmc, reduction = &quot;umap&quot;,
+         label = TRUE, pt.size = 0.5,
+          repel = TRUE) + NoLegend()
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_102_0.png" /></p>
+<pre><code class="language-R">pbmc = RenameIdents(pbmc, &quot;0&quot;=&quot;Naive CD4+ T&quot;)
+pbmc = RenameIdents(pbmc, &quot;3&quot;=&quot;CD14+ Mono&quot;)
+pbmc = RenameIdents(pbmc, &quot;1&quot;=&quot;Memory CD4+&quot;)
+pbmc = RenameIdents(pbmc, &quot;5&quot;=&quot;Memory CD4+&quot;)
+### Add more manual annotation based on your checking
+
+</code></pre>
+<pre><code class="language-R">options(repr.plot.width=8, repr.plot.height= 8)
+DimPlot(pbmc, reduction = &quot;umap&quot;,
+         label = TRUE, pt.size = 0.5,
+          repel = TRUE) + NoLegend()
+</code></pre>
+<p><img alt="png" src="../BIOI611_scRNA_files/BIOI611_scRNA_104_0.png" /></p>
+<h2 id="save-the-seurat-object">Save the Seurat object</h2>
+<pre><code class="language-R">saveRDS(pbmc, file = &quot;Seurat_object_pbmc_final.rds&quot;)
+</code></pre>
+<pre><code>Found more than one class "package_version" in cache; using the first, from namespace 'SeuratObject'
+
+Also defined by ‘alabaster.base’
+
+Found more than one class "package_version" in cache; using the first, from namespace 'SeuratObject'
+
+Also defined by ‘alabaster.base’
+</code></pre>
+<h2 id="use-loupe-browser-to-visualize-and-analyze-the-data">Use Loupe Browser to visualize and analyze the data</h2>
+<p>Loupe Browser is a powerful visualization software that provides the intuitive functionality you need to explore and analyze your 10x Genomics Chromium and Visium data. You can also convert your Seurat objects into Loupe Browser files using the LoupeR package.</p>
+<h3 id="step-1-convert-the-seurat-object-to-cloupe-file">Step 1: convert the seurat object to <code>cloupe</code> file</h3>
+<p>10x Genomics' LoupeR is an R package that works with Seurat objects to create a Loupe Browser file. The Loupe Browser file can then be imported into Loupe Browser (v7.0 or later) for data visualization and further exploration.</p>
+<pre><code class="language-R">#remotes::install_github(&quot;10xGenomics/loupeR&quot;)
+#loupeR::setup()
+</code></pre>
+<pre><code class="language-R">library(loupeR)
+</code></pre>
+<pre><code>Warning message in fun(libname, pkgname):
+“Please call `loupeR::setup()` to install the Louper executable  and to agree to the EULA before continuing”
+</code></pre>
+<pre><code class="language-R">loupeR::setup()
+</code></pre>
+<pre><code>Installing Executable
+
+
+
+2025/12/06 03:16:13 Downloading executable
+
+
+
+The LoupeR executable is subject to the 10x End User Software License, available at:
+https://10xgen.com/EULA
+
+Do you accept the End-User License Agreement
+(y/yes or n/no): yes
+
+EULA
+</code></pre>
+<pre><code class="language-R">create_loupe_from_seurat(pbmc, output_name = &quot;Seurat_object_pbmc_cloupe&quot;)
+
+</code></pre>
+<pre><code>2025/12/06 03:16:18 extracting matrix, clusters, and projections
+
+2025/12/06 03:16:19 selected assay: RNA
+
+2025/12/06 03:16:19 selected clusters: active_cluster orig.ident RNA_snn_res.0.2 seurat_clusters singleR_hpca singleR_blueprint
+
+2025/12/06 03:16:19 selected projections: umap
+
+2025/12/06 03:16:19 validating count matrix
+
+2025/12/06 03:16:19 validating clusters
+
+2025/12/06 03:16:19 validating projections
+
+2025/12/06 03:16:19 creating temporary hdf5 file: /tmp/Rtmp3eevui/file1b12091afba.h5
+
+2025/12/06 03:16:24 invoking louper executable
+
+2025/12/06 03:16:24 running command: "/root/.local/share/R/loupeR/louper create --input='/tmp/Rtmp3eevui/file1b12091afba.h5' --output='Seurat_object_pbmc_cloupe.cloupe'"
+</code></pre>
+<pre><code class="language-R">
+</code></pre>
+<h3 id="step-2-load-the-cloupe-file-into-loupe-browser">Step 2: Load the <code>cloupe</code> file into Loupe Browser</h3>
+<p>Loupe Browser can be downloaded via the link below:</p>
+<p>https://www.10xgenomics.com/support/software/loupe-browser/downloads</p>
+<p><img width="904" height="593" alt="Image" src="https://github.com/user-attachments/assets/b2a10d2f-001f-42c0-abb1-a15fc8c80a3f" /></p>
+<pre><code class="language-R">sessionInfo()
+</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base
+
+other attached packages:
+ [1] loupeR_1.1.4                future_1.68.0              
+ [3] scater_1.38.0               ggplot2_4.0.1              
+ [5] scuttle_1.20.0              SingleCellExperiment_1.32.0
+ [7] celldex_1.20.0              SingleR_2.12.0             
+ [9] SummarizedExperiment_1.40.0 Biobase_2.70.0             
+[11] GenomicRanges_1.62.0        Seqinfo_1.0.0              
+[13] IRanges_2.44.0              S4Vectors_0.48.0           
+[15] BiocGenerics_0.56.0         generics_0.1.4             
+[17] MatrixGenerics_1.22.0       matrixStats_1.5.0          
+[19] dplyr_1.1.4                 Seurat_5.0.0               
+[21] SeuratObject_5.2.0          sp_2.2-0
+
+loaded via a namespace (and not attached):
+  [1] RcppAnnoy_0.0.22          splines_4.5.2            
+  [3] later_1.4.4               pbdZMQ_0.3-14            
+  [5] filelock_1.0.3            tibble_3.3.0             
+  [7] polyclip_1.10-7           fastDummies_1.7.5        
+  [9] lifecycle_1.0.4           httr2_1.2.1              
+ [11] hdf5r_1.3.12              globals_0.18.0           
+ [13] lattice_0.22-7            MASS_7.3-65              
+ [15] alabaster.base_1.10.0     magrittr_2.0.4           
+ [17] limma_3.66.0              plotly_4.11.0            
+ [19] yaml_2.3.10               httpuv_1.6.16            
+ [21] otel_0.2.0                sctransform_0.4.2        
+ [23] spam_2.11-1               spatstat.sparse_3.1-0    
+ [25] reticulate_1.44.1         cowplot_1.2.0            
+ [27] pbapply_1.7-4             DBI_1.2.3                
+ [29] RColorBrewer_1.1-3        abind_1.4-8              
+ [31] Rtsne_0.17                presto_1.0.0             
+ [33] purrr_1.2.0               rappdirs_0.3.3           
+ [35] ggrepel_0.9.6             irlba_2.3.5.1            
+ [37] listenv_0.10.0            spatstat.utils_3.2-0     
+ [39] goftest_1.2-3             RSpectra_0.16-2          
+ [41] spatstat.random_3.4-2     fitdistrplus_1.2-4       
+ [43] parallelly_1.45.1         DelayedMatrixStats_1.32.0
+ [45] leiden_0.4.3.1            codetools_0.2-20         
+ [47] DelayedArray_0.36.0       tidyselect_1.2.1         
+ [49] farver_2.1.2              viridis_0.6.5            
+ [51] ScaledMatrix_1.18.0       BiocFileCache_3.0.0      
+ [53] base64enc_0.1-3           spatstat.explore_3.5-3   
+ [55] jsonlite_2.0.0            BiocNeighbors_2.4.0      
+ [57] progressr_0.18.0          ggridges_0.5.7           
+ [59] survival_3.8-3            systemfonts_1.3.1        
+ [61] tools_4.5.2               ragg_1.5.0               
+ [63] ica_1.0-3                 Rcpp_1.1.0               
+ [65] glue_1.8.0                gridExtra_2.3            
+ [67] SparseArray_1.10.1        IRdisplay_1.1            
+ [69] HDF5Array_1.38.0          gypsum_1.6.0             
+ [71] withr_3.0.2               BiocManager_1.30.27      
+ [73] fastmap_1.2.0             rhdf5filters_1.22.0      
+ [75] rsvd_1.0.5                digest_0.6.39            
+ [77] R6_2.6.1                  mime_0.13                
+ [79] textshaping_1.0.4         Cairo_1.7-0              
+ [81] scattermore_1.2           tensor_1.5.1             
+ [83] spatstat.data_3.1-9       RSQLite_2.4.4            
+ [85] h5mread_1.2.0             tidyr_1.3.1              
+ [87] data.table_1.17.8         httr_1.4.7               
+ [89] htmlwidgets_1.6.4         S4Arrays_1.10.0          
+ [91] uwot_0.2.4                pkgconfig_2.0.3          
+ [93] gtable_0.3.6              blob_1.2.4               
+ [95] lmtest_0.9-40             S7_0.2.1                 
+ [97] XVector_0.50.0            htmltools_0.5.8.1        
+ [99] dotCall64_1.2             alabaster.matrix_1.10.0  
+[101] scales_1.4.0              png_0.1-8                
+[103] spatstat.univar_3.1-5     reshape2_1.4.5           
+[105] uuid_1.2-1                nlme_3.1-168             
+[107] curl_7.0.0                rhdf5_2.54.0             
+[109] repr_1.1.7                zoo_1.8-14               
+[111] cachem_1.1.0              stringr_1.6.0            
+[113] BiocVersion_3.22.0        KernSmooth_2.23-26       
+[115] vipor_0.4.7               parallel_4.5.2           
+[117] miniUI_0.1.2              AnnotationDbi_1.72.0     
+[119] ggrastr_1.0.2             alabaster.schemas_1.10.0 
+[121] pillar_1.11.1             grid_4.5.2               
+[123] vctrs_0.6.5               RANN_2.6.2               
+[125] promises_1.5.0            BiocSingular_1.26.0      
+[127] dbplyr_2.5.1              beachmat_2.26.0          
+[129] xtable_1.8-4              cluster_2.1.8.1          
+[131] beeswarm_0.4.0            evaluate_1.0.5           
+[133] cli_3.6.5                 compiler_4.5.2           
+[135] rlang_1.1.6               crayon_1.5.3             
+[137] future.apply_1.20.0       labeling_0.4.3           
+[139] ggbeeswarm_0.7.2          plyr_1.8.9               
+[141] stringi_1.8.7             alabaster.se_1.10.0      
+[143] viridisLite_0.4.2         deldir_2.0-4             
+[145] BiocParallel_1.44.0       Biostrings_2.78.0        
+[147] lazyeval_0.2.2            spatstat.geom_3.6-0      
+[149] Matrix_1.7-4              ExperimentHub_3.0.0      
+[151] IRkernel_1.3.2            RcppHNSW_0.6.0           
+[153] patchwork_1.3.2           sparseMatrixStats_1.22.0 
+[155] bit64_4.6.0-1             Rhdf5lib_1.32.0          
+[157] statmod_1.5.1             KEGGREST_1.50.0          
+[159] shiny_1.11.1              alabaster.ranges_1.10.0  
+[161] AnnotationHub_4.0.0       ROCR_1.0-11              
+[163] igraph_2.2.1              memoise_2.0.1            
+[165] bit_4.6.0
+</code></pre>
+<h2 id="reference">Reference</h2>
+<p>https://monashbioinformaticsplatform.github.io/Single-Cell-Workshop/pbmc3k_tutorial.html</p>
+<p>https://bioinformatics.ccr.cancer.gov/docs/getting-started-with-scrna-seq/IntroToR_Seurat/</p>
+<p>https://hbctraining.github.io/scRNA-seq/lessons/elbow_plot_metric.html</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../BIOI611_analysis_10x_dataset_PBMC/" class="btn btn-neutral float-left" title="Initial analysis of 10x scRNA-seq data for human PBMC using cellranger"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../BIOI611_scRNA_seq_cele_cellranger/" class="btn btn-neutral float-right" title="Initial analysis of 10x scRNA-seq data for C. elegans using cellranger">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../BIOI611_analysis_10x_dataset_PBMC/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../BIOI611_scRNA_seq_cele_cellranger/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

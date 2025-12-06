@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>DEG analysis using DESeq2 - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "DEG analysis using DESeq2";
+        var mkdocs_page_input_path = "BIOI611_DESeq2_analysis.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">DEG analysis using DESeq2</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#navigation-in-the-file-system-and-read-the-count-files">Navigation in the file system and read the count files</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#check-count-matrix">Check count matrix</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#instsall-required-r-packages">Instsall required R packages</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#load-r-packages">Load R packages</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#run-deseq2-to-identify-deg">Run DESeq2 to identify DEG</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#plot-normalized-genes">Plot normalized genes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#extract-deg-results-using-results-function">Extract DEG results using results function</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#understand-normalized-count-in-deseq2-optional">Understand normalized count in DESeq2 (Optional)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#create-a-pseudo-reference-sample-row-wise-geometric-mean">Create a pseudo-reference sample (row-wise geometric mean)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#calculate-ratio-between-each-sample-and-the-pseudo-reference-for-each-gene">Calculate ratio between each sample and the pseudo-reference for each gene</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#calculate-scaling-factor">Calculate scaling factor</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#normalize-the-counts">Normalize the counts</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sessioninfo">SessionInfo</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Bulk RNA-seq</li>
+      <li class="breadcrumb-item active">DEG analysis using DESeq2</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/BIOI611_DESeq2_analysis.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a href="https://colab.research.google.com/github/Bix4UMD/BIOI611_lab/blob/main/docs/BIOI611_DESeq2_analysis.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a></p>
+<h1 id="analysis-of-rna-seq-data-using-r">Analysis of RNA-seq data using R</h1>
+<h2 id="navigation-in-the-file-system-and-read-the-count-files">Navigation in the file system and read the count files</h2>
+<pre><code class="language-R">getwd()
+</code></pre>
+<pre><code class="language-R">list.files()
+</code></pre>
+<pre><code class="language-R"># Define base URL and files to download
+base_url &lt;- &quot;https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/refs/heads/main/data/bulkRNA_SE_tab/&quot;
+files &lt;- c(&quot;N2_day1_rep1.ReadsPerGene.out.tab&quot;,
+           &quot;N2_day1_rep2.ReadsPerGene.out.tab&quot;,
+           &quot;N2_day1_rep3.ReadsPerGene.out.tab&quot;,
+           &quot;N2_day7_rep1.ReadsPerGene.out.tab&quot;,
+           &quot;N2_day7_rep2.ReadsPerGene.out.tab&quot;,
+           &quot;N2_day7_rep3.ReadsPerGene.out.tab&quot;
+           )
+
+# Download each file
+for (f in files) {
+  download.file(paste0(base_url, f), destfile = f, method = &quot;libcurl&quot;)
+}
+</code></pre>
+<pre><code class="language-R">list.files()
+</code></pre>
+<pre><code class="language-R">file_paths &lt;- list.files(pattern = &quot;*.ReadsPerGene.out.tab&quot;)
+file_paths
+</code></pre>
+<pre><code class="language-R"># Function to read the STAR ReadsPerGene.out.tab file
+read_star_file &lt;- function(file_path) {
+  # Read the file
+  df &lt;- read.table(file_path, header = FALSE, stringsAsFactors = FALSE)
+
+  # Keep only the first (gene) and second (unstranded counts) columns
+  library(dplyr)
+  df &lt;- df %&gt;% select(V1, V2)
+
+  # Rename the columns for clarity (GeneID and counts for this sample)
+  colnames(df) &lt;- c(&quot;GeneID&quot;, gsub(&quot;.ReadsPerGene.out.tab&quot;, &quot;&quot;, basename(file_path)))
+
+  return(df)
+}
+
+# Read all files into a list of data frames
+list_of_dfs &lt;- lapply(file_paths, read_star_file)
+
+# Merge all data frames by the GeneID column
+merged_df &lt;- Reduce(function(x, y) merge(x, y, by = &quot;GeneID&quot;), list_of_dfs)
+
+merged_df &lt;- merged_df[-c(1:4), ]
+
+# Check the first few rows of the combined data frame
+head(merged_df)
+
+# Optionally, write the combined data frame to a CSV file
+write.csv(merged_df, &quot;combined_gene_counts.csv&quot;, row.names = FALSE)
+</code></pre>
+<pre><code class="language-R">class(list_of_dfs)
+</code></pre>
+<pre><code class="language-R">head(list_of_dfs[[2]])
+</code></pre>
+<pre><code class="language-R">
+</code></pre>
+<pre><code class="language-R">rownames(merged_df) = merged_df$GeneID
+
+</code></pre>
+<pre><code class="language-R">head(merged_df)
+</code></pre>
+<pre><code class="language-R"># NULL reserved word representing empty
+merged_df$GeneID = NULL
+head(merged_df)
+</code></pre>
+<pre><code class="language-R">subset_df4test &lt;- merged_df[, c(&quot;N2_day1_rep1&quot;, &quot;N2_day1_rep2&quot;, &quot;N2_day1_rep3&quot;)]
+head(subset_df4test)
+</code></pre>
+<h2 id="check-count-matrix">Check count matrix</h2>
+<p>Different samples have different total number of counts</p>
+<pre><code class="language-R">as.data.frame(colSums(merged_df))
+</code></pre>
+<pre><code class="language-R">barplot(colSums(merged_df),
+         las = 2,
+         cex.names= 0.6)
+</code></pre>
+<pre><code class="language-R"># inkscape: an open source software for editing the graph saved in pdf
+pdf(&quot;total_count_barplot.pdf&quot;)
+barplot(colSums(merged_df),
+         las = 2,
+         cex.names= 0.6)
+dev.off()
+</code></pre>
+<pre><code class="language-R">coldata &lt;- colnames(merged_df)
+coldata_df &lt;- cbind(group = gsub(&quot;_rep\\d&quot;, &quot;&quot;, coldata))
+coldata_df
+</code></pre>
+<pre><code class="language-R">rownames(coldata_df) = coldata
+coldata_df
+</code></pre>
+<h2 id="instsall-required-r-packages">Instsall required R packages</h2>
+<pre><code class="language-R">if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+if (!require(&quot;DESeq2&quot;, quietly = TRUE))
+    BiocManager::install(&quot;DESeq2&quot;)
+</code></pre>
+<pre><code>Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+
+'getOption("repos")' replaces Bioconductor standard repositories, see
+'help("repositories", package = "BiocManager")' for details.
+Replacement repositories:
+    CRAN: https://cran.rstudio.com
+
+Bioconductor version 3.22 (BiocManager 1.30.26), R 4.5.2 (2025-10-31)
+
+Installing package(s) 'BiocVersion', 'DESeq2'
+
+also installing the dependencies ‘XVector’, ‘formatR’, ‘abind’, ‘SparseArray’, ‘lambda.r’, ‘futile.options’, ‘Seqinfo’, ‘S4Arrays’, ‘DelayedArray’, ‘futile.logger’, ‘snow’, ‘BH’, ‘S4Vectors’, ‘IRanges’, ‘GenomicRanges’, ‘SummarizedExperiment’, ‘BiocGenerics’, ‘Biobase’, ‘BiocParallel’, ‘matrixStats’, ‘locfit’, ‘MatrixGenerics’, ‘RcppArmadillo’
+</code></pre>
+<pre><code class="language-R">if (!requireNamespace(&quot;remotes&quot;, quietly = TRUE))
+    install.packages(&quot;remotes&quot;)
+if (!requireNamespace(&quot;EnhancedVolcano&quot;, quietly = TRUE))
+    remotes::install_github(&quot;kevinblighe/EnhancedVolcano&quot;)
+</code></pre>
+<h2 id="load-r-packages">Load R packages</h2>
+<pre><code class="language-R">library(DESeq2)
+library(EnhancedVolcano)
+</code></pre>
+<h2 id="run-deseq2-to-identify-deg">Run DESeq2 to identify DEG</h2>
+<pre><code class="language-R">dds &lt;- DESeqDataSetFromMatrix(countData = merged_df,
+                              colData = coldata_df,
+                              design =~ group)
+</code></pre>
+<pre><code class="language-R">class(dds)
+</code></pre>
+<p>The <code>DESeq()</code> function normalizes the read counts,estimates dispersions, and fits the linear model, all in one go.</p>
+<pre><code class="language-R">dds &lt;- DESeq(dds)
+</code></pre>
+<p>Dispersion is a measure of spread or variability in the data. Variance, standard deviation, IQR, among other measures, can all be used to measure dispersion.</p>
+<p>DESeq2 uses a specific measure of dispersion (α) related to the mean (μ) and variance of the data: Var = μ + α*μ^2.</p>
+<pre><code class="language-R">sizeFactors(dds)
+</code></pre>
+<pre><code class="language-R">head(counts(dds,  normalized = TRUE))
+</code></pre>
+<p>The function <code>plotDispEsts</code> shows the dispersion by mean of normalized counts. We expect the dispersion to decrease as the mean of normalized counts increases.</p>
+<p>The functions shows:</p>
+<ol>
+<li>
+<p>black per-gene dispersion estimates</p>
+</li>
+<li>
+<p>a red trend line representing the global relationship between dispersion and normalized count</p>
+</li>
+<li>
+<p>blue 'shrunken' values moderating individual dispersion estimates by the global relationship</p>
+</li>
+<li>
+<p>blue-circled dispersion outliers with high gene-wise dispersion that were not adjusted.</p>
+</li>
+</ol>
+<pre><code class="language-R">plotDispEsts(dds)
+</code></pre>
+<pre><code class="language-R">
+</code></pre>
+<h3 id="plot-normalized-genes">Plot normalized genes</h3>
+<p>The function <code>plotCounts</code> is used to plot normalized counts plus a pseudocount of 0.5 by default.</p>
+<pre><code class="language-R">vsd &lt;- vst(dds, blind=FALSE)
+</code></pre>
+<pre><code class="language-R">class(vsd)
+</code></pre>
+<pre><code class="language-R">plotPCA(vsd, intgroup = c(&quot;group&quot;))
+</code></pre>
+<h3 id="extract-deg-results-using-results-function">Extract DEG results using <code>results</code> function</h3>
+<pre><code class="language-R">res &lt;- results(dds)
+res
+</code></pre>
+<pre><code class="language-R">class(res)
+</code></pre>
+<pre><code class="language-R">mcols(res)$description
+</code></pre>
+<ul>
+<li><code>baseMean</code>: mean of normalized counts for all samples</li>
+<li><code>log2FoldChange</code>: log2 fold change</li>
+<li><code>lfcSE</code>: standard error</li>
+<li><code>stat</code>: Wald statistic</li>
+<li><code>pvalue</code>: Wald test p-value</li>
+<li><code>padj</code>: BH adjusted p-values</li>
+</ul>
+<p>If we used the p-value directly from the Wald test with a significance cut-off of p &lt; 0.05, that means there is a 5% chance it is a false positives. Each p-value is the result of a single test (single gene). The more genes we test, the more we inflate the false positive rate. This is the multiple testing problem. For example, if we test 20,000 genes for differential expression, at p &lt; 0.05 we would expect to find 1,000 genes by chance. If we found 3000 genes to be differentially expressed total, roughly one third of our genes are false positives. We would not want to sift through our “significant” genes to identify which ones are true positives.</p>
+<p>DESeq2 helps reduce the number of genes tested by removing those genes unlikely to be significantly DE prior to testing, such as those with low number of counts and outlier samples (gene-level QC). However, we still need to correct for multiple testing to reduce the number of false positives, and there are a few common approaches:</p>
+<ol>
+<li>
+<p>Bonferroni: The adjusted p-value is calculated by: p-value * m (m = total number of tests). This is a very conservative approach with a high probability of false negatives, so is generally not recommended.</p>
+</li>
+<li>
+<p>FDR/Benjamini-Hochberg: Benjamini and Hochberg (1995) defined the concept of FDR and created an algorithm to control the expected FDR below a specified level given a list of independent p-values. An interpretation of the BH method for controlling the FDR is implemented in DESeq2 in which we rank the genes by p-value, then multiply each ranked p-value by m/rank.</p>
+</li>
+<li>
+<p>Q-value / Storey method: The minimum FDR that can be attained when calling that feature significant. For example, if gene X has a q-value of 0.013 it means that 1.3% of genes that show p-values at least as small as gene X are false positives
+In DESeq2, the p-values attained by the Wald test are corrected for multiple testing using the Benjamini and Hochberg method by default. There are options to use other methods in the results() function. The p-adjusted values should be used to determine significant genes. The significant genes can be output for visualization and/or functional analysis.</p>
+</li>
+</ol>
+<p>So what does FDR &lt; 0.05 mean? By setting the FDR cutoff to &lt; 0.05, we’re saying that the proportion of false positives we expect amongst our differentially expressed genes is 5%. For example, if you call 500 genes as differentially expressed with an FDR cutoff of 0.05, you expect 25 of them to be false positives.</p>
+<p>Note on p-values set to <code>NA</code>: some values in the results table can be set to <code>NA</code> for one of the following reasons:</p>
+<ol>
+<li>
+<p>If within a row, all samples have zero counts, the baseMean column will be zero, and the log2 fold change estimates, p value and adjusted p value will all be set to NA.</p>
+</li>
+<li>
+<p>If a row contains a sample with an extreme count outlier then the p value and adjusted p value will be set to NA. These outlier counts are detected by Cook’s distance. Customization of this outlier filtering and description of functionality for replacement of outlier counts and refitting is described below</p>
+</li>
+<li>
+<p>If a row is filtered by automatic independent filtering, for having a low mean normalized count, then only the adjusted p value will be set to NA. Description and customization of independent filtering is described below</p>
+</li>
+</ol>
+<pre><code class="language-R">plotMA(res, ylim=c(-2,2))
+
+</code></pre>
+<pre><code class="language-R">write.csv(res, file = &quot;BIOI_bulkRNAseq_SE_DESeq2_res.csv&quot;)
+</code></pre>
+<pre><code class="language-R">d &lt;- plotCounts(dds, gene=which.min(res$padj), intgroup=&quot;group&quot;,
+                returnData=TRUE)
+</code></pre>
+<pre><code class="language-R">d
+</code></pre>
+<pre><code class="language-R">which.min(res$padj)
+</code></pre>
+<pre><code class="language-R">library(&quot;ggplot2&quot;)
+ggplot(d, aes(x=group, y=count)) +
+  geom_point(position=position_jitter(w=0.1,h=0)) +
+  scale_y_log10(breaks=c(25,100,400))
+</code></pre>
+<pre><code class="language-R">  EnhancedVolcano(res,
+    lab = rownames(res),
+    x = 'log2FoldChange',
+    y = 'pvalue')
+</code></pre>
+<h2 id="understand-normalized-count-in-deseq2-optional">Understand normalized count in DESeq2 (Optional)</h2>
+<h4 id="create-a-pseudo-reference-sample-row-wise-geometric-mean">Create a pseudo-reference sample (row-wise geometric mean)</h4>
+<p>The code below creates a new column called <code>pseudo_reference</code> that contains the average log-transformed expression value for each gene across all samples. This pseudo-reference is similar to calculating a "reference sample" to compare other samples.</p>
+<pre><code class="language-R">log_data = log(merged_df)
+head(log_data)
+</code></pre>
+<pre><code class="language-R">library(dplyr)
+library(tibble) # rownames_to_column
+
+log_data = log_data %&gt;%
+             rownames_to_column('gene') %&gt;%
+             mutate (pseudo_reference = rowMeans(log_data))
+
+head(log_data)
+</code></pre>
+<pre><code class="language-R">table(log_data$pseudo_reference == &quot;-Inf&quot;)
+</code></pre>
+<pre><code class="language-R">filtered_log_data = log_data %&gt;% filter(pseudo_reference != &quot;-Inf&quot;)
+head(filtered_log_data)
+</code></pre>
+<pre><code class="language-R">filtered_log_data$pseudo_reference = exp(filtered_log_data$pseudo_reference)
+</code></pre>
+<pre><code class="language-R">head(filtered_log_data)
+</code></pre>
+<pre><code class="language-R">dim(log_data)
+dim(filtered_log_data)
+</code></pre>
+<h3 id="calculate-ratio-between-each-sample-and-the-pseudo-reference-for-each-gene">Calculate ratio between each sample and the pseudo-reference for each gene</h3>
+<p>This step calculates the fold change between each sample and the pseudo-reference for each gene.</p>
+<pre><code class="language-R">ratio_data = sweep(exp(filtered_log_data[,2:7]), 1, filtered_log_data[,8], &quot;/&quot;)
+head(ratio_data)
+</code></pre>
+<pre><code class="language-R">
+</code></pre>
+<h3 id="calculate-scaling-factor">Calculate  scaling factor</h3>
+<p>The code below computes the median fold change for each sample across all genes.</p>
+<pre><code class="language-R">
+</code></pre>
+<pre><code class="language-R">scaling_factors = apply(ratio_data, 2, median, na.rm = TRUE)
+scaling_factors
+</code></pre>
+<p>The <code>2</code> indicates that the function is applied to columns, i.e., for each sample.</p>
+<h3 id="normalize-the-counts">Normalize the counts</h3>
+<p>This step below normalizes each sample by its scaling factors, making the data comparable across samples. The result is a normalized gene expression matrix.</p>
+<pre><code class="language-R">manually_normalized = sweep(merged_df, 2, scaling_factors, &quot;/&quot;)
+head(manually_normalized)
+</code></pre>
+<pre><code class="language-R">hist(manually_normalized$N2_day1_rep1)
+</code></pre>
+<p>The code below shows that the size factors and the normalized read counts calculated by ourselves are the same as what DESeq2 function returns.</p>
+<pre><code class="language-R">head(counts(dds,  normalized = TRUE))
+
+</code></pre>
+<pre><code class="language-R">sizeFactors(dds)
+</code></pre>
+<h2 id="sessioninfo">SessionInfo</h2>
+<pre><code class="language-R">sessionInfo()
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../BIOI611_introR/" class="btn btn-neutral float-left" title="Minimal R Introduction"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../BIOI611_DAVID/" class="btn btn-neutral float-right" title="Pathway analysis using DAVID">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../BIOI611_introR/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../BIOI611_DAVID/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
