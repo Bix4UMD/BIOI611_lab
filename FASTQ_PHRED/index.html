@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>PRED Score in Bioinformatics - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "PRED Score in Bioinformatics";
+        var mkdocs_page_input_path = "FASTQ_PHRED.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">PRED Score in Bioinformatics</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/FASTQ_PHRED.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="what-is-phred-scores">What is PHRED Scores</h2>
+<p>A Phred score is a measure of the probability that a base call in a DNA sequencing read is incorrect. It is a logarithmic scale, meaning that a small change in the Phred score represents a large change in the probability of an error.</p>
+<div class="arithmatex">\[Q = -10 \cdot \log_{10}(P)\]</div>
+<p>Where:</p>
+<ul>
+<li>
+<p>Q is the PHRED score.</p>
+</li>
+<li>
+<p>P is the probability that the base was called incorrectly.</p>
+</li>
+</ul>
+<p>For example:</p>
+<ul>
+<li>
+<p><strong>Q = 20</strong>: This corresponds to a 1 in 100 probability of an incorrect base call, or an accuracy of 99%.</p>
+</li>
+<li>
+<p><strong>Q = 30</strong>: This corresponds to a 1 in 1000 probability of an incorrect base call, or an accuracy of 99.9%.</p>
+</li>
+<li>
+<p><strong>Q = 40</strong>: This corresponds to a 1 in 10,000 probability of an incorrect base call, or an accuracy of 99.99%.</p>
+</li>
+</ul>
+<pre><code># Print the header
+cat(sprintf(&quot;%-5s\t\t%-10s\n&quot;, &quot;Phred&quot;, &quot;Prob of&quot;))
+cat(sprintf(&quot;%-5s\t\t%-10s\n&quot;, &quot;score&quot;, &quot;Incorrect call&quot;))
+
+# Loop through Phred scores from 0 to 41
+for (phred in 0:41) {
+  cat(sprintf(&quot;%-5d\t\t%0.5f\n&quot;, phred, 10^(phred / -10)))
+}
+</code></pre>
+<h2 id="what-is-ascii">What is ASCII</h2>
+<p>ASCII (American Standard Code for Information Interchange) is used to represent characters in computers. We can represent Phred scores using ASCII characters. The advantage is that the quality information can be esisly stored in text based FASTQ file.</p>
+<p>Not all <a href="https://www.columbia.edu/kermit/ascii.html">ASCII characters</a> are printable. The first printable ASCII character is <code>!</code> and the decimal code for the character for <code>!</code> is 33. </p>
+<pre><code># Store output in a vector to fit on a slide
+output &lt;- c(sprintf(&quot;%-8s  %-8s&quot;, &quot;Character&quot;, &quot;ASCII #&quot;))
+
+# Loop through ASCII values from 33 to 89
+for (i in 33:89) {
+  output &lt;- c(output, sprintf(&quot;%-8s  %-8d&quot;, intToUtf8(i), i))
+}
+
+# Print the output in a single block (e.g., to fit on a slide)
+cat(paste(output, collapse = &quot;\n&quot;))
+</code></pre>
+<h2 id="phred-scores-in-fastq-file">Phred scores in FASTQ file</h2>
+<p>In a FASTQ file, Phred scores are represented as ASCII characters. These characters are converted back to numeric values (PHRED scores) based on the encoding scheme used:</p>
+<ol>
+<li>
+<p><strong>PHRED+33 Encoding (Sanger/Illumina 1.8+)</strong>:</p>
+<ul>
+<li>
+<p>The ASCII character for a quality score Q is calculated as:</p>
+<p>ASCII character=chr(Q+33)</p>
+</li>
+<li>
+<p>For example:</p>
+<ul>
+<li>A PHRED score of 30 is encoded as <code>chr(30 + 33) = chr(63)</code>, which corresponds to the ASCII character <code>?</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>PHRED+64 Encoding (Illumina 1.3-1.7)</strong>:</p>
+<ul>
+<li>
+<p>The ASCII character for a quality score QQQ is calculated as: </p>
+<p>ASCII character=chr(Q+64)</p>
+</li>
+<li>
+<p>For example:</p>
+<ul>
+<li>A PHRED score of 30 is encoded as <code>chr(30 + 64) = chr(94)</code>, which corresponds to the ASCII character <code>^</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<pre><code># Print the header
+cat(sprintf(&quot;%-5s\t\t%-10s\t%-6s\t\t%-10s\n&quot;, &quot;Phred&quot;, &quot;Prob. of&quot;, &quot;ASCII&quot;, &quot;ASCII&quot;))
+cat(sprintf(&quot;%-5s\t\t%-10s\t%-6s\t%-10s\n&quot;, &quot;score&quot;, &quot;Error&quot;, &quot;Phred+33&quot;, &quot;Phred+64&quot;))
+
+# Loop through Phred scores from 0 to 41
+for (phred in 0:41) {
+  # Calculate the probability of error
+  prob_error &lt;- 10^(phred / -10)
+
+  # Convert Phred scores to ASCII characters
+  ascii_phred33 &lt;- intToUtf8(phred + 33)
+  ascii_phred64 &lt;- intToUtf8(phred + 64)
+
+  # Print the results in a formatted table
+  cat(sprintf(&quot;%-5d\t\t%0.5f\t\t%-6s\t\t%-10s\n&quot;, 
+              phred, prob_error, 
+              ascii_phred33, ascii_phred64))
+}
+</code></pre>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

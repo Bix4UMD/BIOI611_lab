@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Downstream analysis - trajectory analysis using Monocle3 - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Downstream analysis - trajectory analysis using Monocle3";
+        var mkdocs_page_input_path = "bioi611_monocle_cele.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Downstream analysis - trajectory analysis using Monocle3</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#why-single-cell-trajectory-analysis">Why single cell trajectory analysis</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#developmental-process-of-the-cell-types-in-c-elegans">Developmental process of the cell types in C. elegans</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#r-package-installation">R package installation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#configure-the-environment-using-existing-library-files">Configure the environment using existing library files</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#load-required-r-packages">Load required R packages</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#pre-process-the-data">Pre-process the data</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#reduce-dimensionality-and-visualize-the-results">Reduce dimensionality and visualize the results</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cluster-your-cells">Cluster your cells</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#learn-the-trajectory-graph">Learn the trajectory graph</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#order-cells">Order cells</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#reference">Reference</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">scRNA-seq</li>
+      <li class="breadcrumb-item active">Downstream analysis - trajectory analysis using Monocle3</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/bioi611_monocle_cele.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a href="https://colab.research.google.com/github/Bix4UMD/BIOI611_lab/blob/main/docs/bioi611_monocle_cele.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a></p>
+<h1 id="_1"></h1>
+<h2 id="why-single-cell-trajectory-analysis">Why single cell trajectory analysis</h2>
+<p>The development of cells in multicellular organisms is a tightly regulated process that unfolds through a series of lineage decisions and differentiation events. These processes result in a diverse array of specialized cell types, each with distinct functional roles. Understanding the dynamics of cell development is crucial for elucidating fundamental biological mechanisms, and single-cell RNA sequencing (scRNA-seq) has emerged as a powerful tool for studying these processes at an unprecedented resolution.</p>
+<p>Trajectory analysis, combined with pseudotime reconstruction, provides a framework for investigating the temporal and developmental progression of cells within a dataset. Using computational tools like Monocle3, researchers can infer cell trajectories based on the high-dimensional expression profiles of genes, identifying how undifferentiated cells transition through intermediate states toward terminal fates.</p>
+<ul>
+<li>Trajectory Reconstruction:</li>
+</ul>
+<p>Tools like Monocle3 organize single cells into trajectories by arranging them along a developmental axis, reflecting the continuum of cellular states.</p>
+<p>These trajectories are inferred without prior knowledge of time or lineage markers, making them especially powerful for systems where developmental pathways are not fully mapped.</p>
+<ul>
+<li>Pseudotime Analysis:</li>
+</ul>
+<p>Pseudotime represents an inferred temporal ordering of cells along a trajectory.</p>
+<p>It enables the identification of genes and pathways that are dynamically regulated as cells transition through developmental states.</p>
+<h2 id="developmental-process-of-the-cell-types-in-c-elegans">Developmental process of the cell types in <em>C. elegans</em></h2>
+<p>The developmental process of the cell types involves a progression through various stages, starting from neuroblasts (progenitor cells) and leading to differentiated neuron types, as described below:</p>
+<ol>
+<li>Neuroblasts (Progenitors):</li>
+</ol>
+<p>The process begins with neuroblasts, which are multipotent progenitor cells. Examples include:
+* Neuroblast_ADF_AWB: Precursor to the ADF and AWB neurons.
+* Neuroblast_AFD_RMD: Precursor to the AFD and RMD neurons.
+* Neuroblast_ASE_ASJ_AUA: Precursor to the ASE, ASJ, and AUA neurons.
+* Neuroblast_ASG_AWA: Precursor to the ASG and AWA neurons.</p>
+<ol>
+<li>Parent Cells:</li>
+</ol>
+<p>Some intermediate stages are represented by parent cell types, such as:
+* ADL_parent: Gives rise to ADL neurons.
+* ASI_parent: Gives rise to ASI neurons.
+* ASE_parent: Gives rise to ASEL and ASER neurons.
+* ASK_parent: Gives rise to ASK neurons.</p>
+<ol>
+<li>Differentiated Neurons:</li>
+</ol>
+<p>Fully differentiated neurons emerge from the parent cells and neuroblasts, including:</p>
+<ul>
+<li>ADF (Amphid Dorsal Left)</li>
+<li>ADL (Amphid Dorsal Left)</li>
+<li>AFD (Amphid Fan-shaped Dorsal)</li>
+<li>ASE (Amphid Sensory neurons), with subtypes ASEL (Left) and ASER (Right).</li>
+<li>ASG (Amphid Sensory neurons Group)</li>
+<li>ASH (Amphid Sensory neurons Hypodermal)</li>
+<li>ASI (Amphid Sensory neurons Inner)</li>
+<li>ASJ (Amphid Sensory neurons Junction)</li>
+<li>ASK (Amphid Sensory neurons King)</li>
+<li>AWA (Amphid Wing-shaped neurons A)</li>
+<li>AWB (Amphid Wing-shaped neurons B)</li>
+<li>AWC (Amphid Wing-shaped neurons C), with subtype AWC_ON.</li>
+<li>AUA (Amphid Unpaired A neuron)</li>
+</ul>
+<p>The neuroblasts differentiate into parent cell types or directly into specific neuron subtypes. Parent cells serve as intermediate stages, further dividing or maturing into various functional neuron types. This hierarchical process ensures the development of diverse neuronal subtypes specialized for distinct sensory and functional roles.</p>
+<h2 id="r-package-installation">R package installation</h2>
+<p>Installation of the required packages may take more than 1.5 hours.</p>
+<p>Same as other lab notes, a <code>.tar.gz</code> file includes all the library files will be downloaded and uncompressed for preparing the R environment.</p>
+<pre><code class="language-R">#if (!requireNamespace(&quot;BiocManager&quot;, quietly = TRUE))
+#install.packages(&quot;BiocManager&quot;)
+#BiocManager::install(version = &quot;3.20&quot;)
+</code></pre>
+<pre><code class="language-R">## required by scater package
+system(&quot;apt-get install libx11-dev libcairo2-dev&quot;) #, intern = TRUE)
+</code></pre>
+<pre><code class="language-R">#BiocManager::install(c('BiocGenerics', 'DelayedArray', 'DelayedMatrixStats',
+#                       'limma', 'lme4', 'S4Vectors', 'SingleCellExperiment',
+#                       'SummarizedExperiment', 'batchelor', 'HDF5Array',
+#                       'terra', 'ggrastr'))
+</code></pre>
+<pre><code class="language-R">#install.packages(&quot;devtools&quot;)
+#devtools::install_github('cole-trapnell-lab/monocle3')
+</code></pre>
+<pre><code class="language-R">#system(&quot;tar zcvf R_lib_monocle3.tar.gz /usr/local/lib/R/site-library&quot;)
+</code></pre>
+<h2 id="configure-the-environment-using-existing-library-files">Configure the environment using existing library files</h2>
+<pre><code class="language-R"># https://drive.google.com/file/d/1wCqb1oCfxeplWR7jf3vkPWDavVsGAQzZ/view?usp=sharing
+# system(&quot;gdown 1wCqb1oCfxeplWR7jf3vkPWDavVsGAQzZ&quot;)
+# system(&quot;md5sum R_lib_monocle3.tar.gz&quot;, intern = TRUE)
+# system(&quot;tar zxvf R_lib_monocle3.tar.gz&quot;)
+</code></pre>
+<pre><code class="language-R">## Installing the R packages could take around 51 minutes
+## To speed up this process, you can download the R lib files
+## saved from a working Google Colab session
+## https://drive.google.com/file/d/1eN-Raj3Hlnml68ACZQ36VQRGZxFclneL/view?usp=sharing
+system(&quot;gdown 1eN-Raj3Hlnml68ACZQ36VQRGZxFclneL&quot;, intern = TRUE)
+system(&quot;md5sum BIOI611_custom_R_lib_Nov_2025.tar.gz&quot;, intern = TRUE)
+## required by scater package
+system(&quot;apt-get install libx11-dev libcairo2-dev&quot;, intern = TRUE)
+system(&quot;tar zxvf BIOI611_custom_R_lib_Nov_2025.tar.gz&quot;)
+.libPaths(c(&quot;/content/usr/local/lib/R/site-library&quot;, .libPaths()))
+</code></pre>
+<p><span style=white-space:pre-wrap>'fcfbd50c028468ec37d8654fda0eaec6  BIOI611_custom_R_lib_Nov_2025.tar.gz'</span></p>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'Reading package lists...'</li><li>'Building dependency tree...'</li><li>'Reading state information...'</li><li>'libcairo2-dev is already the newest version (1.16.0-5ubuntu2).'</li><li>'libx11-dev is already the newest version (2:1.7.5-1ubuntu0.3).'</li><li>'0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.'</li></ol>
+
+<pre><code class="language-R">.libPaths()
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'/content/usr/local/lib/R/site-library'</li><li>'/usr/local/lib/R/site-library'</li><li>'/usr/lib/R/site-library'</li><li>'/usr/lib/R/library'</li></ol>
+
+<pre><code class="language-R">
+</code></pre>
+<h2 id="load-required-r-packages">Load required R packages</h2>
+<pre><code class="language-R">library(monocle3)
+library(dplyr)
+</code></pre>
+<pre><code>Loading required package: Biobase
+
+Loading required package: BiocGenerics
+
+Loading required package: generics
+
+
+Attaching package: ‘generics’
+
+
+The following objects are masked from ‘package:base’:
+
+    as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,
+    setequal, union
+
+
+
+Attaching package: ‘BiocGenerics’
+
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,
+    order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,
+    unsplit, which.max, which.min
+
+
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+
+Loading required package: SingleCellExperiment
+
+Loading required package: SummarizedExperiment
+
+Loading required package: MatrixGenerics
+
+Loading required package: matrixStats
+
+
+Attaching package: ‘matrixStats’
+
+
+The following objects are masked from ‘package:Biobase’:
+
+    anyMissing, rowMedians
+
+
+
+Attaching package: ‘MatrixGenerics’
+
+
+The following objects are masked from ‘package:matrixStats’:
+
+    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
+    colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
+    colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
+    colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
+    colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
+    colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
+    colWeightedMeans, colWeightedMedians, colWeightedSds,
+    colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
+    rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
+    rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
+    rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
+    rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
+    rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
+    rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
+    rowWeightedSds, rowWeightedVars
+
+
+The following object is masked from ‘package:Biobase’:
+
+    rowMedians
+
+
+Loading required package: GenomicRanges
+
+Loading required package: stats4
+
+Loading required package: S4Vectors
+
+
+Attaching package: ‘S4Vectors’
+
+
+The following object is masked from ‘package:utils’:
+
+    findMatches
+
+
+The following objects are masked from ‘package:base’:
+
+    expand.grid, I, unname
+
+
+Loading required package: IRanges
+
+Loading required package: Seqinfo
+
+
+Attaching package: ‘monocle3’
+
+
+The following objects are masked from ‘package:Biobase’:
+
+    exprs, fData, fData&lt;-, pData, pData&lt;-
+
+
+
+Attaching package: ‘dplyr’
+
+
+The following objects are masked from ‘package:GenomicRanges’:
+
+    intersect, setdiff, union
+
+
+The following object is masked from ‘package:Seqinfo’:
+
+    intersect
+
+
+The following objects are masked from ‘package:IRanges’:
+
+    collapse, desc, intersect, setdiff, slice, union
+
+
+The following objects are masked from ‘package:S4Vectors’:
+
+    first, intersect, rename, setdiff, setequal, union
+
+
+The following object is masked from ‘package:matrixStats’:
+
+    count
+
+
+The following object is masked from ‘package:Biobase’:
+
+    combine
+
+
+The following objects are masked from ‘package:BiocGenerics’:
+
+    combine, intersect, setdiff, setequal, union
+
+
+The following object is masked from ‘package:generics’:
+
+    explain
+
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+</code></pre>
+<p>When we were working on the scRNA-seq data in C. elegans, we didn't perform cell type annotation because of limited time.</p>
+<pre><code class="language-R">expression_matrix &lt;- readRDS(url(&quot;https://depts.washington.edu:/trapnell-lab/software/monocle3/celegans/data/packer_embryo_expression.rds&quot;))
+cell_metadata &lt;- readRDS(url(&quot;https://depts.washington.edu:/trapnell-lab/software/monocle3/celegans/data/packer_embryo_colData.rds&quot;))
+gene_annotation &lt;- readRDS(url(&quot;https://depts.washington.edu:/trapnell-lab/software/monocle3/celegans/data/packer_embryo_rowData.rds&quot;))
+
+cds &lt;- new_cell_data_set(expression_matrix,
+                         cell_metadata = cell_metadata,
+                         gene_metadata = gene_annotation)
+</code></pre>
+<pre><code class="language-R">cds
+</code></pre>
+<pre><code>class: cell_data_set 
+dim: 20222 6188 
+metadata(1): cds_version
+assays(1): counts
+rownames(20222): WBGene00010957 WBGene00010958 ... WBGene00021594
+  WBGene00007064
+rowData names(3): id gene_short_name num_cells_expressed
+colnames(6188): AAACCTGCAAGACGTG-300.1.1 AAACCTGGTGTGAATA-300.1.1 ...
+  TGCGGGTAGTACTTGC-b02 TTTGTCAAGTACACCT-b02
+colData names(19): cell n.umi ... bg.b01.loading bg.b02.loading
+reducedDimNames(0):
+mainExpName: NULL
+altExpNames(0):
+</code></pre>
+<pre><code class="language-R">class(expression_matrix)
+dim(expression_matrix)
+</code></pre>
+<p>'dgCMatrix'</p>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>20222</li><li>6188</li></ol>
+
+<pre><code class="language-R">head(cell_metadata, 4)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 4 × 19</caption>
+<thead>
+    <tr><th></th><th scope=col>cell</th><th scope=col>n.umi</th><th scope=col>time.point</th><th scope=col>batch</th><th scope=col>Size_Factor</th><th scope=col>raw.embryo.time</th><th scope=col>embryo.time</th><th scope=col>embryo.time.bin</th><th scope=col>raw.embryo.time.bin</th><th scope=col>lineage</th><th scope=col>num_genes_expressed</th><th scope=col>cell.type</th><th scope=col>bg.300.loading</th><th scope=col>bg.400.loading</th><th scope=col>bg.500.1.loading</th><th scope=col>bg.500.2.loading</th><th scope=col>bg.r17.loading</th><th scope=col>bg.b01.loading</th><th scope=col>bg.b02.loading</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>AAACCTGCAAGACGTG-300.1.1</th><td>AAACCTGCAAGACGTG-300.1.1</td><td>1003</td><td>300_minutes</td><td>Waterston_300_minutes</td><td>0.7795692</td><td>350</td><td>350</td><td>330-390</td><td>330-390</td><td>ABalpppapav/ABpraaaapav</td><td>646</td><td>AFD</td><td>0.808794</td><td>0.2324676</td><td>-2.000489</td><td>-2.425965</td><td>-0.5436492</td><td>-2.2848042</td><td>-2.1302609</td></tr>
+    <tr><th scope=row>AAACCTGGTGTGAATA-300.1.1</th><td>AAACCTGGTGTGAATA-300.1.1</td><td>1458</td><td>300_minutes</td><td>Waterston_300_minutes</td><td>1.1332123</td><td>190</td><td>190</td><td>170-210</td><td>170-210</td><td>ABalppppa/ABpraaapa    </td><td>857</td><td>NA </td><td>9.220938</td><td>3.9429037</td><td>-3.420859</td><td>-3.479376</td><td> 4.8987977</td><td> 1.6406862</td><td> 0.1534805</td></tr>
+    <tr><th scope=row>AAACCTGTCGGCCGAT-300.1.1</th><td>AAACCTGTCGGCCGAT-300.1.1</td><td>1633</td><td>300_minutes</td><td>Waterston_300_minutes</td><td>1.2692289</td><td>260</td><td>245</td><td>210-270</td><td>210-270</td><td>ABpxpaaaaa             </td><td>865</td><td>NA </td><td>6.008029</td><td>2.2257000</td><td>-3.630310</td><td>-3.828569</td><td> 1.9894965</td><td>-0.1370570</td><td>-0.5189810</td></tr>
+    <tr><th scope=row>AAAGATGGTTCGTTGA-300.1.1</th><td>AAAGATGGTTCGTTGA-300.1.1</td><td>1716</td><td>300_minutes</td><td>Waterston_300_minutes</td><td>1.3337396</td><td>220</td><td>225</td><td>210-270</td><td>210-270</td><td>NA                     </td><td>873</td><td>NA </td><td>7.518360</td><td>3.0385123</td><td>-3.932011</td><td>-4.290579</td><td> 1.9108642</td><td>-0.9612141</td><td>-2.2660029</td></tr>
+</tbody>
+</table>
+
+<p>If you work on your own dataset, the meta data information will be created/collected by yourself. In this notebook, the metadata has been created/collected by the authors. In Seurat object, metadata information is stored in <code>@metadata</code> dataframe.</p>
+<p>Column <code>cell.type</code>: Cell type annotation performed by the authors in <a href="https://www.science.org/doi/10.1126/science.aax1971">the Science paper</a></p>
+<p>Column <code>embryo.time.bin</code>:  For each cell, the age of the embryo that it came from was estimated by correlating its transcriptome with a bulk RNA-seq time series. The bulk RNA-seq time series are from the paper <a href="https://www.nature.com/articles/nature13996">here</a>.  </p>
+<pre><code class="language-R">table(cell_metadata$cell.type)
+</code></pre>
+<pre><code>                   ADF                ADF_AWB                    ADL 
+                   170                    102                    477 
+            ADL_parent                    AFD                    ASE 
+                   148                    326                    205 
+            ASE_parent                   ASEL                   ASER 
+                   149                     38                     39 
+                   ASG                ASG_AWA                    ASH 
+                   173                     99                    345 
+                   ASI             ASI_parent                    ASJ 
+                   212                    187                    320 
+                   ASK             ASK_parent                    AUA 
+                   233                    150                     98 
+                   AWA                    AWB                    AWC 
+                   236                    212                    309 
+                AWC_ON     Neuroblast_ADF_AWB     Neuroblast_AFD_RMD 
+                     9                    131                    147 
+Neuroblast_ASE_ASJ_AUA     Neuroblast_ASG_AWA     Neuroblast_ASJ_AUA 
+                   103                    142                    123
+</code></pre>
+<pre><code class="language-R">head(gene_annotation)
+</code></pre>
+<table class="dataframe">
+<caption>A data.frame: 6 × 3</caption>
+<thead>
+    <tr><th></th><th scope=col>id</th><th scope=col>gene_short_name</th><th scope=col>num_cells_expressed</th></tr>
+    <tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;int&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><th scope=row>WBGene00010957</th><td>WBGene00010957</td><td>nduo-6</td><td>6038</td></tr>
+    <tr><th scope=row>WBGene00010958</th><td>WBGene00010958</td><td>ndfl-4</td><td>1597</td></tr>
+    <tr><th scope=row>WBGene00010959</th><td>WBGene00010959</td><td>nduo-1</td><td>5342</td></tr>
+    <tr><th scope=row>WBGene00010960</th><td>WBGene00010960</td><td>atp-6 </td><td>5921</td></tr>
+    <tr><th scope=row>WBGene00010961</th><td>WBGene00010961</td><td>nduo-2</td><td>2686</td></tr>
+    <tr><th scope=row>WBGene00000829</th><td>WBGene00000829</td><td>ctb-1 </td><td>5079</td></tr>
+</tbody>
+</table>
+
+<h2 id="pre-process-the-data">Pre-process the data</h2>
+<p>Most analyses (including trajectory inference, and clustering) in Monocle3, require various normalization and preprocessing steps. preprocess_cds executes and stores these preprocessing steps.</p>
+<p>Specifically, depending on the options selected, <code>preprocess_cds</code> first normalizes the data by log and size factor to address depth differences, or by size factor only. Next, <code>preprocess_cds</code> calculates a lower dimensional space that will be used as the input for further dimensionality reduction like tSNE and UMAP.</p>
+<p>In monocle3, <code>cds</code> is short for <code>cell_data_set</code> (CDS) object.</p>
+<pre><code class="language-R">cds &lt;- preprocess_cds(cds, num_dim = 50)
+</code></pre>
+<p>Data sets that contain cells from different groups often benefit from alignment to subtract differences between them. Alignment can be used to remove batch effects, subtract the effects of treatments, or even potentially compare across species. align_cds executes alignment and stores these adjusted coordinates.</p>
+<p>This function can be used to subtract both continuous and discrete batch effects.</p>
+<p>⚠️ Important</p>
+<p>Your own dataset might not include the batch-loading information demonstrated here. You will need to address batch effects using the batch information specific to your data. For instance, if your data were collected at different locations, the location data could be used as a factor to correct for batch effects.</p>
+<pre><code class="language-R">cds &lt;- align_cds(cds, alignment_group = &quot;batch&quot;,
+           residual_model_formula_str = &quot;~ bg.300.loading + bg.400.loading +
+           bg.500.1.loading + bg.500.2.loading + bg.r17.loading +
+           bg.b01.loading + bg.b02.loading&quot;)
+</code></pre>
+<pre><code>Aligning cells from different batches using Batchelor.
+Please remember to cite:
+     Haghverdi L, Lun ATL, Morgan MD, Marioni JC (2018). 'Batch effects in single-cell RNA-sequencing data are corrected by matching mutual nearest neighbors.' Nat. Biotechnol., 36(5), 421-427. doi: 10.1038/nbt.4091
+</code></pre>
+<h2 id="reduce-dimensionality-and-visualize-the-results">Reduce dimensionality and visualize the results</h2>
+<pre><code class="language-R">cds &lt;- reduce_dimension(cds)
+
+</code></pre>
+<pre><code>No preprocess_method specified, and aligned coordinates have been computed previously. Using preprocess_method = 'Aligned'
+</code></pre>
+<pre><code class="language-R">plot_cells(cds, label_groups_by_cluster=FALSE,  color_cells_by = &quot;cell.type&quot;)
+</code></pre>
+<pre><code>No trajectory to plot. Has learn_graph() been called yet?
+
+Warning message:
+“[1m[22m`aes_string()` was deprecated in ggplot2 3.0.0.
+[36mℹ[39m Please use tidy evaluation idioms with `aes()`.
+[36mℹ[39m See also `vignette("ggplot2-in-packages")` for more information.
+[36mℹ[39m The deprecated feature was likely used in the [34mmonocle3[39m package.
+  Please report the issue to the authors.”
+Warning message:
+“[1m[22mThe `size` argument of `element_line()` is deprecated as of ggplot2 3.4.0.
+[36mℹ[39m Please use the `linewidth` argument instead.
+[36mℹ[39m The deprecated feature was likely used in the [34mmonocle3[39m package.
+  Please report the issue to the authors.”
+Warning message:
+“[1m[22mRemoved 1 row containing missing values or values outside the scale range
+(`geom_text_repel()`).”
+</code></pre>
+<p><img alt="png" src="../bioi611_monocle_cele_files/bioi611_monocle_cele_32_1.png" /></p>
+<p>You can use <code>plot_cells()</code> to visualize the variation of individual genes along the trajectory. Let's examine a few genes that exhibit intriguing expression patterns in ciliated neurons:</p>
+<pre><code class="language-R">ciliated_genes &lt;- c(&quot;che-1&quot;,
+                    &quot;hlh-17&quot;,
+                    &quot;nhr-6&quot;,
+                    &quot;dmd-6&quot;,
+                    &quot;ceh-36&quot;,
+                    &quot;ham-1&quot;)
+
+plot_cells(cds,
+           genes=ciliated_genes,
+           label_cell_groups=FALSE,
+           show_trajectory_graph=FALSE)
+</code></pre>
+<p><img alt="png" src="../bioi611_monocle_cele_files/bioi611_monocle_cele_34_0.png" /></p>
+<p>The C. elegans <em>che-1</em> gene encodes a zinc finger transcription factor required for specification of the ASE chemosensory neurons.</p>
+<h2 id="cluster-your-cells">Cluster your cells</h2>
+<p>This function takes a <code>cell_data_set</code> as input, clusters the cells using Louvain or Leiden community detection, and returns a <code>cell_data_set</code> with internally stored cluster assignments. In addition to clustering, the function calculates partitions, representing superclusters of the Louvain or Leiden communities, identified through a kNN pruning method. Cluster assignments can be accessed via the <code>clusters</code> function, and partition assignments can be accessed via the <code>partitions</code> function.</p>
+<pre><code class="language-R">cds &lt;- cluster_cells(cds)
+
+</code></pre>
+<pre><code class="language-R">plot_cells(cds, color_cells_by = &quot;partition&quot;)
+</code></pre>
+<pre><code>No trajectory to plot. Has learn_graph() been called yet?
+</code></pre>
+<p><img alt="png" src="../bioi611_monocle_cele_files/bioi611_monocle_cele_39_1.png" /></p>
+<h2 id="learn-the-trajectory-graph">Learn the trajectory graph</h2>
+<p>Monocle3 aims to learn how cells transition through a biological program of gene expression changes in an experiment.</p>
+<p>Each cell can be viewed as a point in a high-dimensional space, where each dimension describes the expression of a different gene.</p>
+<p>Identifying the program of gene expression changes is equivalent to learning a trajectory that the cells follow through this space.</p>
+<p>However, the more dimensions there are in the analysis, the harder the trajectory is to learn.</p>
+<p>Fortunately, many genes typically co-vary with one another, and so the dimensionality of the data can be reduced with a wide variety of different algorithms.</p>
+<p>Monocle3 provides two different algorithms for dimensionality reduction via reduce_dimension (UMAP and tSNE). Both take a cell_data_set object and a number of dimensions allowed for the reduced space.</p>
+<p>You can also provide a model formula indicating some variables (e.g. batch ID or other technical factors) to "subtract" from the data so it doesn't contribute to the trajectory. The function learn_graph is the fourth step in the trajectory building process after preprocess_cds, reduce_dimension, and cluster_cells. After learn_graph, order_cells is typically called.</p>
+<p>Principal graph</p>
+<p>Monocle uses reverse graph embedding (RGE) to map the cells to a lower-dimensional latent space, i.e. each cell <span class="arithmatex">\(\boldsymbol{x}_i, i=1, \ldots, N\)</span> has a corresponding latent point <span class="arithmatex">\(\boldsymbol{z}_i\)</span>. These latent points are clustered in a way similar to k-means by iteratively fitting of a small set of centroids, <span class="arithmatex">\(\boldsymbol{y}_k, k=1, \ldots, K(K \leq N)\)</span>. The principal graph is then built on these centroids. Finally the latent points are mapped on the nearest point on this qraph to obtain their pseudotimes.</p>
+<blockquote>
+<p>Centroid = the “center point” of a group of cells</p>
+</blockquote>
+<pre><code class="language-R"># ---- Learn the trajectory graph ----
+cds &lt;- learn_graph(cds)
+# ---- Plot trajectory colored by cell type ----
+plot_cells(cds,
+           color_cells_by = &quot;cell.type&quot;,
+           label_groups_by_cluster=FALSE,
+           label_leaves=FALSE,
+           label_branch_points=FALSE)
+</code></pre>
+<pre><code>  |======================================================================| 100%
+
+
+Warning message:
+“[1m[22mUsing `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+[36mℹ[39m Please use `linewidth` instead.
+[36mℹ[39m The deprecated feature was likely used in the [34mmonocle3[39m package.
+  Please report the issue to the authors.”
+Warning message:
+“[1m[22mRemoved 1 row containing missing values or values outside the scale range
+(`geom_text_repel()`).”
+</code></pre>
+<p><img alt="png" src="../bioi611_monocle_cele_files/bioi611_monocle_cele_42_2.png" /></p>
+<pre><code class="language-R"># ---- Plot trajectory colored by embryo time ----
+plot_cells(cds,
+           color_cells_by = &quot;embryo.time.bin&quot;,
+           label_cell_groups=FALSE,
+           label_leaves=TRUE,
+           label_branch_points=TRUE,
+           graph_label_size=1.5)
+</code></pre>
+<p><img alt="png" src="../bioi611_monocle_cele_files/bioi611_monocle_cele_43_0.png" /></p>
+<pre><code class="language-R">principal_graph(cds)
+</code></pre>
+<pre><code>List of length 1
+names(1): UMAP
+</code></pre>
+<pre><code class="language-R"># ---- Extract the principal graph object ----
+p_graph &lt;- principal_graph(cds)[[&quot;UMAP&quot;]]
+igraph::V(p_graph) # V(): graph -&gt; vertices
+</code></pre>
+<pre><code>+ 397/397 vertices, named, from 7f8aade:
+  [1] Y_1   Y_2   Y_3   Y_4   Y_5   Y_6   Y_7   Y_8   Y_9   Y_10  Y_11  Y_12 
+ [13] Y_13  Y_14  Y_15  Y_16  Y_17  Y_18  Y_19  Y_20  Y_21  Y_22  Y_23  Y_24 
+ [25] Y_25  Y_26  Y_27  Y_28  Y_29  Y_30  Y_31  Y_32  Y_33  Y_34  Y_35  Y_36 
+ [37] Y_37  Y_38  Y_39  Y_40  Y_41  Y_42  Y_43  Y_44  Y_45  Y_46  Y_47  Y_48 
+ [49] Y_49  Y_50  Y_51  Y_52  Y_53  Y_54  Y_55  Y_56  Y_57  Y_58  Y_59  Y_60 
+ [61] Y_61  Y_62  Y_63  Y_64  Y_65  Y_66  Y_67  Y_68  Y_69  Y_70  Y_71  Y_72 
+ [73] Y_73  Y_74  Y_75  Y_76  Y_77  Y_78  Y_79  Y_80  Y_81  Y_82  Y_83  Y_84 
+ [85] Y_85  Y_86  Y_87  Y_88  Y_89  Y_90  Y_91  Y_92  Y_93  Y_94  Y_95  Y_96 
+ [97] Y_97  Y_98  Y_99  Y_100 Y_101 Y_102 Y_103 Y_104 Y_105 Y_106 Y_107 Y_108
+[109] Y_109 Y_110 Y_111 Y_112 Y_113 Y_114 Y_115 Y_116 Y_117 Y_118 Y_119 Y_120
++ ... omitted several vertices
+</code></pre>
+<p>The <code>Y_</code> prefix tells us that this is indeed the tree of the latent centroids</p>
+<pre><code class="language-R">plot_cells(cds,
+           color_cells_by = &quot;embryo.time.bin&quot;,
+           label_cell_groups=FALSE,
+           label_leaves=TRUE,
+           label_branch_points=TRUE,
+           graph_label_size=1.5)
+</code></pre>
+<p><img alt="png" src="../bioi611_monocle_cele_files/bioi611_monocle_cele_48_0.png" /></p>
+<pre><code class="language-R">plot_cells(cds,
+          color_cells_by = &quot;embryo.time.bin&quot;,
+          label_cell_groups=FALSE,
+          label_groups_by_cluster=FALSE,
+          label_leaves=FALSE,
+          label_branch_points=TRUE,
+          label_principal_points = TRUE,       # set this to TRUE
+          graph_label_size=3)
+</code></pre>
+<p><img alt="png" src="../bioi611_monocle_cele_files/bioi611_monocle_cele_49_0.png" /></p>
+<pre><code class="language-R">
+</code></pre>
+<h2 id="order-cells">Order cells</h2>
+<p>Assigns cells a pseudotime value based on their projection on the principal graph learned in the <code>learn_graph</code> function and the position of chosen root states.</p>
+<p>This function takes as input a <code>cell_data_set</code> and returns it with pseudotime information stored internally. <code>order_cells()</code> optionally takes "root" state(s) in the form of cell or principal graph node IDs, which you can use to specify the start of the trajectory. If you don't provide a root state, an plot will be generated where you can choose the root state(s) interactively.</p>
+<pre><code class="language-R"># a helper function to identify the root principal points:
+# Step 1: Identify cells from the earliest time bin
+# Step 2: For each cell, find which principal graph node it is closest to
+# Step 3: Determine which principal node is most associated with early cells
+#
+get_earliest_principal_node &lt;- function(cds, time_bin=&quot;130-170&quot;){
+  cell_ids &lt;- which(colData(cds)[, &quot;embryo.time.bin&quot;] == time_bin)
+  # vertex is also called node in a graph
+  closest_vertex &lt;-
+  cds@principal_graph_aux[[&quot;UMAP&quot;]]$pr_graph_cell_proj_closest_vertex
+  closest_vertex &lt;- as.matrix(closest_vertex[colnames(cds), ])
+  root_pr_nodes &lt;-
+  igraph::V(principal_graph(cds)[[&quot;UMAP&quot;]])$name[as.numeric(names
+  (which.max(table(closest_vertex[cell_ids,]))))]
+
+  root_pr_nodes
+}
+</code></pre>
+<p>The function above, <code>get_earliest_principal_node</code>, helps find the "starting point" in a path that cells follow as they change or develop, based on some time-related information.</p>
+<pre><code class="language-R"># This identifies the principal graph node that is closest to
+#  most of the earliest-stage cells (&quot;130–170&quot;).
+get_earliest_principal_node(cds)
+</code></pre>
+<p>'Y_134'</p>
+<pre><code class="language-R">
+
+
+library(ggplot2)
+
+# choose your branch point
+bp_to_show &lt;- get_earliest_principal_node(cds)
+# get the coordinates of all principal nodes
+pg_coords &lt;- cds@principal_graph_aux[[&quot;UMAP&quot;]]$dp_mst
+
+bp_coord &lt;- pg_coords[, bp_to_show]
+p &lt;- plot_cells(
+  cds,
+  color_cells_by = &quot;embryo.time.bin&quot;,
+  label_cell_groups = FALSE,
+  label_leaves = FALSE,
+  label_branch_points = FALSE,  # hide all branch point labels
+  label_principal_points = FALSE
+)
+
+# overlay only one branch point
+p +
+  geom_point(aes(x = bp_coord[1], y = bp_coord[2]),
+             color = &quot;red&quot;, size = 6) +
+  geom_text(aes(x = bp_coord[1], y = bp_coord[2], label = bp_to_show),
+             color = &quot;black&quot;, size = 5, fontface = &quot;bold&quot;)
+
+</code></pre>
+<pre><code>Warning message in geom_point(aes(x = bp_coord[1], y = bp_coord[2]), color = "red", :
+“[1m[22mAll aesthetics have length 1, but the data has 6188 rows.
+[36mℹ[39m Please consider using `annotate()` or provide this layer with data containing
+  a single row.”
+Warning message in geom_text(aes(x = bp_coord[1], y = bp_coord[2], label = bp_to_show), :
+“[1m[22mAll aesthetics have length 1, but the data has 6188 rows.
+[36mℹ[39m Please consider using `annotate()` or provide this layer with data containing
+  a single row.”
+</code></pre>
+<p><img alt="png" src="../bioi611_monocle_cele_files/bioi611_monocle_cele_55_1.png" /></p>
+<pre><code class="language-R">cds &lt;- order_cells(cds, root_pr_nodes = get_earliest_principal_node(cds))
+
+</code></pre>
+<pre><code class="language-R">plot_cells(cds,
+           color_cells_by = &quot;pseudotime&quot;,
+           label_cell_groups=FALSE,
+           label_leaves=FALSE,
+           label_branch_points=FALSE,
+           graph_label_size=1.5)
+</code></pre>
+<p><img alt="png" src="../bioi611_monocle_cele_files/bioi611_monocle_cele_57_0.png" /></p>
+<pre><code class="language-R">
+</code></pre>
+<p>Finding genes that change as a function of pseudotime
+Identifying the genes that change as cells progress along a trajectory is a core objective of this type of analysis. Knowing the order in which genes go on and off can inform new models of development.</p>
+<p>Let's return to the embryo data, which we processed using the commands</p>
+<pre><code class="language-R">
+</code></pre>
+<p>You can use <code>graph_test()</code> to find genes that are differentially expressed on the different path through the trajectory. The parameter, neighbor_graph="principal_graph", tells <code>graph_test()</code> to test whether cells at similar positions on the trajectory have correlated expression:</p>
+<pre><code class="language-R">ciliated_cds_pr_test_res &lt;- graph_test(cds, neighbor_graph=&quot;principal_graph&quot;, cores=4)
+pr_deg_ids &lt;- row.names(subset(ciliated_cds_pr_test_res, q_value &lt; 0.05))
+</code></pre>
+<pre><code>  |=======================================================| 100%, Elapsed 10:47
+</code></pre>
+<pre><code class="language-R">pr_deg_ids[1:10]
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>'WBGene00010957'</li><li>'WBGene00010958'</li><li>'WBGene00010959'</li><li>'WBGene00010960'</li><li>'WBGene00010961'</li><li>'WBGene00000829'</li><li>'WBGene00010962'</li><li>'WBGene00010963'</li><li>'WBGene00010964'</li><li>'WBGene00010965'</li></ol>
+
+<p>Here are a couple of interesting genes that score as highly significant according to <code>graph_test()</code>:</p>
+<pre><code class="language-R">plot_cells(cds, genes=c(&quot;hlh-4&quot;, &quot;gcy-8&quot;, &quot;dac-1&quot;, &quot;oig-8&quot;),
+           show_trajectory_graph=FALSE,
+           label_cell_groups=FALSE,
+           label_leaves=FALSE)
+</code></pre>
+<p><img alt="png" src="../bioi611_monocle_cele_files/bioi611_monocle_cele_65_0.png" /></p>
+<p>We can then collect the trajectory-variable genes into modules:</p>
+<pre><code class="language-R">gene_module_df &lt;- find_gene_modules(cds[pr_deg_ids,], resolution=c(10^seq(-6,-1)))
+
+</code></pre>
+<pre><code class="language-R">dim(gene_module_df)
+head(gene_module_df)
+</code></pre>
+<style>
+.list-inline {list-style: none; margin:0; padding: 0}
+.list-inline>li {display: inline-block}
+.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
+</style>
+<ol class=list-inline><li>8086</li><li>5</li></ol>
+
+<table class="dataframe">
+<caption>A tibble: 6 × 5</caption>
+<thead>
+    <tr><th scope=col>id</th><th scope=col>module</th><th scope=col>supermodule</th><th scope=col>dim_1</th><th scope=col>dim_2</th></tr>
+    <tr><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
+</thead>
+<tbody>
+    <tr><td>WBGene00010957</td><td>31</td><td>1</td><td>4.616760</td><td>1.855626</td></tr>
+    <tr><td>WBGene00010958</td><td>10</td><td>1</td><td>5.523911</td><td>2.357088</td></tr>
+    <tr><td>WBGene00010959</td><td>31</td><td>1</td><td>4.584704</td><td>1.823956</td></tr>
+    <tr><td>WBGene00010960</td><td>31</td><td>1</td><td>4.642980</td><td>1.889853</td></tr>
+    <tr><td>WBGene00010961</td><td>31</td><td>1</td><td>4.651276</td><td>1.886895</td></tr>
+    <tr><td>WBGene00000829</td><td>31</td><td>1</td><td>4.642779</td><td>1.885232</td></tr>
+</tbody>
+</table>
+
+<pre><code class="language-R">cell_group_df &lt;- tibble::tibble(cell=row.names(colData(cds)),
+                                cell_group=colData(cds)$cell.type)
+agg_mat &lt;- aggregate_gene_expression(cds, gene_module_df, cell_group_df)
+row.names(agg_mat) &lt;- stringr::str_c(&quot;Module &quot;, row.names(agg_mat))
+pheatmap::pheatmap(agg_mat,
+                   scale=&quot;column&quot;, clustering_method=&quot;ward.D2&quot;)
+</code></pre>
+<p><img alt="png" src="../bioi611_monocle_cele_files/bioi611_monocle_cele_69_0.png" /></p>
+<pre><code class="language-R">gene_module_df &lt;- find_gene_modules(cds[pr_deg_ids,], resolution=c(10^seq(-6,-1)))
+
+</code></pre>
+<p>You can also use <code>plot_cells()</code> on <code>gene_module_df</code>:</p>
+<pre><code class="language-R">plot_cells(cds,
+           genes=gene_module_df %&gt;% dplyr::filter(module %in% c(27, 10, 7, 30)),
+           label_cell_groups=FALSE,
+           show_trajectory_graph=FALSE)
+</code></pre>
+<p><img alt="png" src="../bioi611_monocle_cele_files/bioi611_monocle_cele_72_0.png" /></p>
+<p>Monocle offers another plotting function that can sometimes give a clearer view of a gene's dynamics along a single path. You can select a path with <code>choose_cells()</code> or by subsetting the cell data set by cluster, cell type, or other annotation that's restricted to the path. Let's pick one such path, the AFD cells:</p>
+<pre><code class="language-R"># Error: `choose_cells` only works in interactive mode.
+# Not working in Jupyter notebook or colab
+# May try this function in R studio or
+# use new kernel `xeus-r`
+# choose_cells(cds)
+</code></pre>
+<pre><code class="language-R">AFD_genes &lt;- c(&quot;gcy-8&quot;, &quot;dac-1&quot;, &quot;oig-8&quot;)
+AFD_lineage_cds &lt;- cds[rowData(cds)$gene_short_name %in% AFD_genes,
+                       colData(cds)$cell.type %in% c(&quot;AFD&quot;)]
+</code></pre>
+<pre><code class="language-R">AFD_lineage_cds
+</code></pre>
+<pre><code>class: cell_data_set 
+dim: 3 326 
+metadata(2): cds_version citations
+assays(1): counts
+rownames(3): WBGene00001535 WBGene00000895 WBGene00020582
+rowData names(3): id gene_short_name num_cells_expressed
+colnames(326): AAACCTGCAAGACGTG-300.1.1 ACCAGTATCGTAGGTT-300.1.1 ...
+  GCTGCGATCTTCTGGC-b02 GGGCACTAGCCTTGAT-b02
+colData names(19): cell n.umi ... bg.b01.loading bg.b02.loading
+reducedDimNames(3): PCA Aligned UMAP
+mainExpName: NULL
+altExpNames(0):
+</code></pre>
+<p>The function <code>plot_genes_in_pseudotime()</code> takes a small set of genes and shows you their dynamics as a function of pseudotime:</p>
+<pre><code class="language-R">plot_genes_in_pseudotime(AFD_lineage_cds,
+                         min_expr=0.5)
+</code></pre>
+<p><img alt="png" src="../bioi611_monocle_cele_files/bioi611_monocle_cele_78_0.png" /></p>
+<p>As you can see, gene <code>dac-1</code> is activated before the other two genes.</p>
+<h2 id="reference">Reference</h2>
+<p>https://colab.research.google.com/drive/10fqFG9UVbazqeaZwbzpSAJ3I79tSoSYG#scrollTo=1onUusVNBvAr&amp;line=1&amp;uniqifier=1</p>
+<p>https://cole-trapnell-lab.github.io/monocle3/docs/differential/#pseudo-dep</p>
+<p>https://github.com/cole-trapnell-lab/monocle3/issues/179#issuecomment-2145687700</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../BIOI611_scRNA_cele/" class="btn btn-neutral float-left" title="Downstream analysis of 10x scRNA-seq data for C. elegans data"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../BIOI611_scRNA_cele/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Read QC and alignment - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Read QC and alignment";
+        var mkdocs_page_input_path = "bulkRNAseq_lab.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Read QC and alignment</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#download-reference-genome">Download reference genome</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#how-many-chromsomes-there-are">How many chromsomes there are</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#how-many-genes-there-are">How many genes there are</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#download-raw-fastq-files">Download raw fastq files</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#quality-control">Quality control</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#read-alignment-using-star">Read alignment using STAR</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#generate-genome-index">Generate genome index</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#use-multiqc-to-generate-report">Use MultiQC to generate report</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#use-rseqc-to-generate-qc-plots">Use RSeQC to generate QC plots</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#advanced-topcis">Advanced topcis</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#bind-paths-and-mounts-in-sigularity">Bind paths and mounts in sigularity</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#use-samtools-to-display-the-content-of-bam-files">Use samtools to display the content of BAM files</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Bulk RNA-seq</li>
+      <li class="breadcrumb-item active">Read QC and alignment</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/bulkRNAseq_lab.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="analysis-of-rna-seq-data-read-qc-and-alignment">Analysis of RNA-seq data: read QC and alignment</h1>
+<h2 id="download-reference-genome">Download reference genome</h2>
+<p>To download the reference for this lab, we use <a href="https://useast.ensembl.org/Caenorhabditis_elegans/Info/Index">ENSEMBL database</a>. 
+In ENSEMBL database, each species may have different releases of genome build. We use <code>release-111</code> in this project. </p>
+<p>The genome sequences can be obtained from the link below:
+https://ftp.ensembl.org/pub/release-111/fasta/caenorhabditis_elegans/dna/</p>
+<p>The genoe anntation file in gtf format can be obtained here: 
+https://ftp.ensembl.org/pub/release-111/gtf/caenorhabditis_elegans/</p>
+<pre><code>%%bash
+wget -O Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz https://ftp.ensembl.org/pub/release-111/fasta/caenorhabditis_elegans/dna/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz
+gunzip Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz
+</code></pre>
+<pre><code>%%bash
+## A *fai file will be generated
+samtools faidx ref/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa 
+</code></pre>
+<pre><code>%%bash
+wget -O Caenorhabditis_elegans.WBcel235.111.gtf.gz -nv https://ftp.ensembl.org/pub/release-111/gtf/caenorhabditis_elegans/Caenorhabditis_elegans.WBcel235.111.gtf.gz
+gunzip Caenorhabditis_elegans.WBcel235.111.gtf.gz
+</code></pre>
+<p>In this course, the reference files have been downloaded and stored in shared folder for BIOI611:
+/scratch/zt1/project/bioi611/shared/reference/</p>
+<p>As you already leart, you can create a symbolic link for you to use in your scratch folder: </p>
+<pre><code class="language-bash">%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+ln -s /scratch/zt1/project/bioi611/shared/reference/ .
+</code></pre>
+<h3 id="how-many-chromsomes-there-are">How many chromsomes there are</h3>
+<pre><code class="language-bash">%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+grep '&gt;' reference/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa
+</code></pre>
+<pre><code>&gt;I dna:chromosome chromosome:WBcel235:I:1:15072434:1 REF
+&gt;II dna:chromosome chromosome:WBcel235:II:1:15279421:1 REF
+&gt;III dna:chromosome chromosome:WBcel235:III:1:13783801:1 REF
+&gt;IV dna:chromosome chromosome:WBcel235:IV:1:17493829:1 REF
+&gt;V dna:chromosome chromosome:WBcel235:V:1:20924180:1 REF
+&gt;X dna:chromosome chromosome:WBcel235:X:1:17718942:1 REF
+&gt;MtDNA dna:chromosome chromosome:WBcel235:MtDNA:1:13794:1 REF
+</code></pre>
+<h3 id="how-many-genes-there-are">How many genes there are</h3>
+<pre><code class="language-bash">%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+
+grep -v '#' reference/Caenorhabditis_elegans.WBcel235.111.gtf \
+       |awk '$3==&quot;gene&quot;' \
+       |sed 's/.*gene_biotype &quot;//' \
+       |sed 's/&quot;;//'|sort |uniq -c \
+       | sort -k1,1n
+</code></pre>
+<pre><code>     22 rRNA
+    100 antisense_RNA
+    129 snRNA
+    194 lincRNA
+    261 miRNA
+    346 snoRNA
+    634 tRNA
+   2128 pseudogene
+   7764 ncRNA
+  15363 piRNA
+  19985 protein_coding
+</code></pre>
+<p><img alt="image.png" src="../bulkRNAseq_lab_files/ffadf6f7-cfd1-4cdd-907e-7d4ac12c2a76.png" />
+Source: https://useast.ensembl.org/Help/Faq?id=468eudogene</p>
+<h2 id="download-raw-fastq-files">Download raw fastq files</h2>
+<p>When scientists publish their results based on NGS data, they are required to deposit the raw data in public database, e.g. NCBI GEO/SRA database. In the manuscript, the accession number is included for the community to search and download the data. Majority of the times, the information will be included in a section called 'Data Availability'. </p>
+<p>Depending on whether GEO or SRA numbers are provided. You can go to either GEO or SRA database:</p>
+<p>https://www.ncbi.nlm.nih.gov/sra</p>
+<p>https://www.ncbi.nlm.nih.gov/geo/</p>
+<p>An alternative way is that you can use third party tool which will help you quick generate the command lines that you can use to download the data. One example is SRA explorer: </p>
+<p>https://sra-explorer.info/</p>
+<pre><code>%%bash
+mkdir -p raw_data/ 
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/002/SRR15694102/SRR15694102.fastq.gz -o raw_data/N2_day7_rep1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/001/SRR15694101/SRR15694101.fastq.gz -o raw_data/N2_day7_rep2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/000/SRR15694100/SRR15694100.fastq.gz -o raw_data/N2_day7_rep3.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/099/SRR15694099/SRR15694099.fastq.gz -o raw_data/N2_day1_rep1.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/098/SRR15694098/SRR15694098.fastq.gz -o raw_data/N2_day1_rep2.fastq.gz
+curl -L ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/097/SRR15694097/SRR15694097.fastq.gz -o raw_data/N2_day1_rep3.fastq.gz
+</code></pre>
+<h2 id="quality-control">Quality control</h2>
+<p>Use FastQC to check the quality of fastq files:</p>
+<pre><code>%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+sbatch ../../shared/scripts/bulkRNA_SE_s1_fastqc.sub
+</code></pre>
+<p>Use <code>trim galore</code> to remove adaptors, low quality bases and low quality reads. </p>
+<pre><code>%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+sbatch ../../shared/scripts/bulkRNA_SE_s2_trim_galore.sub
+</code></pre>
+<p>The command lines to run <code>trim_galore</code> were listed below. In the jobs between, <code>trim_galore</code> is executed in container built by <code>singularity</code>. </p>
+<p>The input and output folders are all under <code>/scratch/zt1/project/bioi611/</code>. When you run trim_galore inside the container, you need to make sure <code>trim_galore</code> has access to the input and output files. In the job below, the STAR index files are located in  the shared folder (two levels up). So you need to bind the folder that includes both <code>$PWD</code> and the STAR index folder. That's the reason we specify <code>SIF_BIND="/scratch/zt1/project/bioi611/"</code>. </p>
+<pre><code class="language-bash">%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+cat ../../shared/scripts/bulkRNA_SE_s2_trim_galore.sub
+</code></pre>
+<pre><code>#!/bin/bash
+#SBATCH --partition=standard
+#SBATCH -t 40:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=6
+#SBATCH --cpus-per-task=12
+#SBATCH --job-name=bulkRNA_SE_s2_trim_galore
+#SBATCH --mail-type=FAIL,BEGIN,END
+#SBATCH --error=%x-%J-%u.err
+#SBATCH --output=%x-%J-%u.out
+
+module load singularity
+## Binding path and singularity image file 
+SIF_BIND="/scratch/zt1/project/bioi611/"
+SIF_TRIMGALORE="/scratch/zt1/project/bioi611/shared/software/trimgalore_v0.6.10.sif"
+
+## Paths to working directory and input fastq files
+WORKDIR="/scratch/zt1/project/bioi611/user/$USER"
+FASTQ_DIR="/scratch/zt1/project/bioi611/shared/raw_data/bulk_RNAseq_SE/"
+
+cd $WORKDIR
+date 
+singularity exec -B $SIF_BIND $SIF_TRIMGALORE trim_galore --fastqc --cores 4 --output_dir bulk_RNAseq_SE_trim_galore $FASTQ_DIR/N2_day1_rep1.fastq.gz &amp;
+singularity exec -B $SIF_BIND $SIF_TRIMGALORE trim_galore --fastqc --cores 4 --output_dir bulk_RNAseq_SE_trim_galore $FASTQ_DIR/N2_day1_rep2.fastq.gz &amp;
+singularity exec -B $SIF_BIND $SIF_TRIMGALORE trim_galore --fastqc --cores 4 --output_dir bulk_RNAseq_SE_trim_galore $FASTQ_DIR/N2_day1_rep3.fastq.gz &amp;
+singularity exec -B $SIF_BIND $SIF_TRIMGALORE trim_galore --fastqc --cores 4 --output_dir bulk_RNAseq_SE_trim_galore $FASTQ_DIR/N2_day7_rep1.fastq.gz &amp;
+singularity exec -B $SIF_BIND $SIF_TRIMGALORE trim_galore --fastqc --cores 4 --output_dir bulk_RNAseq_SE_trim_galore $FASTQ_DIR/N2_day7_rep2.fastq.gz &amp;
+singularity exec -B $SIF_BIND $SIF_TRIMGALORE trim_galore --fastqc --cores 4 --output_dir bulk_RNAseq_SE_trim_galore $FASTQ_DIR/N2_day7_rep3.fastq.gz &amp;
+wait
+date
+</code></pre>
+<h2 id="read-alignment-using-star">Read alignment using STAR</h2>
+<h4 id="generate-genome-index">Generate genome index</h4>
+<p>During this step, the reference genome (FASTA file) and annotations (GTF files) are supplied. The genome index are saved to disk and only need to be generated once. </p>
+<pre><code>%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+sbatch ../../shared/scripts/bulkRNA_s1_star_idx.sub
+</code></pre>
+<pre><code class="language-python">Here is the content in `bulkRNA_s1_star_idx.sub`: 
+</code></pre>
+<pre><code class="language-bash">%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+cat ../../shared/scripts/bulkRNA_s1_star_idx.sub
+</code></pre>
+<pre><code>#!/bin/bash
+#SBATCH --partition=standard
+#SBATCH -t 40:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
+#SBATCH --job-name=bulkRNA_s1_star_idx
+#SBATCH --mail-type=FAIL,BEGIN,END
+#SBATCH --error=%x-%J-%u.err
+#SBATCH --output=%x-%J-%u.out
+
+PATH="/scratch/zt1/project/bioi611/shared/software/STAR_2.7.11b/Linux_x86_64_static/:$PATH"
+
+WORKDIR="/scratch/zt1/project/bioi611/user/$USER"
+FASTA="/scratch/zt1/project/bioi611/shared/reference/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa"
+GTF="/scratch/zt1/project/bioi611/shared/reference/Caenorhabditis_elegans.WBcel235.111.gtf"
+
+cd $WORKDIR
+mkdir STAR_index
+STAR --runThreadN 2 --runMode genomeGenerate \
+     --genomeDir STAR_index \
+     --genomeFastaFiles $FASTA \
+     --sjdbGTFfile $GTF
+</code></pre>
+<p>The genome files will be outputted into <code>STAR_index/</code>: </p>
+<pre><code class="language-bash">%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+ls STAR_index/
+</code></pre>
+<pre><code>chrLength.txt
+chrNameLength.txt
+chrName.txt
+chrStart.txt
+exonGeTrInfo.tab
+exonInfo.tab
+geneInfo.tab
+Genome
+genomeParameters.txt
+SA
+SAindex
+sjdbInfo.txt
+sjdbList.fromGTF.out.tab
+sjdbList.out.tab
+transcriptInfo.tab
+</code></pre>
+<p>Important things to keep in mind: </p>
+<ol>
+<li>
+<p><code>STAR</code> is a splicing aware mapper which is required for RNA-seq read alignment</p>
+</li>
+<li>
+<p>Genome index only need to be built one</p>
+</li>
+<li>
+<p>Make sure the reference file and annotation file match each other. </p>
+</li>
+</ol>
+<p>For a particular species, there might be reference genomes built for different strains/ecotypes. Even for the same strain/ecotype, there could be different versions. </p>
+<p>Human Genome Assemblies, <code>hg19</code> and <code>hg38</code> are two different versions of the human genome, which is the complete set of DNA in an individual's cells. <code>Hg19</code> is the older of the two assemblies and was released in 2002. <code>Hg38</code>, also known as <code>GRCh38</code>, is the more recent assembly and was released in 2013. It is a more accurate and detailed version of the human genome and includes additional data that was not available when HG19 was released.</p>
+<p>After ethe reference genome is built, you can start to align the RNA-seq reads using the command lines below. </p>
+<pre><code>%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+sbatch ../../shared/scripts/bulkRNA_SE_s3_STAR_align.sub
+sbatch ../../shared/scripts/bulkRNA_SE_s4_bam_index.sub
+</code></pre>
+<pre><code class="language-bash">%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+cat ../../shared/scripts/bulkRNA_SE_s3_STAR_align.sub
+</code></pre>
+<pre><code>#!/bin/bash
+#SBATCH --partition=standard
+#SBATCH -t 40:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=6
+#SBATCH --cpus-per-task=10
+#SBATCH --job-name=bulkRNA_SE_STAR_align
+#SBATCH --mail-type=FAIL,BEGIN,END
+#SBATCH --error=%x-%J-%u.err
+#SBATCH --output=%x-%J-%u.out
+
+
+PATH="/scratch/zt1/project/bioi611/shared/software/STAR_2.7.11b/Linux_x86_64_static/:$PATH"
+
+INDIR=bulk_RNAseq_SE_trim_galore/
+OUTDIR=bulkRNA_SE_STAR_align/
+
+mkdir -p $OUTDIR
+STAR --genomeDir STAR_index \
+    --outSAMtype BAM SortedByCoordinate \
+    --twopassMode Basic \
+    --quantMode TranscriptomeSAM GeneCounts \
+    --readFilesCommand zcat \
+    --outFileNamePrefix $OUTDIR/N2_day1_rep1. \
+    --runThreadN 10 \
+    --readFilesIn $INDIR/N2_day1_rep1_trimmed.fq.gz &gt; $OUTDIR/N2_day1_rep1.log.txt 2&gt;&amp;1 &amp;
+STAR --genomeDir STAR_index \
+    --outSAMtype BAM SortedByCoordinate \
+    --twopassMode Basic \
+    --quantMode TranscriptomeSAM GeneCounts \
+    --readFilesCommand zcat \
+    --outFileNamePrefix $OUTDIR/N2_day1_rep2. \
+    --runThreadN 10 \
+    --readFilesIn $INDIR/N2_day1_rep2_trimmed.fq.gz &gt; $OUTDIR/N2_day1_rep2.log.txt 2&gt;&amp;1 &amp;
+STAR --genomeDir STAR_index \
+    --outSAMtype BAM SortedByCoordinate \
+    --twopassMode Basic \
+    --quantMode TranscriptomeSAM GeneCounts \
+    --readFilesCommand zcat \
+    --outFileNamePrefix $OUTDIR/N2_day1_rep3. \
+    --runThreadN 10 \
+    --readFilesIn $INDIR/N2_day1_rep3_trimmed.fq.gz &gt; $OUTDIR/N2_day1_rep3.log.txt 2&gt;&amp;1 &amp;
+STAR --genomeDir STAR_index \
+    --outSAMtype BAM SortedByCoordinate \
+    --twopassMode Basic \
+    --quantMode TranscriptomeSAM GeneCounts \
+    --readFilesCommand zcat \
+    --outFileNamePrefix $OUTDIR/N2_day7_rep1. \
+    --runThreadN 10 \
+    --readFilesIn $INDIR/N2_day7_rep1_trimmed.fq.gz &gt; $OUTDIR/N2_day7_rep1.log.txt 2&gt;&amp;1 &amp;
+STAR --genomeDir STAR_index \
+    --outSAMtype BAM SortedByCoordinate \
+    --twopassMode Basic \
+    --quantMode TranscriptomeSAM GeneCounts \
+    --readFilesCommand zcat \
+    --outFileNamePrefix $OUTDIR/N2_day7_rep2. \
+    --runThreadN 10 \
+    --readFilesIn $INDIR/N2_day7_rep2_trimmed.fq.gz &gt; $OUTDIR/N2_day7_rep2.log.txt 2&gt;&amp;1 &amp;
+STAR --genomeDir STAR_index \
+    --outSAMtype BAM SortedByCoordinate \
+    --twopassMode Basic \
+    --quantMode TranscriptomeSAM GeneCounts \
+    --readFilesCommand zcat \
+    --outFileNamePrefix $OUTDIR/N2_day7_rep3. \
+    --runThreadN 10 \
+    --readFilesIn $INDIR/N2_day7_rep3_trimmed.fq.gz &gt; $OUTDIR/N2_day7_rep3.log.txt 2&gt;&amp;1 &amp;
+wait
+</code></pre>
+<p>In the <code>STAR</code> command lines, the following parameters are used </p>
+<ul>
+<li><code>--genomeDir STAR_index</code></li>
+</ul>
+<p><code>--genomeDir</code> is required. The name of the parameter is self-explanatory. </p>
+<ul>
+<li><code>--outSAMtype BAM SortedByCoordinate</code></li>
+</ul>
+<p>This parameter is optional. If not specified, 'SAM' will be used: 
+<code>SAM</code>: output SAM without sorting</p>
+<p><code>BAM</code> format is the binary format for <code>SAM</code> file. To understand the details of <code>BAM/SAM</code> format, refer to the link <a href="https://samtools.github.io/hts-specs/SAMv1.pdf">here</a>. </p>
+<ul>
+<li><code>--twopassMode Basic</code></li>
+</ul>
+<p>Wil the parameter above, <code>STAR</code> will perform the 1st pass mapping,
+then it will automatically extract junctions, insert them into the genome index, and, finally, re-map
+all reads in the 2nd mapping pass. This option can be used with annotations, which can be included
+either at the run-time, or at the genome generation step</p>
+<ul>
+<li><code>--quantMode TranscriptomeSAM GeneCounts</code></li>
+</ul>
+<p>With parameters above, <code>STAR</code> produces both the <code>Aligned.toTranscriptome.out.bam</code> and <code>ReadsPerGene.out.tab</code> outputs</p>
+<ul>
+<li><code>--readFilesCommand zcat</code></li>
+</ul>
+<p>The parameter specifies the command line (<code>None</code>, <code>zcat</code> or <code>bzcat</code>) to execute for each of the input file</p>
+<ul>
+<li>
+<p><code>--outFileNamePrefix $OUTDIR/N2_day7_rep2.</code>:  output files name prefix (including full or relative path)</p>
+</li>
+<li>
+<p><code>--runThreadN 10</code>: number of threads to run STAR</p>
+</li>
+<li>
+<p><code>--readFilesIn  $INDIR/N2_day7_rep3_trimmed.fq.gz</code>: paths to files that contain input read1 (and, if needed, read2)</p>
+</li>
+</ul>
+<pre><code>
+The step below is optional. After alignment, it is good practice to index the sorted BAM file so that downstream tools (such as IGV, featureCounts, or samtools view) can quickly access specific genomic regions.
+
+</code></pre>
+<p>%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+sbatch ../../shared/scripts/bulkRNA_SE_s4_bam_index.sub</p>
+<pre><code>
+
+```bash
+%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+grep 'samtools' ../../shared/scripts/bulkRNA_SE_s4_bam_index.sub
+</code></pre>
+<pre><code>module load samtools
+samtools index bulkRNA_SE_STAR_align/N2_day1_rep1.Aligned.sortedByCoord.out.bam &amp;
+samtools index bulkRNA_SE_STAR_align/N2_day1_rep2.Aligned.sortedByCoord.out.bam &amp;
+samtools index bulkRNA_SE_STAR_align/N2_day1_rep3.Aligned.sortedByCoord.out.bam &amp;
+samtools index bulkRNA_SE_STAR_align/N2_day7_rep1.Aligned.sortedByCoord.out.bam &amp;
+samtools index bulkRNA_SE_STAR_align/N2_day7_rep2.Aligned.sortedByCoord.out.bam &amp;
+samtools index bulkRNA_SE_STAR_align/N2_day7_rep3.Aligned.sortedByCoord.out.bam &amp;
+</code></pre>
+<p>After the job is finished, each <code>BAM</code> file will have a <code>*.bai</code> file generated: </p>
+<pre><code class="language-bash">%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+ls bulkRNA_SE_STAR_align/*.bai
+</code></pre>
+<pre><code>bulkRNA_SE_STAR_align/N2_day1_rep1.Aligned.sortedByCoord.out.bam.bai
+bulkRNA_SE_STAR_align/N2_day1_rep2.Aligned.sortedByCoord.out.bam.bai
+bulkRNA_SE_STAR_align/N2_day1_rep3.Aligned.sortedByCoord.out.bam.bai
+bulkRNA_SE_STAR_align/N2_day7_rep1.Aligned.sortedByCoord.out.bam.bai
+bulkRNA_SE_STAR_align/N2_day7_rep2.Aligned.sortedByCoord.out.bam.bai
+bulkRNA_SE_STAR_align/N2_day7_rep3.Aligned.sortedByCoord.out.bam.bai
+</code></pre>
+<h2 id="use-multiqc-to-generate-report">Use MultiQC to generate report</h2>
+<p><code>MultiQC</code> is a reporting tool that parses results and statistics from bioinformatics tool outputs, such as log files and console outputs. It helps to summarise experiments containing multiple samples and multiple analysis steps. It’s designed to be placed at the end of pipelines or to be run manually when you’ve finished running your tools.</p>
+<pre><code>%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+sbatch ../../shared/scripts/bulkRNA_SE_s5_multiqc.sub
+</code></pre>
+<pre><code class="language-bash">%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+grep -v 'SBATCH' ../../shared/scripts/bulkRNA_SE_s5_multiqc.sub
+</code></pre>
+<pre><code>#!/bin/bash
+
+module load singularity
+## Paths to working directory and input fastq files
+WORKDIR="/scratch/zt1/project/bioi611/user/$USER"
+
+cd $WORKDIR
+singularity exec -B $PWD /scratch/zt1/project/bioi611/shared/software/multiqc_v1.25.sif multiqc -f -o bulk_RNAseq_SE_multiqc ./bulk_RNAseq_SE_fastqc/  bulk_RNAseq_SE_trim_galore/ bulkRNA_SE_STAR_align/
+</code></pre>
+<p>In the command line above, you will again run <code>multiqc</code> in singularity container. This time, <code>-B $PWD</code> is used. <code>$PWD</code> is a dynamic environmental variable that stores the current working directory in which the input and output of <code>multiqc</code> will be store. </p>
+<h2 id="use-rseqc-to-generate-qc-plots">Use RSeQC to generate QC plots</h2>
+<p>RSeQC package provides a number of useful modules that can comprehensively evaluate RNA-seq data. </p>
+<p>In this lecture, we are going to use one of the modules <code>geneBody_coverage.py</code>. This module is used to check if read coverage is uniform and if there is any 5'/3' bias. This module scales all transcripts to 100 nt and calculates the number of reads covering each nucleotide position. Finally, it generates plots illustrating the coverage profile along the gene body.</p>
+<pre><code>%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+sbatch ../../shared/scripts/bulkRNA_SE_s6_RSeQC_genebody_cov.sub
+</code></pre>
+<pre><code class="language-bash">%%bash
+cd /scratch/zt1/project/bioi611/user/$USER
+cat ../../shared/scripts/bulkRNA_SE_s6_RSeQC_genebody_cov.sub
+</code></pre>
+<pre><code>#!/bin/bash
+#SBATCH --partition=standard
+#SBATCH -t 40:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --job-name=bulkRNA_SE_s6_RSeQC_genebody_cov.sub
+#SBATCH --mail-type=FAIL,BEGIN,END
+#SBATCH --error=%x-%J-%u.err
+#SBATCH --output=%x-%J-%u.out
+
+module load singularity
+
+## Binding path and singularity image file
+SIF_BIND="/scratch/zt1/project/bioi611/"
+SIF_TRIMGALORE="/scratch/zt1/project/bioi611/shared/software/rseqc_v5.0.3.sif"
+SIF_BEDOPS="/scratch/zt1/project/bioi611/shared/software/bedops_v2.4.39.sif"
+## Paths to working directory and input fastq files
+WORKDIR="/scratch/zt1/project/bioi611/user/$USER"
+
+cd $WORKDIR
+
+
+mkdir -p bulk_RNAseq_SE_RSeQC/
+singularity exec -B $SIF_BIND $SIF_TRIMGALORE geneBody_coverage.py -r /scratch/zt1/project/bioi611/shared/reference/Caenorhabditis_elegans.WBcel235.111.bed -i bulkRNA_SE_STAR_align/N2_day1_rep1.Aligned.sortedByCoord.out.bam,bulkRNA_SE_STAR_align/N2_day7_rep1.Aligned.sortedByCoord.out.bam -o bulk_RNAseq_SE_RSeQC/geneBody_cov
+
+
+# Test command line which can be completed in less than 2 minutes 
+# singularity exec -B $SIF_BIND $SIF_TRIMGALORE geneBody_coverage.py -r test_1000genes.bed -i bulkRNA_SE_STAR_align/N2_day1_rep1.Aligned.sortedByCoord.out.bam -o test_genebody_cov/test
+</code></pre>
+<p>After the job above is completed, one of the output file is a PDF file. As you can see, in the two samples checked, the coverage over the gene body is quite uniform. </p>
+<p><img alt="image.png" src="../bulkRNAseq_lab_files/image.png" /></p>
+<p><code>Caenorhabditis_elegans.WBcel235.111.bed</code> is used as one of the input for <code>geneBody_coverage.py</code> in RSeQC. To understand the bed file format, please refer to the link below: </p>
+<p>https://genome.ucsc.edu/FAQ/FAQformat.html#format1</p>
+<p>The bed file can be genreated using GFF3 file. GFF3 format is a similar format as GTF. To generate bed file from GFF3 file, you can use the command line below:</p>
+<pre><code>wget https://ftp.ensembl.org/pub/release-111/gff3/caenorhabditis_elegans/Caenorhabditis_elegans.WBcel235.111.gff3.gz
+export PATH=&quot;/scratch/zt1/project/bioi611/shared/software:$PATH&quot;
+gff3ToGenePred  Caenorhabditis_elegans.WBcel235.111.gff3  Caenorhabditis_elegans.WBcel235.111.phred
+genePredToBed  Caenorhabditis_elegans.WBcel235.111.phred Caenorhabditis_elegans.WBcel235.111.bed
+</code></pre>
+<h2 id="advanced-topcis">Advanced topcis</h2>
+<h3 id="bind-paths-and-mounts-in-sigularity">Bind paths and mounts in sigularity</h3>
+<p>Singularity allows you to map directories on your host system to directories within your container using bind mounts. This allows you to read and write data on the host system with ease.</p>
+<p>The system administrator has the ability to define what bind paths will be included automatically inside each container. Some bind paths are automatically derived (e.g. a user’s home directory) and some are statically defined (e.g. bind paths in the Singularity configuration file). In the default configuration, the directories <code>$HOME</code>, <code>/tmp</code>, <code>/proc</code>, <code>/sys</code>, <code>/dev</code>, and <code>$PWD</code> are among the system-defined bind paths.</p>
+<p>On UMD HPC, <code>$PWD</code> is not defined. So you have to mount the path via the command line parameter <code>-B/--bind</code>. </p>
+<p>You can go into the singlarity container just as you are working in a linux system. </p>
+<pre><code>%%bash
+module load singularity
+SIF_TRIMGALORE=&quot;/scratch/zt1/project/bioi611/shared/software/trimgalore_v0.6.10.sif&quot;
+singularity exec $SIF_TRIMGALORE /bin/bash
+</code></pre>
+<p>You will be in the container after you run the command lines above. You can then run the Linux commands you leart from previous classes. To exit the container, simply press <code>ctrl+d</code> on your keyborad. </p>
+<p>Running the commands below, you run <code>ls $FASTQ_DIR</code> inside the container to list the fastq files. </p>
+<pre><code class="language-bash">%%bash
+module load singularity
+## Binding path and singularity image file 
+SIF_BIND=&quot;/scratch/zt1/project/bioi611/&quot;
+SIF_TRIMGALORE=&quot;/scratch/zt1/project/bioi611/shared/software/trimgalore_v0.6.10.sif&quot;
+## Paths to working directory and input fastq files
+WORKDIR=&quot;/scratch/zt1/project/bioi611/user/$USER&quot;
+FASTQ_DIR=&quot;/scratch/zt1/project/bioi611/shared/raw_data/bulk_RNAseq_SE/&quot;
+cd $WORKDIR 
+singularity exec -B $SIF_BIND $SIF_TRIMGALORE ls $FASTQ_DIR
+</code></pre>
+<pre><code>N2_day1_rep1.fastq.gz
+N2_day1_rep2.fastq.gz
+N2_day1_rep3.fastq.gz
+N2_day7_rep1.fastq.gz
+N2_day7_rep2.fastq.gz
+N2_day7_rep3.fastq.gz
+</code></pre>
+<p>Running the commands below, the command lines will fail because <code>$WORKDIR</code> is not mounted. </p>
+<pre><code class="language-bash">%%bash
+module load singularity
+## Binding path and singularity image file 
+SIF_BIND=&quot;/scratch/zt1/project/bioi611/&quot;
+SIF_TRIMGALORE=&quot;/scratch/zt1/project/bioi611/shared/software/trimgalore_v0.6.10.sif&quot;
+## Paths to working directory and input fastq files
+WORKDIR=&quot;/scratch/zt1/project/bioi611/user/$USER&quot;
+FASTQ_DIR=&quot;/scratch/zt1/project/bioi611/shared/raw_data/bulk_RNAseq_SE/&quot;
+cd $WORKDIR 
+singularity exec $SIF_TRIMGALORE ls $WORKDIR
+</code></pre>
+<pre><code>ls: /scratch/zt1/project/bioi611/user/xie186: No such file or directory
+
+
+
+---------------------------------------------------------------------------
+
+CalledProcessError                        Traceback (most recent call last)
+
+Cell In[20], line 1
+----&gt; 1 get_ipython().run_cell_magic('bash', '', 'module load singularity\n## Binding path and singularity image file \nSIF_BIND="/scratch/zt1/project/bioi611/"\nSIF_TRIMGALORE="/scratch/zt1/project/bioi611/shared/software/trimgalore_v0.6.10.sif"\n## Paths to working directory and input fastq files\nWORKDIR="/scratch/zt1/project/bioi611/user/$USER"\nFASTQ_DIR="/scratch/zt1/project/bioi611/shared/raw_data/bulk_RNAseq_SE/"\ncd $WORKDIR \nsingularity exec $SIF_TRIMGALORE ls $WORKDIR\n')
+
+
+File /cvmfs/hpcsw.umd.edu/spack-software/2023.11.20/views/2023/linux-rhel8-zen2/gcc@11.3.0/python-3.10.10/mpi-nocuda/linux-rhel8-zen2/gcc/11.3.0/lib/python3.10/site-packages/IPython/core/interactiveshell.py:2430, in InteractiveShell.run_cell_magic(self, magic_name, line, cell)
+   2428 with self.builtin_trap:
+   2429     args = (magic_arg_s, cell)
+-&gt; 2430     result = fn(*args, **kwargs)
+   2432 # The code below prevents the output from being displayed
+   2433 # when using magics with decodator @output_can_be_silenced
+   2434 # when the last Python token in the expression is a ';'.
+   2435 if getattr(fn, magic.MAGIC_OUTPUT_CAN_BE_SILENCED, False):
+
+
+File /cvmfs/hpcsw.umd.edu/spack-software/2023.11.20/views/2023/linux-rhel8-zen2/gcc@11.3.0/python-3.10.10/mpi-nocuda/linux-rhel8-zen2/gcc/11.3.0/lib/python3.10/site-packages/IPython/core/magics/script.py:153, in ScriptMagics._make_script_magic.&lt;locals&gt;.named_script_magic(line, cell)
+    151 else:
+    152     line = script
+--&gt; 153 return self.shebang(line, cell)
+
+
+File /cvmfs/hpcsw.umd.edu/spack-software/2023.11.20/views/2023/linux-rhel8-zen2/gcc@11.3.0/python-3.10.10/mpi-nocuda/linux-rhel8-zen2/gcc/11.3.0/lib/python3.10/site-packages/IPython/core/magics/script.py:305, in ScriptMagics.shebang(self, line, cell)
+    300 if args.raise_error and p.returncode != 0:
+    301     # If we get here and p.returncode is still None, we must have
+    302     # killed it but not yet seen its return code. We don't wait for it,
+    303     # in case it's stuck in uninterruptible sleep. -9 = SIGKILL
+    304     rc = p.returncode or -9
+--&gt; 305     raise CalledProcessError(rc, cell)
+
+
+CalledProcessError: Command 'b'module load singularity\n## Binding path and singularity image file \nSIF_BIND="/scratch/zt1/project/bioi611/"\nSIF_TRIMGALORE="/scratch/zt1/project/bioi611/shared/software/trimgalore_v0.6.10.sif"\n## Paths to working directory and input fastq files\nWORKDIR="/scratch/zt1/project/bioi611/user/$USER"\nFASTQ_DIR="/scratch/zt1/project/bioi611/shared/raw_data/bulk_RNAseq_SE/"\ncd $WORKDIR \nsingularity exec $SIF_TRIMGALORE ls $WORKDIR\n'' returned non-zero exit status 1.
+</code></pre>
+<h3 id="use-samtools-to-display-the-content-of-bam-files">Use <code>samtools</code> to display the content of <code>BAM</code> files</h3>
+<p><code>Samtools</code> is a powerful tool that can be used to display and manipulate <code>SAM/BAM</code> files. The command lines below shows you how to use <code>samtools view</code> to display the content: the headers and the alignments. </p>
+<pre><code class="language-bash">%%bash
+module load samtools
+WORKDIR=&quot;/scratch/zt1/project/bioi611/user/$USER&quot;
+samtools view -H $WORKDIR/bulkRNA_SE_STAR_align/N2_day1_rep1.Aligned.sortedByCoord.out.bam
+</code></pre>
+<pre><code>@HD VN:1.4  SO:coordinate
+@SQ SN:I    LN:15072434
+@SQ SN:II   LN:15279421
+@SQ SN:III  LN:13783801
+@SQ SN:IV   LN:17493829
+@SQ SN:V    LN:20924180
+@SQ SN:X    LN:17718942
+@SQ SN:MtDNA    LN:13794
+@PG ID:STAR PN:STAR VN:2.7.11b  CL:STAR   --runThreadN 10   --genomeDir STAR_index   --readFilesIn bulk_RNAseq_SE_trim_galore//N2_day1_rep1_trimmed.fq.gz      --readFilesCommand zcat      --outFileNamePrefix bulkRNA_SE_STAR_align//N2_day1_rep1.   --outSAMtype BAM   SortedByCoordinate      --quantMode TranscriptomeSAM   GeneCounts      --twopassMode Basic
+@PG ID:samtools PN:samtools PP:STAR VN:1.17 CL:samtools view -H /scratch/zt1/project/bioi611/user/xie186/bulkRNA_SE_STAR_align/N2_day1_rep1.Aligned.sortedByCoord.out.bam
+@CO user command line: STAR --genomeDir STAR_index --outSAMtype BAM SortedByCoordinate --twopassMode Basic --quantMode TranscriptomeSAM GeneCounts --readFilesCommand zcat --outFileNamePrefix bulkRNA_SE_STAR_align//N2_day1_rep1. --runThreadN 10 --readFilesIn bulk_RNAseq_SE_trim_galore//N2_day1_rep1_trimmed.fq.gz
+</code></pre>
+<pre><code class="language-bash">%%bash
+module load samtools
+WORKDIR=&quot;/scratch/zt1/project/bioi611/user/$USER&quot;
+samtools view -h $WORKDIR/bulkRNA_SE_STAR_align/N2_day1_rep1.Aligned.sortedByCoord.out.bam |head -14
+</code></pre>
+<pre><code>@HD VN:1.4  SO:coordinate
+@SQ SN:I    LN:15072434
+@SQ SN:II   LN:15279421
+@SQ SN:III  LN:13783801
+@SQ SN:IV   LN:17493829
+@SQ SN:V    LN:20924180
+@SQ SN:X    LN:17718942
+@SQ SN:MtDNA    LN:13794
+@PG ID:STAR PN:STAR VN:2.7.11b  CL:STAR   --runThreadN 10   --genomeDir STAR_index   --readFilesIn bulk_RNAseq_SE_trim_galore//N2_day1_rep1_trimmed.fq.gz      --readFilesCommand zcat      --outFileNamePrefix bulkRNA_SE_STAR_align//N2_day1_rep1.   --outSAMtype BAM   SortedByCoordinate      --quantMode TranscriptomeSAM   GeneCounts      --twopassMode Basic
+@PG ID:samtools PN:samtools PP:STAR VN:1.17 CL:samtools view -h /scratch/zt1/project/bioi611/user/xie186/bulkRNA_SE_STAR_align/N2_day1_rep1.Aligned.sortedByCoord.out.bam
+@CO user command line: STAR --genomeDir STAR_index --outSAMtype BAM SortedByCoordinate --twopassMode Basic --quantMode TranscriptomeSAM GeneCounts --readFilesCommand zcat --outFileNamePrefix bulkRNA_SE_STAR_align//N2_day1_rep1. --runThreadN 10 --readFilesIn bulk_RNAseq_SE_trim_galore//N2_day1_rep1_trimmed.fq.gz
+SRR15694099.8922190 256 I   2366    0   96M *   0   0   TGAAAATTTTGTGATTTTCGTAAATTTATTCCTATTTATTAATAAAAACAAAAACAATTCCATTAAATATCCCATTTTCAGCGCAAAATCGACTGG    CCCFFFFFHHHHHJJJJJJJIJJJJJJJJJJJJJJJIJJJJJJJIJJIIIIJJJJJJJJJJJJJJJJJJJIJJJJIIJJHHGHFFDDDDCDDDDD@    NH:i:8  HI:i:8  AS:i:94 nM:i:0
+SRR15694099.16768635    16  I   2481    1   95M *   0   0   GAGATAGAACGGATCAACAAGATTATTATTATATCATTAATAATATTTATCAATTTTCTTCTGAGAGTCTCATTGAGACTCTTATTTACGCCAAG ;&gt;@EEAB@;B;EAA6.=7==&gt;GEAGAGEGHF&gt;F=FCHEFDBGBFD&lt;D9GBBBBBB;;D?BF@DFEGDHFEIIIHEGIIFFDHFBFDD&lt;DDDA@@@ NH:i:4  HI:i:1  AS:i:93 nM:i:0
+SRR15694099.10859917    0   I   2602    255 71M *   0   0   ATTTTTGAAAAAAAAATAATTAAAAAAACACATTTTTTGGAAAAAAAAATAAATAAAAAAAATTGTCCTCG ?@@DDEDB?HHBDHGIIIGIIGCBBGEHAF?GIHIIIGGFBCCEBB@BBBCCCEECCCCBBBBCCC@CCC@ NH:i:1  HI:i:1  AS:i:69 nM:i:0
+</code></pre>
+<pre><code class="language-bash">%%bash
+module load samtools
+WORKDIR=&quot;/scratch/zt1/project/bioi611/user/$USER&quot;
+samtools view $WORKDIR/bulkRNA_SE_STAR_align/N2_day1_rep1.Aligned.sortedByCoord.out.bam |head -4
+</code></pre>
+<pre><code>SRR15694099.8922190 256 I   2366    0   96M *   0   0   TGAAAATTTTGTGATTTTCGTAAATTTATTCCTATTTATTAATAAAAACAAAAACAATTCCATTAAATATCCCATTTTCAGCGCAAAATCGACTGG    CCCFFFFFHHHHHJJJJJJJIJJJJJJJJJJJJJJJIJJJJJJJIJJIIIIJJJJJJJJJJJJJJJJJJJIJJJJIIJJHHGHFFDDDDCDDDDD@    NH:i:8  HI:i:8  AS:i:94 nM:i:0
+SRR15694099.16768635    16  I   2481    1   95M *   0   0   GAGATAGAACGGATCAACAAGATTATTATTATATCATTAATAATATTTATCAATTTTCTTCTGAGAGTCTCATTGAGACTCTTATTTACGCCAAG ;&gt;@EEAB@;B;EAA6.=7==&gt;GEAGAGEGHF&gt;F=FCHEFDBGBFD&lt;D9GBBBBBB;;D?BF@DFEGDHFEIIIHEGIIFFDHFBFDD&lt;DDDA@@@ NH:i:4  HI:i:1  AS:i:93 nM:i:0
+SRR15694099.10859917    0   I   2602    255 71M *   0   0   ATTTTTGAAAAAAAAATAATTAAAAAAACACATTTTTTGGAAAAAAAAATAAATAAAAAAAATTGTCCTCG ?@@DDEDB?HHBDHGIIIGIIGCBBGEHAF?GIHIIIGGFBCCEBB@BBBCCCEECCCCBBBBCCC@CCC@ NH:i:1  HI:i:1  AS:i:69 nM:i:0
+SRR15694099.30104406    16  I   2611    255 40M1I55M    *   0   0   AAAAAAATAATTAAAAAAACACATTTTTTGGAAAAAAAAAATAAATAAAAAAAATTGTCCTCGAGGATCCTCCGGAGCGCGTCGAATCAATGTTTC    BBDDAB&gt;&gt;A&gt;48BBDCCC@4((&lt;5AA&gt;4(43BDDDDDDACC@CCA?DBACDB?BHE=;EA;&lt;EFB=81@F:BGHGBBA8BFBGBHHHBFFEDD?@@    NH:i:1  HI:i:1  AS:i:89 nM:i:0
+</code></pre>
+<pre><code class="language-python">
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../basic_linux/" class="btn btn-neutral float-left" title="Basic Linux"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../Phred_FQ/" class="btn btn-neutral float-right" title="Phred score in FASTQ">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../basic_linux/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../Phred_FQ/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
