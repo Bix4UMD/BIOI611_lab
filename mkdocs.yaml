@@ -33,11 +33,15 @@ extra_javascript:
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
+extra_css:
+  - stylesheets/basic_linux.css
+
 # Page Tree
 nav:
   
   - Get ready for the course: 
     - Basic Linux:  basic_linux.md
+    - Optional Linux and HPC extensions: basic_linux_optional.md
 
   - Bulk RNA-seq:
     - Read QC and alignment: bulkRNAseq_lab.md

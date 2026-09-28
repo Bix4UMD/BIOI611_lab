@@ -1,0 +1,2 @@
+# Downloadable scripts and TSV examples must keep Unix line endings on Windows.
+docs/assets/basic_linux/* text eol=lf
