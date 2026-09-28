@@ -1,0 +1,7 @@
+/* Keep the Linux lesson's explanatory tables readable without sideways scrolling. */
+#linux-for-bioinformatics-on-zaratan ~ .wy-table-responsive td,
+#linux-for-bioinformatics-on-zaratan ~ .wy-table-responsive th,
+#linux-for-bioinformatics-on-zaratan ~ table td,
+#linux-for-bioinformatics-on-zaratan ~ table th {
+  white-space: normal;
+}

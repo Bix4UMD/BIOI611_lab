@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Basic Linux - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../stylesheets/basic_linux.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Basic Linux";
+        var mkdocs_page_input_path = "basic_linux.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Basic Linux</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-open-your-zaratan-terminal">1. Open your Zaratan terminal</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#login-nodes-and-compute-nodes">Login nodes and compute nodes</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-choose-the-right-storage-and-check-quotas">2. Choose the right storage and check quotas</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#inspect-the-shortcuts">Inspect the shortcuts</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#storage-quota-versus-compute-allocation">Storage quota versus compute allocation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-prepare-a-small-practice-workspace">3. Prepare a small practice workspace</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-navigate-the-filesystem">4. Navigate the filesystem</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-terminal-essentials-and-getting-help">5. Terminal essentials and getting help</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#6-copy-rename-create-and-remove-files">6. Copy, rename, create, and remove files</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#practice-deletion-only-on-disposable-files">Practice deletion only on disposable files</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#7-view-files-and-redirect-output">7. View files and redirect output</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#standard-input-output-and-error">Standard input, output, and error</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#8-search-and-filter-biological-data">8. Search and filter biological data</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#find-files-and-count-records">Find files and count records</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#select-columns-and-filter-rows">Select columns and filter rows</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#extract-sequence-identifiers">Extract sequence identifiers</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#wildcards-versus-regular-expressions">Wildcards versus regular expressions</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#9-permissions-and-executable-scripts">9. Permissions and executable scripts</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#run-a-small-python-script">Run a small Python script</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#10-edit-save-and-inspect-a-script">10. Edit, save, and inspect a script</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#how-vivim-modes-work">How vi/vim modes work</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#create-and-save-a-script">Create and save a script</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#11-environment-variables-and-available-software">11. Environment variables and available software</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#12-submit-your-first-slurm-job">12. Submit your first Slurm job</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#check-the-allocation-and-create-the-script">Check the allocation and create the script</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#submit-from-the-practice-directory">Submit from the practice directory</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#monitor-and-check-completion">Monitor and check completion</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#13-compress-archive-and-transfer-files">13. Compress, archive, and transfer files</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#compress-a-copy-keeping-the-original-data">Compress a copy, keeping the original data</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#create-inspect-then-extract-an-archive">Create, inspect, then extract an archive</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#transfer-between-your-computer-and-zaratan">Transfer between your computer and Zaratan</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#14-independent-exercise-and-submission">14. Independent exercise and submission</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#troubleshooting-checklist">Troubleshooting checklist</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux_optional/">Optional Linux and HPC extensions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Get ready for the course</li>
+      <li class="breadcrumb-item active">Basic Linux</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/basic_linux.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="linux-for-bioinformatics-on-zaratan">Linux for Bioinformatics on Zaratan</h1>
+<p>This lab introduces the Linux skills you will use in BIOI611. Work through the main lesson in order, using your own Zaratan account. By the end, you should be able to find and manage files, filter a small biological dataset, check your resource usage, and submit and inspect a Slurm job.</p>
+<p><strong>Where to run commands:</strong> use the Bash terminal opened through <strong>Zaratan Shell Access</strong>. Copy commands inside a <code>bash</code> block, without copying a terminal prompt or the expected output. Lines starting with <code>#</code> are comments. Instructions explicitly labeled <strong>local computer</strong> are the exception.</p>
+<p><strong>Reading this as a notebook?</strong> The cells are lesson text, not Python programs. Copy the Bash examples into a terminal. In a Python-kernel notebook, <code>%%bash</code> runs a cell in a separate Bash process; a <code>cd</code> or variable assignment there does not persist into the next cell. Do not type <code>%%bash</code> into the portal terminal.</p>
+<h2 id="1-open-your-zaratan-terminal">1. Open your Zaratan terminal</h2>
+<ol>
+<li>Sign in to <a href="https://portal.zaratan.umd.edu/pun/sys/dashboard">Zaratan OnDemand</a> with your UMD account and complete any authentication prompts.</li>
+<li>Select <strong>Clusters → Zaratan Shell Access</strong>.</li>
+<li>Wait for a Linux command prompt, then run:</li>
+</ol>
+<pre><code class="language-bash">whoami
+hostname
+pwd
+id
+</code></pre>
+<p><code>whoami</code> should print your Directory ID. <code>hostname</code> identifies the machine, and <code>pwd</code> prints your current directory. <code>id</code> shows your Unix account and groups; BIOI611 allocation members should have the <code>zt-bioi611</code> group.</p>
+<p>Portal login, terminal access, and permission to submit a job are separate checks. If the terminal or BIOI611 group is missing, send your instructor your Directory ID and the exact error. Never include your password or an authentication code. Account provisioning problems may require <a href="https://hpcc.umd.edu/getting-started/new-user/">UMD HPC support</a>.</p>
+<h3 id="login-nodes-and-compute-nodes">Login nodes and compute nodes</h3>
+<p>The shell opens on a <strong>login node</strong>, where you can navigate, edit scripts, transfer files, and run the tiny examples in this lesson. Submit substantial analyses, such as read alignment, to <strong>compute nodes through Slurm</strong>. Opening a terminal does not allocate compute resources. Follow the <a href="https://hpcc.umd.edu/home/policies/">UMD HPC policies</a>.</p>
+<h2 id="2-choose-the-right-storage-and-check-quotas">2. Choose the right storage and check quotas</h2>
+<table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Intended use</th>
+<th>Quota and backup</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Home: <code>~</code> or <code>$HOME</code></td>
+<td>Small scripts and configuration files</td>
+<td>Personal 10 GB soft quota; backed up. A temporary increase to 20 GB is allowed for up to seven days.</td>
+</tr>
+<tr>
+<td><code>~/scratch.bioi611</code></td>
+<td>Data and outputs for active analyses</td>
+<td>Shared BIOI611 project quota; not backed up. Use this for job input/output.</td>
+</tr>
+<tr>
+<td><code>~/SHELL.bioi611</code></td>
+<td>Medium-term storage between analyses</td>
+<td>Shared BIOI611 project quota; not backed up. <strong>Unavailable on compute nodes.</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Move retained data off scratch when it is no longer needed for active work. SHELL is not a backup: keep a separate copy of irreplaceable data. These rules are described in <a href="https://hpcc.umd.edu/kb/storage/">UMD's storage guide</a> and <a href="https://hpcc.umd.edu/home/policies/">storage policies</a>.</p>
+<p>The similarly named <strong>Bash shell</strong> is the program interpreting your commands. <strong><code>$SHELL</code></strong> is an environment variable that normally names your login shell, such as <code>/bin/bash</code>. <strong>SHELL storage</strong> is a filesystem; it is unrelated to that variable.</p>
+<h3 id="inspect-the-shortcuts">Inspect the shortcuts</h3>
+<pre><code class="language-bash">ls -ld ~/scratch ~/scratch.bioi611 ~/SHELL ~/SHELL.bioi611
+readlink -f ~/scratch.bioi611
+readlink -f ~/SHELL.bioi611
+</code></pre>
+<p>The <code>-&gt;</code> in the listing marks a <strong>symbolic link</strong>, a shortcut to another path. The BIOI611 scratch link normally resolves to <code>/scratch/zt1/project/bioi611/user/YOUR_DIRECTORY_ID</code>. The generic <code>scratch</code> and <code>SHELL</code> links may point to another project if you belong to several projects. Use the explicit BIOI611 links in this course. If a link is absent or inaccessible, stop and ask the instructor rather than creating a replacement in your home directory.</p>
+<h3 id="storage-quota-versus-compute-allocation">Storage quota versus compute allocation</h3>
+<pre><code class="language-bash">home_quota
+scratch_quota
+shell_quota
+sbalance
+</code></pre>
+<p>The first three commands report storage usage and limits. <code>sbalance</code> reports computational allocation usage in service units (SU). A personal scratch quota displayed as <code>unlimited</code> does <strong>not</strong> override the shared project quota. Everyone in the project contributes to that limit. See the <a href="https://hpcc.umd.edu/kb/utilities/">UMD command reference</a>.</p>
+<p><code>du -sh DIRECTORY</code> measures the disk space used by a directory; it does not report your allocation quota. Avoid scanning the entire shared project tree just to check your own usage.</p>
+<h2 id="3-prepare-a-small-practice-workspace">3. Prepare a small practice workspace</h2>
+<p>Use these synthetic teaching files, which contain no real study or student data:</p>
+<ul>
+<li><a href="../assets/basic_linux/sequences.fasta">sequences.fasta</a>: three short sequences.</li>
+<li><a href="../assets/basic_linux/counts.tsv">counts.tsv</a>: four genes, two samples, and a header row. Fields are separated by tabs.</li>
+<li><a href="../assets/basic_linux/hello_slurm.sh">hello_slurm.sh</a>: a minimal batch job.</li>
+</ul>
+<p>In your Zaratan terminal, first enter your personal BIOI611 scratch directory:</p>
+<pre><code class="language-bash">cd ~/scratch.bioi611
+pwd -P
+</code></pre>
+<p>If <code>cd</code> fails, resolve the access problem before continuing. Create a dedicated workspace, then create the two small datasets directly. This setup does not require downloading files or waiting for the course website to be published:</p>
+<pre><code class="language-bash">mkdir -p linux_practice/{data,results,scripts,logs}
+cd linux_practice
+cat &gt; data/sequences.fasta &lt;&lt;'FASTA'
+&gt;seq1 synthetic teaching sequence
+ACGTACGTACGT
+&gt;seq2 synthetic teaching sequence
+GGGAAATTTCCC
+&gt;seq3 synthetic teaching sequence
+ATATCGCGATAT
+FASTA
+printf '%s\t%s\t%s\n' \
+    gene_id sample_1 sample_2 \
+    geneA 600 700 \
+    geneB 100 900 \
+    geneC 800 200 \
+    geneD 550 650 &gt; data/counts.tsv
+ls -lh data
+</code></pre>
+<p>Paste the complete block, including the final <code>FASTA</code> marker on a line by itself. The lines between the markers are file contents, not commands; <code>printf</code> creates real tab separators in the count table. These commands overwrite only the two named practice files when repeated, including an empty file left by a failed download. We will create the job script in section 12. The links above provide equivalent downloadable copies if you prefer uploading files through the portal's <strong>Files</strong> menu.</p>
+<p>Unless an example explicitly changes directories, run the rest of the main lesson from <code>~/scratch.bioi611/linux_practice</code>. On returning to a new terminal, enter that directory again.</p>
+<h2 id="4-navigate-the-filesystem">4. Navigate the filesystem</h2>
+<p>The filesystem starts at <code>/</code>, the root directory. An <strong>absolute path</strong> starts with <code>/</code>; a <strong>relative path</strong> is interpreted from your current directory. For example, <code>data/counts.tsv</code> is relative to <code>linux_practice</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.</code></td>
+<td>Current directory</td>
+</tr>
+<tr>
+<td><code>..</code></td>
+<td>Parent directory</td>
+</tr>
+<tr>
+<td><code>~</code> or <code>$HOME</code></td>
+<td>Your home directory</td>
+</tr>
+<tr>
+<td><code>cd -</code></td>
+<td>Return to the previous working directory</td>
+</tr>
+<tr>
+<td><code>cd</code> with no argument</td>
+<td>Return home</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash">pwd
+ls
+ls -lh data
+ls -la
+ls -ld data
+cd data
+pwd
+cd ..
+readlink -f data/counts.tsv
+cd ~
+cd -
+</code></pre>
+<p><code>ls -l</code> gives a detailed listing, <code>-h</code> uses readable sizes, and <code>-a</code> includes hidden names beginning with <code>.</code>. <code>ls -ld data</code> describes the directory itself. Options can be combined: <code>ls -la</code> means <code>ls -l -a</code>.</p>
+<p>Linux names are case-sensitive: <code>Data</code> and <code>data</code> are different. Spaces separate command arguments. Quote a path containing spaces, and quote variables containing paths:</p>
+<pre><code class="language-bash">mkdir -p &quot;results/practice notes&quot;
+ls -ld &quot;results/practice notes&quot;
+printf '%s\n' &quot;$HOME&quot;
+</code></pre>
+<p>Prefer simple filenames without spaces in analysis projects. The shell expands wildcards before running a command: <code>data/*.tsv</code> means matching filenames, not a regular expression for their contents.</p>
+<h2 id="5-terminal-essentials-and-getting-help">5. Terminal essentials and getting help</h2>
+<table>
+<thead>
+<tr>
+<th>Key or command</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tab; Tab twice</td>
+<td>Complete a command/path; list possible completions</td>
+</tr>
+<tr>
+<td>Up/Down arrows</td>
+<td>Recall previous commands; inspect them before pressing Enter</td>
+</tr>
+<tr>
+<td>Ctrl+R</td>
+<td>Search command history</td>
+</tr>
+<tr>
+<td>Ctrl+C</td>
+<td>Interrupt a foreground command or cancel an unfinished command line</td>
+</tr>
+<tr>
+<td><code>history</code></td>
+<td>Show recent commands</td>
+</tr>
+<tr>
+<td><code>ls --help</code></td>
+<td>Read a command's usage and options</td>
+</tr>
+<tr>
+<td><code>man ls</code></td>
+<td>Open its manual; press <code>q</code> to leave</td>
+</tr>
+<tr>
+<td><code>exit</code></td>
+<td>Close this shell session</td>
+</tr>
+</tbody>
+</table>
+<p>A continuation prompt such as <code>&gt;</code> often means a quote or command is unfinished. Ctrl+C returns to a fresh prompt. A successful command may produce no output. <code>echo $?</code> immediately after a command shows its exit status: zero usually means success.</p>
+<h2 id="6-copy-rename-create-and-remove-files">6. Copy, rename, create, and remove files</h2>
+<p>Run the following in your practice workspace:</p>
+<pre><code class="language-bash">cp -i data/counts.tsv results/counts_copy.tsv
+mkdir -p results/backup
+cp -i data/sequences.fasta results/backup/
+cp -r data results/data_copy
+mv -i results/counts_copy.tsv results/counts_renamed.tsv
+touch results/notes.txt
+ls -lh results
+</code></pre>
+<p><code>cp</code> copies a file; <code>cp -r</code> copies a directory recursively. <code>mv</code> moves or renames files. <code>-i</code> asks before overwriting an existing destination. <code>mkdir -p</code> creates missing parents. <code>touch</code> creates an empty file if it does not exist, or updates its timestamp if it does. If you repeat the directory-copy example with an existing destination, <code>cp</code> may nest the source inside it; inspect the result with <code>ls</code>.</p>
+<h3 id="practice-deletion-only-on-disposable-files">Practice deletion only on disposable files</h3>
+<p><code>rm</code> does not send files to a desktop recycle bin. Check <code>pwd</code> and <code>ls</code> before deleting anything.</p>
+<pre><code class="language-bash">mkdir -p results/empty_folder
+rmdir results/empty_folder
+cp data/counts.tsv results/delete_me.tsv
+rm -i results/delete_me.tsv
+mkdir -p results/disposable
+touch results/disposable/test.txt
+rm -ri results/disposable
+</code></pre>
+<p>Answer the deletion prompts only for these practice files. <code>rmdir</code> removes an empty directory. <code>rm -r</code> removes a directory and its contents. <strong>A nonempty directory does not require <code>-f</code>.</strong> The force option suppresses prompts and ignores missing files; it is unnecessary here.</p>
+<h2 id="7-view-files-and-redirect-output">7. View files and redirect output</h2>
+<pre><code class="language-bash">cat data/sequences.fasta
+head -n 3 data/counts.tsv
+tail -n 2 data/counts.tsv
+less data/counts.tsv
+</code></pre>
+<p>Use <code>cat</code> for small files and <code>less</code> for larger text. Inside <code>less</code>, use Space to advance, <code>b</code> to go back, <code>/geneC</code> then Enter to search, <code>n</code> for the next match, and <code>q</code> to quit. <code>head</code> and <code>tail</code> print ten lines by default; <code>-n</code> changes that count. <code>tail -n +2</code> starts at line two and is useful for skipping a header.</p>
+<h3 id="standard-input-output-and-error">Standard input, output, and error</h3>
+<p>A program reads <strong>standard input</strong>, writes results to <strong>standard output</strong>, and writes diagnostics to <strong>standard error</strong>. By default, output and errors appear in the terminal.</p>
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&gt;</code></td>
+<td>Write standard output to a file, <strong>overwriting</strong> it</td>
+</tr>
+<tr>
+<td><code>&gt;&gt;</code></td>
+<td>Append standard output to a file</td>
+</tr>
+<tr>
+<td><code>2&gt;</code></td>
+<td>Write standard error to a file</td>
+</tr>
+<tr>
+<td><code>2&gt;&amp;1</code></td>
+<td>Send standard error to the current standard-output destination</td>
+</tr>
+<tr>
+<td><code>\|</code></td>
+<td>Pass standard output to the next command's standard input</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash">printf 'First observation\n' &gt; results/notes.txt
+printf 'Second observation\n' &gt;&gt; results/notes.txt
+cat results/notes.txt
+ls data/does_not_exist 2&gt; logs/expected_error.txt
+cat logs/expected_error.txt
+</code></pre>
+<p>The failed <code>ls</code> is intentional. Never redirect output onto the input file: <code>sort file &gt; file</code> truncates the input before <code>sort</code> reads it. Write to a new filename instead. The order of redirections matters: <code>command &gt; log.txt 2&gt;&amp;1</code> combines both streams in the log. A plain pipe carries standard output only.</p>
+<h2 id="8-search-and-filter-biological-data">8. Search and filter biological data</h2>
+<h3 id="find-files-and-count-records">Find files and count records</h3>
+<pre><code class="language-bash">find data -type f -name '*.fasta'
+wc -l data/counts.tsv
+grep '^&gt;' data/sequences.fasta
+grep -c '^&gt;' data/sequences.fasta
+</code></pre>
+<p>Quote the pattern passed to <code>find</code> so the shell does not expand it first. The table has <strong>5 lines: one header and four genes</strong>. The FASTA header count is <strong>3</strong>. <code>^&gt;</code> means a <code>&gt;</code> at the start of a line; counting every line of a FASTA file does not count sequences.</p>
+<p>A pipe connects commands:</p>
+<pre><code class="language-bash">grep '^&gt;' data/sequences.fasta | wc -l
+tail -n +2 data/counts.tsv | wc -l
+</code></pre>
+<p>Expected counts are <strong>3 sequences</strong> and <strong>4 genes</strong>, respectively.</p>
+<h3 id="select-columns-and-filter-rows">Select columns and filter rows</h3>
+<pre><code class="language-bash">cut -f1,2 data/counts.tsv
+awk -F '\t' 'NR &gt; 1 &amp;&amp; $2 &gt; 500 &amp;&amp; $3 &gt; 500' data/counts.tsv
+awk -F '\t' 'NR &gt; 1 &amp;&amp; $2 &gt; 500 &amp;&amp; $3 &gt; 500' data/counts.tsv | wc -l
+</code></pre>
+<p><code>cut</code> uses tabs by default. In <code>awk</code>, <code>-F '\t'</code> selects a tab separator, <code>$2</code> and <code>$3</code> mean columns two and three, and <code>NR &gt; 1</code> skips the header. This selects <strong>geneA and geneD</strong>, so the final count is <strong>2</strong>. Without explicitly handling the header, a numeric-looking filter can accidentally include text.</p>
+<p>Preserve the header when saving a filtered table:</p>
+<pre><code class="language-bash">awk -F '\t' 'NR == 1 || ($2 &gt; 500 &amp;&amp; $3 &gt; 500)' data/counts.tsv &gt; results/high_counts.tsv
+cat results/high_counts.tsv
+</code></pre>
+<p>Expected output, displayed here with tabs between columns:</p>
+<pre><code class="language-text">gene_id sample_1    sample_2
+geneA   600 700
+geneD   550 650
+</code></pre>
+<h3 id="extract-sequence-identifiers">Extract sequence identifiers</h3>
+<pre><code class="language-bash">grep '^&gt;' data/sequences.fasta | sed 's/^&gt;//; s/ .*//' &gt; results/sequence_ids.txt
+cat results/sequence_ids.txt
+sort results/sequence_ids.txt | uniq -c
+</code></pre>
+<p><code>sed</code> removes the leading <code>&gt;</code> and the description after the first space. The IDs are <code>seq1</code>, <code>seq2</code>, and <code>seq3</code>. <code>uniq</code> combines adjacent repeated lines, so sort first when counting duplicates across a file.</p>
+<h3 id="wildcards-versus-regular-expressions">Wildcards versus regular expressions</h3>
+<p>Use <code>grep -F</code> for literal text and <code>grep -E</code> for extended regular expressions:</p>
+<pre><code class="language-bash">grep -F 'geneA' data/counts.tsv
+grep -E '^gene(A|D)[[:space:]]' data/counts.tsv
+grep -E '^&gt;seq[0-9]+' data/sequences.fasta
+</code></pre>
+<p>In extended regular expressions, <code>^</code> anchors the start, <code>$</code> anchors the end, <code>.</code> matches a character, <code>[0-9]</code> matches a digit, <code>*</code> repeats zero or more times, <code>+</code> repeats one or more times, <code>?</code> makes the preceding item optional, <code>|</code> means alternatives, and <code>{n}</code> requests a repetition count. Use <code>[[:digit:]]</code>, <code>[[:space:]]</code>, and <code>[[:alnum:]_]</code> for common character classes. The <code>\d</code> shorthand belongs to some other regex dialects; do not assume it works with ordinary <code>grep</code> or <code>grep -E</code>.</p>
+<p>Compare the filename wildcard <code>*.fasta</code> with the regex <code>.*\.fasta$</code>. The latter escapes the literal dot and anchors the filename ending. See the <a href="https://www.gnu.org/software/grep/manual/grep.html">GNU grep manual</a> for syntax details.</p>
+<h2 id="9-permissions-and-executable-scripts">9. Permissions and executable scripts</h2>
+<pre><code class="language-bash">id
+ls -ld data
+ls -l data/counts.tsv
+</code></pre>
+<p>In <code>-rw-r--r--</code>, the first character describes the file type; the next three groups describe <strong>owner</strong>, <strong>group</strong>, and <strong>others</strong>. The permission letters have different meanings for files and directories:</p>
+<table>
+<thead>
+<tr>
+<th>Permission</th>
+<th>File</th>
+<th>Directory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>r</code></td>
+<td>Read contents</td>
+<td>List entry names</td>
+</tr>
+<tr>
+<td><code>w</code></td>
+<td>Change contents</td>
+<td>Create, remove, or rename entries, normally together with <code>x</code></td>
+</tr>
+<tr>
+<td><code>x</code></td>
+<td>Execute as a program</td>
+<td>Traverse/access entries by name</td>
+</tr>
+</tbody>
+</table>
+<p>Deleting or renaming a file is governed primarily by its parent directory permissions, not by the file's write bit. ACLs and sticky-directory rules can impose additional restrictions. SHELL uses AFS access controls; the simple scratch examples here are not instructions for managing SHELL permissions.</p>
+<h3 id="run-a-small-python-script">Run a small Python script</h3>
+<p>Load the cluster's Python environment, then create a script. The lines between the two <code>PY</code> markers are file contents; the closing <code>PY</code> must be on a line by itself.</p>
+<pre><code class="language-bash">module load python
+cat &gt; scripts/hello.py &lt;&lt;'PY'
+#!/usr/bin/env python3
+print(&quot;Hello, BIOI611!&quot;)
+PY
+chmod u-x scripts/hello.py
+python3 scripts/hello.py
+</code></pre>
+<p>This works without execute permission because Python reads the file. To run the file itself, add execute permission:</p>
+<pre><code class="language-bash">chmod u+x scripts/hello.py
+./scripts/hello.py
+ls -l scripts/hello.py
+</code></pre>
+<p>Both commands print <code>Hello, BIOI611!</code>. The first line, called a <strong>shebang</strong>, selects an interpreter. <code>/usr/bin/env python3</code> finds Python through <code>PATH</code>. A missing execute bit normally causes <code>Permission denied</code>; a nonexistent interpreter path can cause a different error even when the script exists.</p>
+<p>Symbolic permissions include <code>u+x</code> (add owner execute), <code>g-w</code> (remove group write), and <code>o=r</code> (set others to read only). Numeric modes add read = 4, write = 2, and execute = 1; for example, <code>chmod 750 scripts/hello.py</code> gives the owner all three permissions, the group read/execute, and others none. Change permissions only on your own practice files.</p>
+<h2 id="10-edit-save-and-inspect-a-script">10. Edit, save, and inspect a script</h2>
+<p>You can edit a file using the portal's file editor or use <code>vi</code>/<code>vim</code> in the terminal. Vim supports the basic vi commands used in this exercise.</p>
+<h3 id="how-vivim-modes-work">How vi/vim modes work</h3>
+<p>In vi/vim, what a key does depends on the current <strong>mode</strong>. Start with the three modes shown in this diagram:</p>
+<p><img alt="Diagram of vi working modes: start in normal (vi) mode, use i, a, or o to enter input mode, Esc to return, and a colon to enter command-line mode." src="https://github.com/user-attachments/assets/b131eb16-373a-4e68-b773-e5d3daa9f443" /></p>
+<p><em>In the diagram, “vi mode” means normal mode, “Input mode” means insert mode, and “Command mode” means the command-line prompt opened with <code>:</code>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>What you do there</th>
+<th>How to enter or leave</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Normal mode</strong> (“vi mode”)</td>
+<td>Move around and use editing commands. This is the starting mode.</td>
+<td>Press <strong>Esc</strong> to return from insert mode or cancel the command-line prompt.</td>
+</tr>
+<tr>
+<td><strong>Insert mode</strong> (“Input mode”)</td>
+<td>Type text into the file.</td>
+<td>From normal mode, press <strong><code>i</code></strong> to insert before the cursor, <strong><code>a</code></strong> to append after it, or <strong><code>o</code></strong> to open a new line below. Press <strong>Esc</strong> when finished typing.</td>
+</tr>
+<tr>
+<td><strong>Command-line mode</strong> (“Command mode”)</td>
+<td>Enter commands such as <code>:w</code> (save), <code>:q</code> (quit), or <code>:wq</code> (save and quit).</td>
+<td>From normal mode, type <strong><code>:</code></strong>, then the command, and press <strong>Enter</strong> to execute it.</td>
+</tr>
+</tbody>
+</table>
+<p>A typical sequence is <strong><code>i</code> → type text → Esc → <code>:wq</code> → Enter</strong>. The diagram abbreviates the exit command as <code>wq</code>; when starting in normal mode, include the colon: <strong><code>:wq</code></strong>. Commands such as <code>:w</code> return to normal mode after running; <code>:wq</code> saves and exits the editor.</p>
+<h3 id="create-and-save-a-script">Create and save a script</h3>
+<p>Open your practice file:</p>
+<pre><code class="language-bash">vi scripts/editor_practice.py
+</code></pre>
+<ol>
+<li>Press <code>i</code> to enter insert mode.</li>
+<li>Type <code>print("I saved a script on Zaratan.")</code>.</li>
+<li>Press <strong>Esc</strong> to leave insert mode.</li>
+<li>Type <strong><code>:wq</code></strong>, then press <strong>Enter</strong>, to save and quit.</li>
+</ol>
+<p>If you want to abandon unsaved edits, press <strong>Esc</strong>, type <strong><code>:q!</code></strong>, and press <strong>Enter</strong>. <code>:w</code> saves without quitting. <code>:q</code> quits if there are no unsaved changes.</p>
+<pre><code class="language-bash">cat scripts/editor_practice.py
+python3 scripts/editor_practice.py
+</code></pre>
+<p>Expected output: <code>I saved a script on Zaratan.</code> If you create a shell script on Windows, save it with <strong>LF (Unix) line endings</strong>, not CRLF. Slurm can reject scripts containing DOS line breaks.</p>
+<h2 id="11-environment-variables-and-available-software">11. Environment variables and available software</h2>
+<pre><code class="language-bash">printf '%s\n' &quot;$HOME&quot;
+printf '%s\n' &quot;$SHELL&quot;
+printf '%s\n' &quot;$PATH&quot; | tr ':' '\n'
+command -v python3
+module list
+module avail python
+</code></pre>
+<p><code>PATH</code> is a colon-separated list of directories searched for commands. To temporarily add your own program directory while preserving the existing search path:</p>
+<pre><code class="language-bash">mkdir -p &quot;$HOME/bin&quot;
+export PATH=&quot;$HOME/bin:$PATH&quot;
+</code></pre>
+<p>This change lasts for the current shell and processes launched from it. If you need it every session, add that exact line once to <code>~/.bashrc</code> using an editor; do not repeatedly append it or replace the whole file. Batch scripts should explicitly initialize the environment they need.</p>
+<p>Use <code>module avail</code> to discover software before installing another copy. <code>module load</code> makes a package available and <code>module list</code> shows what is loaded. Record the version used for an analysis. Personal Miniforge installation, containers, and source compilation are covered in the <a href="../basic_linux_optional/">optional extensions</a>.</p>
+<h2 id="12-submit-your-first-slurm-job">12. Submit your first Slurm job</h2>
+<p>This first job uses only standard Linux commands and the supplied tiny FASTA file. No Conda environment or RNA-seq reference is required.</p>
+<h3 id="check-the-allocation-and-create-the-script">Check the allocation and create the script</h3>
+<pre><code class="language-bash">sbalance
+</code></pre>
+<p>BIOI611 students should see the <code>bioi611-class</code> account. If it is absent or has no available resources, contact the instructor before submitting. Create <code>scripts/hello_slurm.sh</code> by pasting the entire block below into your terminal, including the final <code>SLURM_SCRIPT</code> marker. The quoted marker preserves the dollar signs in the script for Slurm to expand when the job runs. This saves the script; it does not submit or execute the job:</p>
+<pre><code class="language-bash">cat &gt; scripts/hello_slurm.sh &lt;&lt;'SLURM_SCRIPT'
+#!/bin/bash
+#SBATCH --job-name=bioi611_hello
+#SBATCH --account=bioi611-class
+#SBATCH --partition=standard
+#SBATCH --time=00:02:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=1G
+#SBATCH --output=logs/%x-%j.out
+#SBATCH --error=logs/%x-%j.err
+
+source /etc/profile
+set -euo pipefail
+cd &quot;$SLURM_SUBMIT_DIR&quot;
+printf 'Job ID: %s\n' &quot;$SLURM_JOB_ID&quot;
+printf 'Host: '
+hostname
+date
+printf 'Working directory: '
+pwd
+grep -c '^&gt;' data/sequences.fasta &gt; results/sequence_count.txt
+printf 'Sequences: '
+cat results/sequence_count.txt
+SLURM_SCRIPT
+</code></pre>
+<p>Check the saved script before submitting it:</p>
+<pre><code class="language-bash">bash -n scripts/hello_slurm.sh
+cat scripts/hello_slurm.sh
+</code></pre>
+<p><code>bash -n</code> checks syntax without running the script; no output normally means the syntax check passed.</p>
+<p>All <code>#SBATCH</code> directives come before executable commands. This requests one task, one CPU, 1 GB of memory, and at most two minutes of running time. The time limit does not include waiting in the queue. <code>source /etc/profile</code> initializes the cluster environment; <code>set -euo pipefail</code> makes this script stop on failures, unset variables, or failed pipeline stages.</p>
+<h3 id="submit-from-the-practice-directory">Submit from the practice directory</h3>
+<pre><code class="language-bash">cd ~/scratch.bioi611/linux_practice
+mkdir -p logs results
+sbatch scripts/hello_slurm.sh
+</code></pre>
+<p>Slurm prints <code>Submitted batch job</code> followed by a job ID. Record that number. The <code>logs</code> directory must exist <strong>before</strong> submission because Slurm opens the log files before running the script. <code>%x</code> becomes the job name and <code>%j</code> the job ID. Do not run the script using <code>bash scripts/hello_slurm.sh</code>: that would bypass Slurm.</p>
+<h3 id="monitor-and-check-completion">Monitor and check completion</h3>
+<pre><code class="language-bash">squeue -u &quot;$USER&quot;
+</code></pre>
+<p><code>PD</code> means pending and <code>R</code> means running. A pending job may be waiting for resources; check the reason shown in the queue. A short job may finish before you see it in <code>squeue</code>. Disappearing from the queue does not itself prove success.</p>
+<p>In the following examples, <strong>replace <code>123456</code> with your actual job ID</strong>:</p>
+<pre><code class="language-bash">sacct -j 123456 --format=JobID,JobName,State,ExitCode,Elapsed,AllocCPUS,MaxRSS
+cat logs/bioi611_hello-123456.out
+cat logs/bioi611_hello-123456.err
+cat results/sequence_count.txt
+</code></pre>
+<p>Look for <code>COMPLETED</code>, exit code <code>0:0</code>, and a sequence count of <strong>3</strong>. Accounting information can take a short time to appear. <code>MaxRSS</code> may be reported on the <code>.batch</code> step. <code>FAILED</code>, <code>OUT_OF_MEMORY</code>, and <code>TIMEOUT</code> require checking the error log and the requested resources.</p>
+<p>To cancel one of your own pending or running jobs, substitute its ID:</p>
+<pre><code class="language-bash">scancel 123456
+</code></pre>
+<p>Use <a href="https://hpcc.umd.edu/kb/submitting-jobs/">UMD's job-submission guide</a> for resource options. The <a href="../basic_linux_optional/#an-rna-seq-job-with-star">optional extensions</a> show how the same ideas apply to STAR after its software and real input files are ready.</p>
+<h2 id="13-compress-archive-and-transfer-files">13. Compress, archive, and transfer files</h2>
+<h3 id="compress-a-copy-keeping-the-original-data">Compress a copy, keeping the original data</h3>
+<pre><code class="language-bash">cp data/counts.tsv results/counts_for_compression.tsv
+gzip results/counts_for_compression.tsv
+zcat results/counts_for_compression.tsv.gz | head -n 3
+gunzip results/counts_for_compression.tsv.gz
+</code></pre>
+<p>By default, <code>gzip</code> replaces its input with a <code>.gz</code> file, and <code>gunzip</code> reverses that operation. <code>zcat</code> reads compressed text without permanently decompressing it. These tiny files may not become smaller after compression because of format overhead.</p>
+<h3 id="create-inspect-then-extract-an-archive">Create, inspect, then extract an archive</h3>
+<pre><code class="language-bash">tar -czvf results/practice_data.tar.gz data/sequences.fasta data/counts.tsv
+tar -tzvf results/practice_data.tar.gz
+mkdir -p results/extracted
+tar -xzvf results/practice_data.tar.gz -C results/extracted
+ls results/extracted/data
+du -sh data results
+</code></pre>
+<p><code>c</code> creates, <code>t</code> lists, and <code>x</code> extracts an archive; <code>z</code> uses gzip, <code>v</code> prints names, and <code>f</code> introduces the archive filename. Only after checking the extracted files, optionally remove the practice archive with <code>rm -i results/practice_data.tar.gz</code>. Do not delete the archive before the extraction step.</p>
+<h3 id="transfer-between-your-computer-and-zaratan">Transfer between your computer and Zaratan</h3>
+<p>The portal's <strong>Files</strong> menu can upload and download files. An alternative is <code>scp</code>. Run the following on <strong>your local computer</strong>, not inside the Zaratan terminal, and replace <code>YOUR_DIRECTORY_ID</code>:</p>
+<pre><code class="language-bash">scp local_notes.txt YOUR_DIRECTORY_ID@login.zaratan.umd.edu:/scratch/zt1/project/bioi611/user/YOUR_DIRECTORY_ID/linux_practice/results/
+scp YOUR_DIRECTORY_ID@login.zaratan.umd.edu:/scratch/zt1/project/bioi611/user/YOUR_DIRECTORY_ID/linux_practice/results/high_counts.tsv .
+</code></pre>
+<p>The first command uploads a local file you have created; the second downloads your filtered table to the current local directory. Connections may require UMD authentication or VPN depending on your setup; follow <a href="https://hpcc.umd.edu/getting-started/connecting/">UMD's connection instructions</a>. For repeated directory transfers, <code>rsync</code> is another option; preview with its <code>--dry-run</code> option before a large transfer and avoid <code>--delete</code> in beginner exercises.</p>
+<h2 id="14-independent-exercise-and-submission">14. Independent exercise and submission</h2>
+<p>Using your own account and practice files:</p>
+<ol>
+<li>Report your Directory ID, login hostname, and the resolved path of <code>~/scratch.bioi611</code>.</li>
+<li>Copy the FASTA file to a new name under <code>results/</code>, then count its sequence headers and save the count in a text file.</li>
+<li>Save a table containing the header and genes with counts greater than 500 in <strong>both</strong> samples. Explain why a header is not a gene record.</li>
+<li>Submit the small Slurm job, record its job ID, and find its completion state and output log.</li>
+<li>Explain which command checks home storage, which checks scratch storage, and which checks computational allocation usage. State where you would keep active input data and whether that location is backed up.</li>
+</ol>
+<p>Submit a short text file containing your commands, the sequence and filtered-gene counts, your job ID, completion state, and log filename. Use actual output from your own account. Successful completion means <strong>3 sequences, 2 selected genes, and a completed job with exit code <code>0:0</code></strong>.</p>
+<h2 id="troubleshooting-checklist">Troubleshooting checklist</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>First checks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>No such file or directory</code></td>
+<td>Run <code>pwd</code> and <code>ls</code>; check spelling, capitalization, and whether setup/downloads completed.</td>
+</tr>
+<tr>
+<td><code>Permission denied</code></td>
+<td>Inspect <code>id</code>, <code>ls -l FILE</code>, and <code>ls -ld PARENT</code>; do not try to repair shared course permissions yourself.</td>
+</tr>
+<tr>
+<td><code>command not found</code></td>
+<td>Check <code>command -v COMMAND</code>, <code>module list</code>, and the required environment.</td>
+</tr>
+<tr>
+<td>Quota exceeded</td>
+<td>Run all three quota commands; identify the filesystem before moving or deleting your own files.</td>
+</tr>
+<tr>
+<td>Invalid Slurm account</td>
+<td>Check <code>sbalance</code> and confirm BIOI611 allocation membership with the instructor.</td>
+</tr>
+<tr>
+<td>Job failed or produced no output</td>
+<td>Check <code>sacct</code>, <code>.err</code>, input paths, environment setup, and whether <code>logs/</code> existed at submission.</td>
+</tr>
+<tr>
+<td>Shell shows a continuation prompt</td>
+<td>Complete the quoted command or press Ctrl+C and start again.</td>
+</tr>
+</tbody>
+</table>
+<p>Continue with <a href="../basic_linux_optional/">optional Linux, software, and HPC extensions</a> when you are comfortable with the main workflow.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../basic_linux_optional/" class="btn btn-neutral float-right" title="Optional Linux and HPC extensions">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+    
+      <span><a href="../basic_linux_optional/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
