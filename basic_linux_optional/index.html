@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Optional Linux and HPC extensions - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../stylesheets/basic_linux.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Optional Linux and HPC extensions";
+        var mkdocs_page_input_path = "basic_linux_optional.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Optional Linux and HPC extensions</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#symbolic-links">Symbolic links</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#install-software-only-when-needed">Install software only when needed</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#install-miniforge3-in-your-personal-scratch-space">Install Miniforge3 in your personal scratch space</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#create-a-course-environment">Create a course environment</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#an-rna-seq-job-with-star">An RNA-seq job with STAR</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#download-a-real-gene-count-table">Download a real gene-count table</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#containers">Containers</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#build-from-source">Build from source</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#inspect-cluster-resources">Inspect cluster resources</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Get ready for the course</li>
+      <li class="breadcrumb-item active">Optional Linux and HPC extensions</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/basic_linux_optional.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="optional-linux-software-and-hpc-extensions">Optional Linux, software, and HPC extensions</h1>
+<p>Complete the <a href="../basic_linux/">main Linux lesson</a> first. These sections are independent references for later analyses; they are not a sequence of commands to paste into a login node. Use Slurm for substantial computations.</p>
+<h2 id="symbolic-links">Symbolic links</h2>
+<p>A symbolic link names another file or directory without making a second copy. Try this inside your practice directory:</p>
+<pre><code class="language-bash">cd ~/scratch.bioi611/linux_practice
+ln -s ../data/sequences.fasta results/sequences_link.fasta
+ls -l results/sequences_link.fasta
+readlink -f results/sequences_link.fasta
+cat results/sequences_link.fasta
+unlink results/sequences_link.fasta
+ls data/sequences.fasta
+</code></pre>
+<p>A relative link target is interpreted from the directory containing the link. Here it is relative to <code>results/</code>. <code>unlink</code> removes this link, leaving the target file in <code>data/</code> intact. If the target moves or disappears, the link becomes broken. A link is not a backup and does not bypass permissions or storage quotas.</p>
+<h2 id="install-software-only-when-needed">Install software only when needed</h2>
+<p>First inspect the cluster's software library:</p>
+<pre><code class="language-bash">module list
+module avail python
+module load python
+python3 --version
+</code></pre>
+<p>Discover the available module names and versions rather than copying another cluster's module list. Record the exact loaded version for reproducibility. Follow <a href="https://hpcc.umd.edu/kb/utilities/">UMD's module reference</a> and <a href="https://hpcc.umd.edu/software/installing_sw/">software installation guidance</a>.</p>
+<h3 id="install-miniforge3-in-your-personal-scratch-space">Install Miniforge3 in your personal scratch space</h3>
+<p>Do this only if you need a personal Conda installation and have not already set one up for this course. Use <strong>Miniforge3</strong>; Mambaforge has been retired. Installation and package caches can consume substantial space, so place them in your own scratch directory rather than filling home. SHELL is not suitable for software that must run on compute nodes.</p>
+<p>This example pins the Linux x86_64 installer to <a href="https://github.com/conda-forge/miniforge/releases/tag/26.7.2-0">Miniforge3 26.7.2-0</a>. Check the architecture first:</p>
+<pre><code class="language-bash">uname -m
+</code></pre>
+<p>Continue with this installer only when the result is <code>x86_64</code>. If the installation prefix below already exists, reuse it instead of reinstalling over it.</p>
+<pre><code class="language-bash">cd ~/scratch.bioi611
+mkdir -p software/downloads software/envs software/conda_pkgs
+cd software/downloads
+wget https://github.com/conda-forge/miniforge/releases/download/26.7.2-0/Miniforge3-26.7.2-0-Linux-x86_64.sh
+bash Miniforge3-26.7.2-0-Linux-x86_64.sh -b -p &quot;$HOME/scratch.bioi611/software/miniforge3&quot;
+source &quot;$HOME/scratch.bioi611/software/miniforge3/etc/profile.d/conda.sh&quot;
+conda --version
+</code></pre>
+<p>Check that the download and installation complete successfully before continuing. <code>source</code> makes the activation function available in the current shell; repeat it when opening a new terminal. This approach does not require automatically activating Conda from <code>.bashrc</code>.</p>
+<h3 id="create-a-course-environment">Create a course environment</h3>
+<p>The following environment includes Python, FastQC, and STAR, so the alignment example below does not depend on software missing from its installation instructions. The versions are explicit course examples, not a claim that they are the newest releases.</p>
+<pre><code class="language-bash">export CONDA_PKGS_DIRS=&quot;$HOME/scratch.bioi611/software/conda_pkgs&quot;
+conda create --prefix &quot;$HOME/scratch.bioi611/software/envs/bioi611&quot; \
+    --override-channels --channel conda-forge --channel bioconda \
+    --strict-channel-priority python=3.11 fastqc=0.12.1 star=2.7.11b
+conda activate &quot;$HOME/scratch.bioi611/software/envs/bioi611&quot;
+python3 --version
+fastqc --version
+STAR --version
+</code></pre>
+<p>Confirm Conda's proposed transaction when prompted and wait for it to finish. Do not proceed to a batch job if a package cannot be resolved or its version check fails. The channel order follows <a href="https://bioconda.github.io/">Bioconda's current recommendations</a>.</p>
+<p>Record the requested packages and the resolved environment:</p>
+<pre><code class="language-bash">conda env export --from-history &gt; &quot;$HOME/scratch.bioi611/software/bioi611-requested.yml&quot;
+conda list --explicit &gt; &quot;$HOME/scratch.bioi611/software/bioi611-linux-64-explicit.txt&quot;
+</code></pre>
+<p>The history export captures requested dependencies; the explicit export records resolved package builds for the same platform. Keep these small files with your analysis scripts and preserve a separate copy. Scratch installations are not backed up. In each batch script, source the same <code>conda.sh</code> and activate the same environment explicitly.</p>
+<h2 id="an-rna-seq-job-with-star">An RNA-seq job with STAR</h2>
+<p>This is a <strong>later-course template</strong>, not part of the tiny first-day exercise. Before submitting it, you need all of the following:</p>
+<ul>
+<li>The environment installed above, with <code>STAR --version</code> working.</li>
+<li>A scratch analysis directory containing <code>STAR_ref/</code>, a completed STAR genome index for the correct reference assembly.</li>
+<li>A matching single-end FASTQ file at <code>raw_data/N2_day1_rep1.fastq.gz</code>. This filename is an example: change it to your real sample.</li>
+<li>Enough project storage, available compute allocation, and memory/time appropriate for your reference and dataset.</li>
+</ul>
+<p>The synthetic sequences in the main lesson are <strong>not</strong> substitutes for an RNA-seq reference or FASTQ input. Follow the <a href="../bulkRNAseq_lab/">RNA-seq lab</a> for reference and input preparation. Index construction is itself a compute job.</p>
+<p>Save the following as <code>s1_star.sh</code> in your scratch RNA-seq analysis directory:</p>
+<pre><code class="language-bash">#!/bin/bash
+#SBATCH --job-name=s1_star_aln
+#SBATCH --account=bioi611-class
+#SBATCH --partition=standard
+#SBATCH --time=40:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=20
+#SBATCH --mem=32G
+#SBATCH --output=logs/%x-%j.out
+#SBATCH --error=logs/%x-%j.err
+
+source /etc/profile
+source &quot;$HOME/scratch.bioi611/software/miniforge3/etc/profile.d/conda.sh&quot; || exit 1
+conda activate &quot;$HOME/scratch.bioi611/software/envs/bioi611&quot; || exit 1
+set -euo pipefail
+cd &quot;$SLURM_SUBMIT_DIR&quot;
+command -v STAR
+STAR --version
+test -s STAR_ref/Genome
+test -s raw_data/N2_day1_rep1.fastq.gz
+mkdir -p STAR_align
+STAR --genomeDir STAR_ref \
+    --outSAMtype BAM SortedByCoordinate \
+    --twopassMode Basic \
+    --quantMode TranscriptomeSAM GeneCounts \
+    --readFilesCommand zcat \
+    --outFileNamePrefix STAR_align/N2_day1_rep1. \
+    --runThreadN &quot;$SLURM_CPUS_PER_TASK&quot; \
+    --readFilesIn raw_data/N2_day1_rep1.fastq.gz
+</code></pre>
+<p>The 20 CPUs, 32 GB, and 40-hour limit are example requests; choose values suitable for the analysis, and review actual usage afterward. A large reference or BAM sorting may require more memory. Paired-end data require both FASTQ filenames. Each sample or concurrent run needs its own output prefix/directory so results are not overwritten.</p>
+<p>From the analysis directory that contains the script, index, and input:</p>
+<pre><code class="language-bash">pwd
+ls STAR_ref/Genome raw_data/N2_day1_rep1.fastq.gz
+mkdir -p logs
+sbalance
+sbatch s1_star.sh
+</code></pre>
+<p><code>$SLURM_CPUS_PER_TASK</code> keeps the program's thread count consistent with the allocation. Job paths are interpreted from the submission directory; <code>#SBATCH</code> directives do not expand shell variables such as <code>$HOME</code>. See <a href="https://hpcc.umd.edu/kb/submitting-jobs/">UMD's submission guide</a>.</p>
+<h2 id="download-a-real-gene-count-table">Download a real gene-count table</h2>
+<p>The main lesson uses fixed synthetic data so everyone sees the same answers. For a later exercise, download the <strong>GSE102537</strong> table with a matching filename:</p>
+<pre><code class="language-bash">cd ~/scratch.bioi611/linux_practice
+mkdir -p data/geo
+wget -O data/geo/GSE102537_raw_counts_GRCh38.p13_NCBI.tsv.gz \
+    'https://www.ncbi.nlm.nih.gov/geo/download/?type=rnaseq_counts&amp;acc=GSE102537&amp;format=file&amp;file=GSE102537_raw_counts_GRCh38.p13_NCBI.tsv.gz'
+gzip -t data/geo/GSE102537_raw_counts_GRCh38.p13_NCBI.tsv.gz
+zcat data/geo/GSE102537_raw_counts_GRCh38.p13_NCBI.tsv.gz | head -n 5
+</code></pre>
+<p>Inspect the header and sample metadata before selecting columns. A count threshold is a data-manipulation demonstration, not a differential-expression analysis. For a table with one header line, a tab-separated numeric filter can explicitly exclude it:</p>
+<pre><code class="language-bash">zcat data/geo/GSE102537_raw_counts_GRCh38.p13_NCBI.tsv.gz \
+    | awk -F '\t' 'NR &gt; 1 &amp;&amp; $2 &gt; 500 &amp;&amp; $3 &gt; 500' \
+    | wc -l
+</code></pre>
+<p>Record the accession, filename, download date, and checksum alongside your analysis. External data can change, so do not reuse the synthetic dataset's expected counts here. On large real datasets, run substantial processing through Slurm. In a script using <code>pipefail</code>, a preview ending in <code>head</code> can cause an upstream command to report a broken pipe after <code>head</code> exits early.</p>
+<h2 id="containers">Containers</h2>
+<p>A container packages software and dependencies. It helps keep software environments consistent, but identical scientific results still depend on inputs, parameters, software versions, random seeds, and sometimes hardware. Docker commonly uses a privileged daemon, although rootless Docker also exists. HPC sites often provide Apptainer or Singularity for running containers without a Docker daemon.</p>
+<p>Check what Zaratan currently provides:</p>
+<pre><code class="language-bash">module avail singularity
+module avail apptainer
+</code></pre>
+<p>Load an available module using its actual name. The commands below use <code>singularity</code>; if your instructor provides Apptainer instead, use <code>apptainer</code> with the corresponding commands. Do not assume a module name from a different cluster is available here.</p>
+<p>After loading the runtime, download a versioned Trim Galore image into scratch:</p>
+<pre><code class="language-bash">cd ~/scratch.bioi611
+mkdir -p software/containers software/container_cache
+export SINGULARITY_CACHEDIR=&quot;$HOME/scratch.bioi611/software/container_cache&quot;
+export APPTAINER_CACHEDIR=&quot;$HOME/scratch.bioi611/software/container_cache&quot;
+cd software/containers
+singularity pull trimgalore_v0.6.10.sif docker://quay.io/biocontainers/trim-galore:0.6.10--hdfd78af_0
+singularity exec trimgalore_v0.6.10.sif trim_galore --help
+</code></pre>
+<p>A <code>.sif</code> file is a Singularity/Apptainer image; the <code>docker://</code> reference names an image in a registry. Keep the image tag and checksum with your analysis record. If that tag is unavailable, check the BioContainers registry rather than silently using an unversioned image.</p>
+<p>To expose your own scratch directory at a predictable path inside the container:</p>
+<pre><code class="language-bash">singularity exec -B &quot;$HOME/scratch.bioi611:/work&quot; trimgalore_v0.6.10.sif ls /work
+</code></pre>
+<p>Here <code>-B</code> binds the host directory to <code>/work</code> in the container. Paths in analysis commands must match the paths visible inside the container. Checking help or listing a small directory is a lightweight check; actual read trimming still belongs in a Slurm job. Containers do not allocate CPUs or memory on their own.</p>
+<h2 id="build-from-source">Build from source</h2>
+<p>Use a provided module, Conda environment, or course container first. When building from source is necessary, follow the project's own build instructions, record a release or commit, and install under your own scratch space. A compiler and development libraries may be required; do not use <code>sudo</code> on the cluster.</p>
+<p>For example, after checking <a href="https://github.com/lh3/bwa">BWA's build instructions</a> and loading any required compiler module:</p>
+<pre><code class="language-bash">cd ~/scratch.bioi611
+mkdir -p software/src
+cd software/src
+git clone https://github.com/lh3/bwa.git
+cd bwa
+git rev-parse HEAD
+make
+</code></pre>
+<p>Save the commit ID with your analysis notes. For a reproducible course environment, use the instructor's selected release/commit before building. Do not start genome indexing on a login node after compilation: prepare a Slurm job with the real reference path and suitable resources.</p>
+<h2 id="inspect-cluster-resources">Inspect cluster resources</h2>
+<p>These commands report changing cluster state, so their output will differ between sessions:</p>
+<pre><code class="language-bash">sinfo -s
+scontrol show partition standard
+squeue -u &quot;$USER&quot;
+</code></pre>
+<p>For a job of your own, replace <code>123456</code> with its ID:</p>
+<pre><code class="language-bash">scontrol show job 123456
+sacct -j 123456 --format=JobID,State,ExitCode,Elapsed,AllocCPUS,MaxRSS
+</code></pre>
+<p>Inspect a node with <code>scontrol show node NODE_NAME</code>, replacing <code>NODE_NAME</code> with a real name from <code>sinfo</code> or your job information. Available node resources do not describe your personal allocation balance; use <code>sbalance</code> for that. Start with your job state and logs before interpreting detailed node configuration.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../basic_linux/" class="btn btn-neutral float-left" title="Basic Linux"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../bulkRNAseq_lab/" class="btn btn-neutral float-right" title="Read QC and alignment">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../basic_linux/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../bulkRNAseq_lab/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
