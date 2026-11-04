@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1514" viewBox="0 0 1800 1514" role="img" aria-labelledby="title desc">
+  <title id="title">Modern DAVID Functional Annotation Summary for the C. elegans worked example</title>
+  <desc id="desc">Annotated summary page showing the foreground list, custom DESeq2-tested background, annotation category tabs, source selection and coverage bars, and Table, Chart, and Clustering report buttons.</desc>
+  <defs>
+    <style>
+      .focus { fill: none; stroke: #f28e2b; stroke-width: 5; }
+      .marker { fill: #f28e2b; stroke: #ffffff; stroke-width: 4; }
+      .marker-text { fill: #ffffff; font: 700 22px Arial, Helvetica, sans-serif; text-anchor: middle; dominant-baseline: central; }
+      .key-title { fill: #17365d; font: 700 30px Arial, Helvetica, sans-serif; }
+      .key-text { fill: #17365d; font: 23px Arial, Helvetica, sans-serif; }
+    </style>
+  </defs>
+  <rect width="1800" height="1514" fill="#ffffff"/>
+  <image href="david_2025_annotation_summary_raw.png" x="0" y="0" width="1800" height="1214"/>
+
+  <rect class="focus" x="102" y="316" width="735" height="62" rx="9"/>
+  <g transform="translate(102 316)"><circle class="marker" r="22"/><text class="marker-text">1</text></g>
+  <rect class="focus" x="102" y="432" width="253" height="344" rx="9"/>
+  <g transform="translate(102 432)"><circle class="marker" r="22"/><text class="marker-text">2</text></g>
+  <rect class="focus" x="360" y="432" width="1415" height="344" rx="9"/>
+  <g transform="translate(360 432)"><circle class="marker" r="22"/><text class="marker-text">3</text></g>
+  <rect class="focus" x="702" y="382" width="1078" height="47" rx="9"/>
+  <g transform="translate(1780 382)"><circle class="marker" r="22"/><text class="marker-text">4</text></g>
+
+  <rect x="0" y="1214" width="1800" height="300" fill="#eef5fb"/>
+  <line x1="0" y1="1214" x2="1800" y2="1214" stroke="#3b6ea5" stroke-width="4"/>
+  <text class="key-title" x="45" y="1260">Annotation key</text>
+  <g transform="translate(55 1310)"><circle class="marker" r="20"/><text class="marker-text">1</text></g>
+  <text class="key-text" x="90" y="1302">Verify the 1,039-gene foreground and custom background:</text>
+  <text class="key-text" x="90" y="1332">18,709 submitted IDs; effective population = 18,702 genes.</text>
+  <g transform="translate(55 1410)"><circle class="marker" r="20"/><text class="marker-text">2</text></g>
+  <text class="key-text" x="90" y="1418">Tabs organize annotation sources; badges show selections.</text>
+  <g transform="translate(920 1310)"><circle class="marker" r="20"/><text class="marker-text">3</text></g>
+  <text class="key-text" x="955" y="1302">Checkboxes select sources. Bars show annotation coverage,</text>
+  <text class="key-text" x="955" y="1332">not enrichment significance.</text>
+  <g transform="translate(920 1410)"><circle class="marker" r="20"/><text class="marker-text">4</text></g>
+  <text class="key-text" x="955" y="1418">Open gene-centric Table, term-centric Chart, or Clustering.</text>
+</svg>
