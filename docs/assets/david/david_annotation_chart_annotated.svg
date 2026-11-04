@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1534" viewBox="0 0 1800 1534" role="img" aria-labelledby="title desc">
+  <title id="title">Modern DAVID Functional Annotation Chart for the C. elegans worked example</title>
+  <desc id="desc">Annotated term enrichment chart showing the gene list and custom background, EASE and count display thresholds, record and export controls, term information, gene coverage, EASE P values, and annotation-source-family Benjamini adjusted P values.</desc>
+  <defs>
+    <style>
+      .focus { fill: none; stroke: #f28e2b; stroke-width: 5; }
+      .marker { fill: #f28e2b; stroke: #ffffff; stroke-width: 4; }
+      .marker-text { fill: #ffffff; font: 700 22px Arial, Helvetica, sans-serif; text-anchor: middle; dominant-baseline: central; }
+      .key-title { fill: #17365d; font: 700 30px Arial, Helvetica, sans-serif; }
+      .key-text { fill: #17365d; font: 22px Arial, Helvetica, sans-serif; }
+    </style>
+  </defs>
+  <rect width="1800" height="1534" fill="#ffffff"/>
+  <image href="david_2025_annotation_chart_raw.png" x="0" y="0" width="1800" height="1214"/>
+
+  <rect class="focus" x="62" y="201" width="735" height="61" rx="9"/>
+  <g transform="translate(62 201)"><circle class="marker" r="22"/><text class="marker-text">1</text></g>
+  <rect class="focus" x="62" y="266" width="560" height="42" rx="9"/>
+  <g transform="translate(62 266)"><circle class="marker" r="22"/><text class="marker-text">2</text></g>
+  <rect class="focus" x="62" y="311" width="1665" height="49" rx="9"/>
+  <g transform="translate(1727 311)"><circle class="marker" r="22"/><text class="marker-text">3</text></g>
+  <rect class="focus" x="142" y="387" width="1235" height="320" rx="9"/>
+  <g transform="translate(142 387)"><circle class="marker" r="22"/><text class="marker-text">4</text></g>
+  <rect class="focus" x="1388" y="387" width="155" height="320" rx="9"/>
+  <g transform="translate(1388 387)"><circle class="marker" r="22"/><text class="marker-text">5</text></g>
+  <rect class="focus" x="1542" y="387" width="185" height="320" rx="9"/>
+  <g transform="translate(1727 387)"><circle class="marker" r="22"/><text class="marker-text">6</text></g>
+
+  <rect x="0" y="1214" width="1800" height="320" fill="#eef5fb"/>
+  <line x1="0" y1="1214" x2="1800" y2="1214" stroke="#3b6ea5" stroke-width="4"/>
+  <text class="key-title" x="45" y="1260">Chart interpretation key</text>
+  <g transform="translate(55 1310)"><circle class="marker" r="20"/><text class="marker-text">1</text></g>
+  <text class="key-text" x="90" y="1318">Confirm foreground and custom background.</text>
+  <g transform="translate(55 1382)"><circle class="marker" r="20"/><text class="marker-text">2</text></g>
+  <text class="key-text" x="90" y="1390">EASE and Count are display filters (defaults 0.1 and 2).</text>
+  <g transform="translate(55 1454)"><circle class="marker" r="20"/><text class="marker-text">3</text></g>
+  <text class="key-text" x="90" y="1462">Search, record count, sublist, export, and column controls.</text>
+  <g transform="translate(920 1310)"><circle class="marker" r="20"/><text class="marker-text">4</text></g>
+  <text class="key-text" x="955" y="1318">Category, term, and related-term (RT) links.</text>
+  <g transform="translate(920 1382)"><circle class="marker" r="20"/><text class="marker-text">5</text></g>
+  <text class="key-text" x="955" y="1390">Genes and Count describe foreground coverage.</text>
+  <g transform="translate(920 1454)"><circle class="marker" r="20"/><text class="marker-text">6</text></g>
+  <text class="key-text" x="955" y="1446">P-Value is EASE; Benjamini is BH-adjusted within its</text>
+  <text class="key-text" x="955" y="1476">annotation-source family. Use it for multiplicity-aware evidence.</text>
+</svg>

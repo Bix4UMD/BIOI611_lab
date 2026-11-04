@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1444" viewBox="0 0 1600 1444" role="img" aria-labelledby="title desc">
+  <title id="title">Uploading the C. elegans upregulated gene list in the modern DAVID interface</title>
+  <desc id="desc">Annotated DAVID upload dialog showing paste mode, WormBase identifiers, a descriptive list name, C. elegans taxonomy, and the Upload List button.</desc>
+  <defs>
+    <style>
+      .focus { fill: none; stroke: #f28e2b; stroke-width: 5; }
+      .marker { fill: #f28e2b; stroke: #ffffff; stroke-width: 4; }
+      .marker-text { fill: #ffffff; font: 700 22px Arial, Helvetica, sans-serif; text-anchor: middle; dominant-baseline: central; }
+      .key-title { fill: #17365d; font: 700 30px Arial, Helvetica, sans-serif; }
+      .key-text { fill: #17365d; font: 23px Arial, Helvetica, sans-serif; }
+    </style>
+  </defs>
+  <rect width="1600" height="1444" fill="#ffffff"/>
+  <image href="david_2025_upload_worm_list_raw.png" x="0" y="0" width="1600" height="1114"/>
+
+  <rect class="focus" x="300" y="113" width="290" height="48" rx="9"/>
+  <g transform="translate(300 113)"><circle class="marker" r="22"/><text class="marker-text">1</text></g>
+  <rect class="focus" x="244" y="190" width="1117" height="198" rx="9"/>
+  <g transform="translate(244 190)"><circle class="marker" r="22"/><text class="marker-text">2</text></g>
+  <rect class="focus" x="244" y="411" width="522" height="65" rx="9"/>
+  <g transform="translate(244 411)"><circle class="marker" r="22"/><text class="marker-text">3</text></g>
+  <rect class="focus" x="244" y="499" width="705" height="65" rx="9"/>
+  <g transform="translate(244 499)"><circle class="marker" r="22"/><text class="marker-text">4</text></g>
+  <rect class="focus" x="1238" y="499" width="120" height="65" rx="9"/>
+  <g transform="translate(1358 499)"><circle class="marker" r="22"/><text class="marker-text">5</text></g>
+
+  <rect x="0" y="1114" width="1600" height="330" fill="#eef5fb"/>
+  <line x1="0" y1="1114" x2="1600" y2="1114" stroke="#3b6ea5" stroke-width="4"/>
+  <text class="key-title" x="45" y="1160">Annotation key</text>
+  <g transform="translate(55 1208)"><circle class="marker" r="20"/><text class="marker-text">1</text></g>
+  <text class="key-text" x="90" y="1216">Choose Paste identifiers, then paste the ready-made file contents.</text>
+  <g transform="translate(55 1280)"><circle class="marker" r="20"/><text class="marker-text">2</text></g>
+  <text class="key-text" x="90" y="1288">Paste the 1,039 WormBase IDs; do not include a header.</text>
+  <g transform="translate(55 1352)"><circle class="marker" r="20"/><text class="marker-text">3</text></g>
+  <text class="key-text" x="90" y="1360">Name the contrast and the two cutoffs.</text>
+  <g transform="translate(835 1208)"><circle class="marker" r="20"/><text class="marker-text">4</text></g>
+  <text class="key-text" x="870" y="1202">Select Caenorhabditis elegans. DAVID resolves WBGene IDs</text>
+  <text class="key-text" x="870" y="1232">automatically within the selected taxonomy.</text>
+  <g transform="translate(835 1316)"><circle class="marker" r="20"/><text class="marker-text">5</text></g>
+  <text class="key-text" x="870" y="1324">Upload the list, then inspect mapping before enrichment.</text>
+</svg>
