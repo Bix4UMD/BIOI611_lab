@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Minimal R Introduction - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../stylesheets/basic_linux.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Minimal R Introduction";
+        var mkdocs_page_input_path = "BIOI611_introR.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux_optional/">Optional Linux and HPC extensions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Minimal R Introduction</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-start-an-r-session">1. Start an R session</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#variables-and-basic-data-types">Variables and basic data types</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-organize-data-in-r">2. Organize data in R</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#atomic-vectors-and-indexing">Atomic vectors and indexing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#extract-information-from-sample-names">Extract information from sample names</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#matrices-and-data-frames">Matrices and data frames</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#missing-values">Missing values</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#lists-and-lapply">Lists and lapply()</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-read-and-combine-star-count-files">3. Read and combine STAR count files</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#download-the-course-tables">Download the course tables</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#inspect-one-file-before-writing-a-function">Inspect one file before writing a function</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#turn-a-repeated-task-into-a-function">Turn a repeated task into a function</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#merge-two-tables-by-gene-identifier">Merge two tables by gene identifier</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#apply-the-same-steps-to-all-six-samples">Apply the same steps to all six samples</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#prepare-the-count-matrix-and-sample-metadata">Prepare the count matrix and sample metadata</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-produce-graphs-with-base-r">4. Produce graphs with base R</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#plot-a-summary-of-the-course-data">Plot a summary of the course data</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#points-and-lines">Points and lines</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#scatterplots">Scatterplots</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#histograms-and-density">Histograms and density</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#save-a-figure">Save a figure</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-optional-produce-graphs-with-ggplot2">5. Optional: produce graphs with ggplot2</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#practice-and-completion-checks">Practice and completion checks</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#hints-for-practice">Hints for practice</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DAVID/">Pathway analysis using DAVID</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Bulk RNA-seq</li>
+      <li class="breadcrumb-item active">Minimal R Introduction</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/BIOI611_introR.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a href="https://colab.research.google.com/github/Bix4UMD/BIOI611_lab/blob/main/docs/BIOI611_introR.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a></p>
+<h1 id="introduction-to-r">Introduction to R</h1>
+<p>R is a language and environment for statistical computing and graphics. It runs on Windows, macOS, and Linux, and its open-source community develops packages for many kinds of analysis.</p>
+<p>In this lab, we will use R to prepare the gene-count tables used in the next RNA-seq lesson. The course data contain six <em>C. elegans</em> N2 samples: day-1 and day-7 adults, with three biological replicates per group. The two ages are separate groups, not a continuous time series.</p>
+<p>By the end, you should be able to:</p>
+<ul>
+<li>Create and inspect variables, vectors, matrices, data frames, and lists.</li>
+<li>Select rows and columns, and use a function on several files.</li>
+<li>Combine six STAR count tables while keeping gene and sample identifiers aligned.</li>
+<li>Make labeled plots and explain what they show.</li>
+</ul>
+<p>Allow about 60–90 minutes for Sections 1–4. Section 5 provides optional ggplot2 practice. Run code cells from top to bottom; later cells use objects created earlier.</p>
+<h2 id="1-start-an-r-session">1. Start an R session</h2>
+<p>Open this notebook with the Colab button above, or use an R notebook in Jupyter. The notebook specifies an <strong>R</strong> kernel. You can also run its R code in RStudio. The examples are R code, so use an R session to run them. The first command should print an R version.</p>
+<p>Sections 1–4 use packages included with R. Section 3 downloads six small count tables from the course repository; it does not require the original FASTQ files or a cluster account. Internet access is needed for that download. Section 5 additionally uses ggplot2.</p>
+<p>In a notebook, run a cell with <strong>Shift+Enter</strong>. Text after <code>#</code> is a comment. If you restart the session, run the preceding cells again.</p>
+<pre><code class="language-R">R.version.string
+getwd()
+</code></pre>
+<h3 id="variables-and-basic-data-types">Variables and basic data types</h3>
+<p>Use <code>&lt;-</code> to assign a value to an object. R is case-sensitive: <code>gene1</code> and <code>Gene1</code> are different names. For ordinary object names, start with a letter (or a dot not followed by a number); letters, numbers, dots, and underscores can follow. Avoid spaces, reserved words such as <code>if</code>, and names of functions such as <code>rep</code>.</p>
+<p>We will use numeric values for counts, character values for names, and logical values (<code>TRUE</code> or <code>FALSE</code>) for comparisons. <code>150</code> is stored as a double-precision number; <code>150L</code> explicitly creates an integer.</p>
+<pre><code class="language-R"># Assign two numeric values, then display them.
+gene1 &lt;- 150
+gene2 &lt;- 200
+gene1
+gene2
+
+# Character values need quotation marks.
+gene_name &lt;- &quot;KRAS&quot;
+gene_name
+</code></pre>
+<pre><code>[1] 150
+
+
+[1] 200
+
+
+[1] "KRAS"
+</code></pre>
+<pre><code class="language-R">gene1 &gt; gene2
+gene1 &lt; gene2
+is_lower &lt;- gene1 &lt; gene2
+is_lower
+
+class(gene1)
+class(gene_name)
+class(is_lower)
+class(150L)
+</code></pre>
+<pre><code>[1] FALSE
+
+
+[1] TRUE
+
+
+[1] TRUE
+
+
+[1] "numeric"
+
+
+[1] "character"
+
+
+[1] "logical"
+
+
+[1] "integer"
+</code></pre>
+<p><code>&lt;</code> and <code>&gt;</code> compare values; <code>==</code> tests equality. <code>&lt;-</code> assigns a value. A function call uses a function name followed by parentheses, with arguments inside: <code>class(gene1)</code> asks for the class of <code>gene1</code>. Try <code>?class</code> in an R console to open its help.</p>
+<p><strong>Check your understanding:</strong> What will <code>gene1 == gene2</code> return? What changes if you assign <code>gene2 &lt;- 150</code>? Restore <code>gene2 &lt;- 200</code> afterward.</p>
+<h3 id="functions">Functions</h3>
+<p>A function is reusable code with named inputs called arguments. This function adds 1 before taking a base-2 logarithm, so a zero count becomes 0 rather than negative infinity. The last expression is returned; <code>return()</code> is optional.</p>
+<pre><code class="language-R">log2_transform &lt;- function(x) {
+    log2(x + 1)
+}
+
+log2_transform(gene1)
+log2_transform(0)
+</code></pre>
+<pre><code>[1] 7.238405
+
+
+[1] 0
+</code></pre>
+<h2 id="2-organize-data-in-r">2. Organize data in R</h2>
+<h3 id="atomic-vectors-and-indexing">Atomic vectors and indexing</h3>
+<p>An atomic vector holds values of one underlying type. <code>c()</code> combines values into a vector. Combining numbers and character strings converts the numbers to character strings. R indexes start at <strong>1</strong>.</p>
+<pre><code class="language-R">sample_names &lt;- c(&quot;N2_day1_rep1&quot;, &quot;N2_day1_rep2&quot;, &quot;N2_day1_rep3&quot;,
+                  &quot;N2_day7_rep1&quot;, &quot;N2_day7_rep2&quot;, &quot;N2_day7_rep3&quot;)
+sample_names
+length(sample_names)
+sample_names[1]
+sample_names[c(1, 4)]
+
+counts &lt;- c(0, 10, 150, 200)
+counts[counts &gt;= 100]
+</code></pre>
+<pre><code>[1] "N2_day1_rep1" "N2_day1_rep2" "N2_day1_rep3" "N2_day7_rep1" "N2_day7_rep2"
+[6] "N2_day7_rep3"
+
+
+[1] 6
+
+
+[1] "N2_day1_rep1"
+
+
+[1] "N2_day1_rep1" "N2_day7_rep1"
+
+
+[1] 150 200
+</code></pre>
+<h3 id="extract-information-from-sample-names">Extract information from sample names</h3>
+<p><code>sub(pattern, replacement, x)</code> replaces the first match in each string; <code>gsub()</code> replaces all matches. Patterns are regular expressions: <code>[0-9]+</code> means one or more digits, <code>$</code> marks the end, <code>^</code> marks the start, and <code>.*</code> matches any number of characters. Anchoring the replicate suffix avoids leaving part of a multi-digit replicate number behind.</p>
+<p>Here we remove <code>_rep1</code>, <code>_rep2</code>, or <code>_rep3</code> to obtain the group, and keep the digits after <code>_rep</code> to obtain the replicate number. This parsing depends on the course naming convention. For other experiments, use a sample sheet supplied with the data.</p>
+<pre><code class="language-R">group &lt;- sub(&quot;_rep[0-9]+$&quot;, &quot;&quot;, sample_names)
+replicate_id &lt;- as.integer(sub(&quot;^.*_rep&quot;, &quot;&quot;, sample_names))
+group
+replicate_id
+</code></pre>
+<pre><code>[1] "N2_day1" "N2_day1" "N2_day1" "N2_day7" "N2_day7" "N2_day7"
+
+
+[1] 1 2 3 1 2 3
+</code></pre>
+<h3 id="matrices-and-data-frames">Matrices and data frames</h3>
+<p>A matrix has rows and columns. An <strong>atomic matrix</strong> uses one underlying type for every entry, so combining character groups with integer replicate numbers makes all entries character. <code>cbind()</code> combines columns; <code>rownames()</code> assigns row labels; <code>t()</code> swaps rows and columns.</p>
+<pre><code class="language-R">sample_matrix &lt;- cbind(group = group, replicate = replicate_id)
+rownames(sample_matrix) &lt;- sample_names
+sample_matrix
+is.matrix(sample_matrix)
+str(sample_matrix)
+t(sample_matrix)
+</code></pre>
+<pre><code>             group     replicate
+N2_day1_rep1 "N2_day1" "1"      
+N2_day1_rep2 "N2_day1" "2"      
+N2_day1_rep3 "N2_day1" "3"      
+N2_day7_rep1 "N2_day7" "1"      
+N2_day7_rep2 "N2_day7" "2"      
+N2_day7_rep3 "N2_day7" "3"
+
+
+[1] TRUE
+
+
+ chr [1:6, 1:2] "N2_day1" "N2_day1" "N2_day1" "N2_day7" "N2_day7" "N2_day7" ...
+ - attr(*, "dimnames")=List of 2
+  ..$ : chr [1:6] "N2_day1_rep1" "N2_day1_rep2" "N2_day1_rep3" "N2_day7_rep1" ...
+  ..$ : chr [1:2] "group" "replicate"
+
+
+          N2_day1_rep1 N2_day1_rep2 N2_day1_rep3 N2_day7_rep1 N2_day7_rep2
+group     "N2_day1"    "N2_day1"    "N2_day1"    "N2_day7"    "N2_day7"   
+replicate "1"          "2"          "3"          "1"          "2"         
+          N2_day7_rep3
+group     "N2_day7"   
+replicate "3"
+</code></pre>
+<p>A data frame lets different columns retain different types. It is a better choice for sample metadata. Construct it directly so the replicate column stays integer. A factor represents categories; setting its levels explicitly makes day 1 the reference level for a later comparison.</p>
+<p>Replicate numbers label biological replicates <strong>within each group</strong>. Matching replicate numbers across groups do not establish pairing.</p>
+<pre><code class="language-R">coldata_df &lt;- data.frame(
+    group = factor(group, levels = c(&quot;N2_day1&quot;, &quot;N2_day7&quot;)),
+    replicate = replicate_id,
+    row.names = sample_names
+)
+coldata_df
+is.data.frame(coldata_df)
+str(coldata_df)
+table(coldata_df$group)
+</code></pre>
+<pre><code>               group replicate
+N2_day1_rep1 N2_day1         1
+N2_day1_rep2 N2_day1         2
+N2_day1_rep3 N2_day1         3
+N2_day7_rep1 N2_day7         1
+N2_day7_rep2 N2_day7         2
+N2_day7_rep3 N2_day7         3
+
+
+[1] TRUE
+
+
+'data.frame':   6 obs. of  2 variables:
+ $ group    : Factor w/ 2 levels "N2_day1","N2_day7": 1 1 1 2 2 2
+ $ replicate: int  1 2 3 1 2 3
+
+
+
+N2_day1 N2_day7 
+      3       3
+</code></pre>
+<p>For a data frame, use <code>object[rows, columns]</code>. Leaving either position blank keeps all of those rows or columns. <code>$</code> selects a named column. <code>drop = FALSE</code> keeps a single-column selection as a data frame.</p>
+<pre><code class="language-R">coldata_df[1:3, , drop = FALSE]
+coldata_df[, &quot;group&quot;, drop = FALSE]
+coldata_df[coldata_df$group == &quot;N2_day7&quot;, , drop = FALSE]
+</code></pre>
+<pre><code>               group replicate
+N2_day1_rep1 N2_day1         1
+N2_day1_rep2 N2_day1         2
+N2_day1_rep3 N2_day1         3
+
+
+               group
+N2_day1_rep1 N2_day1
+N2_day1_rep2 N2_day1
+N2_day1_rep3 N2_day1
+N2_day7_rep1 N2_day7
+N2_day7_rep2 N2_day7
+N2_day7_rep3 N2_day7
+
+
+               group replicate
+N2_day7_rep1 N2_day7         1
+N2_day7_rep2 N2_day7         2
+N2_day7_rep3 N2_day7         3
+</code></pre>
+<h3 id="missing-values">Missing values</h3>
+<p><code>NA</code> represents a missing value, which is different from a measured count of zero. Use <code>is.na()</code> to find missing values. The example below shows how <code>na.rm = TRUE</code> changes a summary; decide why a value is missing before excluding it from an analysis.</p>
+<pre><code class="language-R">example_counts &lt;- c(0, 10, NA, 20)
+is.na(example_counts)
+mean(example_counts)
+mean(example_counts, na.rm = TRUE)
+</code></pre>
+<pre><code>[1] FALSE FALSE  TRUE FALSE
+
+
+[1] NA
+
+
+[1] 10
+</code></pre>
+<h3 id="lists-and-lapply">Lists and <code>lapply()</code></h3>
+<p>A list can hold objects of different types, including vectors and data frames. <code>lapply()</code> calls a function once on each list element and returns a list. Here the inputs are two count vectors. <code>[[1]]</code> extracts the first list element; <code>[1]</code> returns a list containing that element.</p>
+<pre><code class="language-R">gene_counts &lt;- list(gene1 = c(10, 20), gene2 = c(0, 100))
+gene_counts[[1]]
+lapply(gene_counts, log2_transform)
+</code></pre>
+<pre><code>[1] 10 20
+
+
+$gene1
+[1] 3.459432 4.392317
+
+$gene2
+[1] 0.000000 6.658211
+</code></pre>
+<p><strong>Check your understanding:</strong> Why did the replicate numbers become character values in <code>sample_matrix</code>? Which data-frame expression selects the three day-1 samples?</p>
+<h2 id="3-read-and-combine-star-count-files">3. Read and combine STAR count files</h2>
+<h3 id="download-the-course-tables">Download the course tables</h3>
+<p><code>getwd()</code> shows the current working directory. Relative paths are interpreted from that directory. We will store this lesson's inputs in <code>introR_counts/</code>, using <code>file.path()</code> so paths work across operating systems.</p>
+<p>The download uses a fixed repository revision to keep the example data reproducible. Existing files are reused. If you already have a local repository checkout, you can instead set <code>data_dir</code> to its <code>data/bulkRNA_SE_tab</code> directory before running this cell.</p>
+<pre><code class="language-R">data_dir &lt;- &quot;introR_counts&quot;
+dir.create(data_dir, showWarnings = FALSE, recursive = TRUE)
+file_suffix &lt;- &quot;.ReadsPerGene.out.tab&quot;
+expected_files &lt;- paste0(sample_names, file_suffix)
+data_revision &lt;- &quot;3ae91df81a2849a69b90157c4e75f6f8089cd44b&quot;
+base_url &lt;- paste0(&quot;https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/&quot;,
+                   data_revision, &quot;/data/bulkRNA_SE_tab/&quot;)
+
+for (filename in expected_files) {
+    destination &lt;- file.path(data_dir, filename)
+    if (!file.exists(destination)) {
+        download.file(paste0(base_url, filename), destfile = destination,
+                      mode = &quot;wb&quot;, quiet = TRUE)
+    }
+}
+list.files(data_dir)
+</code></pre>
+<pre><code>[1] "N2_day1_rep1.ReadsPerGene.out.tab" "N2_day1_rep2.ReadsPerGene.out.tab"
+[3] "N2_day1_rep3.ReadsPerGene.out.tab" "N2_day7_rep1.ReadsPerGene.out.tab"
+[5] "N2_day7_rep2.ReadsPerGene.out.tab" "N2_day7_rep3.ReadsPerGene.out.tab"
+</code></pre>
+<p><code>list.files(pattern = ...)</code> expects a regular expression rather than a shell wildcard. In an R string, <code>\\.</code> matches a literal dot. The final <code>$</code> requires the filename to end at <code>.tab</code>.</p>
+<p>We check that all six expected files are present and put them in the same order as <code>sample_names</code>. <code>stopifnot()</code> stops with an error if any check is false.</p>
+<pre><code class="language-R">file_paths &lt;- list.files(
+    data_dir,
+    pattern = &quot;\\.ReadsPerGene\\.out\\.tab$&quot;,
+    full.names = TRUE
+)
+stopifnot(setequal(basename(file_paths), expected_files))
+file_paths &lt;- file_paths[match(expected_files, basename(file_paths))]
+file_paths
+</code></pre>
+<pre><code>[1] "introR_counts/N2_day1_rep1.ReadsPerGene.out.tab"
+[2] "introR_counts/N2_day1_rep2.ReadsPerGene.out.tab"
+[3] "introR_counts/N2_day1_rep3.ReadsPerGene.out.tab"
+[4] "introR_counts/N2_day7_rep1.ReadsPerGene.out.tab"
+[5] "introR_counts/N2_day7_rep2.ReadsPerGene.out.tab"
+[6] "introR_counts/N2_day7_rep3.ReadsPerGene.out.tab"
+</code></pre>
+<h3 id="inspect-one-file-before-writing-a-function">Inspect one file before writing a function</h3>
+<p>STAR's <code>ReadsPerGene.out.tab</code> has no header and contains four tab-separated columns:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Gene identifier, or a summary-row label</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Counts without considering strand</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Counts when read 1 is on the same strand as the RNA</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Counts when read 1 is on the opposite strand to the RNA</td>
+</tr>
+</tbody>
+</table>
+<p>For single-end data, read 1 is the sequenced read. For paired-end data, the read-2 orientation is opposite. The first four rows are summaries (<code>N_unmapped</code>, <code>N_multimapping</code>, <code>N_noFeature</code>, <code>N_ambiguous</code>), not genes. See the <a href="https://github.com/alexdobin/STAR/blob/2.7.11b/doc/STARmanual.pdf">STAR manual, gene-counting section</a>.</p>
+<p>We use column 2 for this <strong>R programming exercise</strong>, matching the existing course examples. Before biological analysis, confirm the library protocol and strandedness to choose the appropriate count column. This notebook does not establish the strandedness of these libraries.</p>
+<pre><code class="language-R">star_table &lt;- read.table(file_paths[1], header = FALSE, sep = &quot;\t&quot;,
+                         stringsAsFactors = FALSE)
+head(star_table)
+dim(star_table)
+str(star_table)
+</code></pre>
+<pre><code>              V1      V2       V3       V4
+1     N_unmapped 1332776  1332776  1332776
+2 N_multimapping 1540190  1540190  1540190
+3    N_noFeature  157102 19017455 18933214
+4    N_ambiguous  536422   128854   120342
+5 WBGene00000003     341      161      180
+6 WBGene00000007     416      215      202
+
+
+[1] 46930     4
+
+
+'data.frame':   46930 obs. of  4 variables:
+ $ V1: chr  "N_unmapped" "N_multimapping" "N_noFeature" "N_ambiguous" ...
+ $ V2: int  1332776 1540190 157102 536422 341 416 0 6 1572 0 ...
+ $ V3: int  1332776 1540190 19017455 128854 161 215 0 4 814 0 ...
+ $ V4: int  1332776 1540190 18933214 120342 180 202 0 2 794 0 ...
+</code></pre>
+<h3 id="turn-a-repeated-task-into-a-function">Turn a repeated task into a function</h3>
+<p>The function below reads one file, keeps the selected count column, removes the four summary labels by name, and names the count column after the sample. Checks catch a malformed table, duplicate gene identifiers, or invalid counts before combining files. They should stop the analysis rather than silently turn missing data into zeros.</p>
+<p><code>count_column = 2L</code> supplies a default argument. For a verified stranded protocol, the appropriate value may be <code>3L</code> or <code>4L</code>. <code>return(df)</code> makes the result explicit.</p>
+<pre><code class="language-R">read_star_file &lt;- function(file_path, count_column = 2L) {
+    stopifnot(length(count_column) == 1L, count_column %in% 2:4)
+    df &lt;- read.table(file_path, header = FALSE, sep = &quot;\t&quot;,
+                     stringsAsFactors = FALSE)
+    stopifnot(ncol(df) == 4L)
+    df &lt;- df[, c(1L, count_column), drop = FALSE]
+    summary_rows &lt;- c(&quot;N_unmapped&quot;, &quot;N_multimapping&quot;,
+                      &quot;N_noFeature&quot;, &quot;N_ambiguous&quot;)
+    stopifnot(all(summary_rows %in% df[[1]]))
+    df &lt;- df[!df[[1]] %in% summary_rows, , drop = FALSE]
+    stopifnot(nrow(df) &gt; 0L, !anyNA(df), !anyDuplicated(df[[1]]),
+              is.numeric(df[[2]]), all(is.finite(df[[2]])),
+              all(df[[2]] &gt;= 0), all(df[[2]] == floor(df[[2]])))
+    sample_id &lt;- sub(&quot;\\.ReadsPerGene\\.out\\.tab$&quot;, &quot;&quot;, basename(file_path))
+    colnames(df) &lt;- c(&quot;GeneID&quot;, sample_id)
+    return(df)
+}
+
+tab_N2_day1_rep1 &lt;- read_star_file(file_paths[1])
+head(tab_N2_day1_rep1)
+dim(tab_N2_day1_rep1)
+</code></pre>
+<pre><code>           GeneID N2_day1_rep1
+5  WBGene00000003          341
+6  WBGene00000007          416
+7  WBGene00000014            0
+8  WBGene00000015            6
+9  WBGene00000022         1572
+10 WBGene00000024            0
+
+
+[1] 46926     2
+</code></pre>
+<h3 id="merge-two-tables-by-gene-identifier">Merge two tables by gene identifier</h3>
+<p><code>merge(..., by = "GeneID")</code> matches identifiers, so it does not assume that the input rows have the same order. Its default is an inner join: genes missing from either table would be dropped. We first require the same gene set. Unique sample-column names also avoid confusing names such as <code>V2.x</code> and <code>V2.y</code>.</p>
+<pre><code class="language-R">tab_N2_day1_rep2 &lt;- read_star_file(file_paths[2])
+stopifnot(setequal(tab_N2_day1_rep1$GeneID, tab_N2_day1_rep2$GeneID))
+two_samples &lt;- merge(tab_N2_day1_rep1, tab_N2_day1_rep2, by = &quot;GeneID&quot;)
+head(two_samples)
+</code></pre>
+<pre><code>          GeneID N2_day1_rep1 N2_day1_rep2
+1 WBGene00000001         3227         2168
+2 WBGene00000002          270          203
+3 WBGene00000003          341          415
+4 WBGene00000004          584          438
+5 WBGene00000005          383          395
+6 WBGene00000006          343          344
+</code></pre>
+<h3 id="apply-the-same-steps-to-all-six-samples">Apply the same steps to all six samples</h3>
+<p><code>lapply()</code> reads each file into a list of data frames. <code>Reduce()</code> repeatedly merges the next table into the accumulated result. Check that every table has the same gene set <strong>before</strong> the inner joins.</p>
+<p>This cell is a worked example: focus first on the inputs, the result, and why the checks matter. You can return to the anonymous <code>function(x, y)</code> syntax after practicing with two tables.</p>
+<pre><code class="language-R">list_of_dfs &lt;- lapply(file_paths, read_star_file)
+same_genes &lt;- vapply(list_of_dfs, function(df) {
+    setequal(df$GeneID, list_of_dfs[[1]]$GeneID)
+}, logical(1))
+stopifnot(all(same_genes))
+
+merged_df &lt;- Reduce(function(x, y) merge(x, y, by = &quot;GeneID&quot;), list_of_dfs)
+merged_df &lt;- merged_df[, c(&quot;GeneID&quot;, sample_names), drop = FALSE]
+head(merged_df)
+dim(merged_df)
+</code></pre>
+<pre><code>          GeneID N2_day1_rep1 N2_day1_rep2 N2_day1_rep3 N2_day7_rep1
+1 WBGene00000001         3227         2168         2589         5659
+2 WBGene00000002          270          203          266          355
+3 WBGene00000003          341          415          411          387
+4 WBGene00000004          584          438          518         1028
+5 WBGene00000005          383          395          483          119
+6 WBGene00000006          343          344          334          206
+  N2_day7_rep2 N2_day7_rep3
+1         2619         5239
+2          191          425
+3          255          499
+4          541          888
+5           65          189
+6          114          220
+
+
+[1] 46926     7
+</code></pre>
+<h3 id="prepare-the-count-matrix-and-sample-metadata">Prepare the count matrix and sample metadata</h3>
+<p>For the next lesson, genes are rows of the count matrix and samples are columns. Sample metadata have one row per sample. The matrix column names must match metadata row names <strong>in the same order</strong>. Keep gene identifiers as row names, outside the numeric matrix.</p>
+<p><code>merged_df</code> remains a table with a <code>GeneID</code> column; <code>count_matrix</code> contains only raw gene counts. These objects have different roles. DESeq2 expects raw, non-negative whole-number counts, not TPM, percentages, or the <code>log2(count + 1)</code> values used for display.</p>
+<pre><code class="language-R">count_matrix &lt;- as.matrix(merged_df[, sample_names, drop = FALSE])
+rownames(count_matrix) &lt;- merged_df$GeneID
+coldata_df &lt;- coldata_df[colnames(count_matrix), , drop = FALSE]
+
+stopifnot(is.numeric(count_matrix), !anyNA(count_matrix),
+          all(count_matrix &gt;= 0),
+          all(count_matrix == floor(count_matrix)),
+          identical(colnames(count_matrix), rownames(coldata_df)))
+dim(count_matrix)
+table(coldata_df$group)
+identical(colnames(count_matrix), rownames(coldata_df))
+</code></pre>
+<pre><code>[1] 46926     6
+
+
+
+N2_day1 N2_day7 
+      3       3
+
+
+[1] TRUE
+</code></pre>
+<p>For these files, expect <strong>46,926 gene rows and 6 sample columns</strong>, three samples in each group, and <code>TRUE</code> for the ordering check. This row count describes this particular annotation; it is not a universal expected number of genes.</p>
+<p>The following files are saved to an <code>introR_results/</code> directory. <code>row.names = FALSE</code> avoids writing an extra numbered column to the count CSV. The metadata CSV deliberately includes sample identifiers as row names.</p>
+<pre><code class="language-R">results_dir &lt;- &quot;introR_results&quot;
+dir.create(results_dir, showWarnings = FALSE, recursive = TRUE)
+write.csv(merged_df, file.path(results_dir, &quot;combined_gene_counts.csv&quot;),
+          row.names = FALSE)
+write.csv(coldata_df, file.path(results_dir, &quot;sample_metadata.csv&quot;),
+          row.names = TRUE)
+saveRDS(list(count_matrix = count_matrix, coldata = coldata_df),
+        file.path(results_dir, &quot;introR_counts_and_metadata.rds&quot;))
+</code></pre>
+<p><strong>Check your understanding:</strong> Why should the four STAR summary rows be excluded? Why is attaching counts with <code>cbind()</code> unsafe if gene orders differ? Why does a zero count mean something different from <code>NA</code>?</p>
+<h2 id="4-produce-graphs-with-base-r">4. Produce graphs with base R</h2>
+<h3 id="plot-a-summary-of-the-course-data">Plot a summary of the course data</h3>
+<p><code>colSums()</code> adds counts across gene rows for each sample. These are <strong>assigned gene counts</strong>, not total sequenced reads: unmapped, ambiguous, and other unassigned reads are excluded. Differences may reflect sequencing depth and other technical or biological effects. This plot is a preliminary check, not a differential-expression test.</p>
+<pre><code class="language-R">assigned_counts &lt;- colSums(count_matrix)
+group_colors &lt;- c(N2_day1 = &quot;#2878A5&quot;, N2_day7 = &quot;#D06030&quot;)
+sample_colors &lt;- unname(group_colors[as.character(coldata_df$group)])
+
+barplot(assigned_counts / 1e6,
+        names.arg = c(&quot;D1 R1&quot;, &quot;D1 R2&quot;, &quot;D1 R3&quot;, &quot;D7 R1&quot;, &quot;D7 R2&quot;, &quot;D7 R3&quot;),
+        col = sample_colors,
+        ylim = c(0, max(assigned_counts / 1e6) * 1.22),
+        main = &quot;Counts assigned to genes in each sample&quot;,
+        xlab = &quot;Sample (day and biological replicate)&quot;,
+        ylab = &quot;Assigned gene counts (millions)&quot;)
+legend(&quot;topright&quot;, legend = c(&quot;Day 1&quot;, &quot;Day 7&quot;), fill = group_colors,
+       bty = &quot;n&quot;)
+</code></pre>
+<p><img alt="png" src="../BIOI611_introR_files/BIOI611_introR_43_0.png" /></p>
+<h3 id="points-and-lines">Points and lines</h3>
+<p>Use lines when the x-axis represents an ordered quantity such as time. The following values are <strong>synthetic plotting practice</strong>, separate from the RNA-seq samples. <code>type = "o"</code> draws both points and connecting lines. <code>lines()</code> adds a series to the existing plot.</p>
+<pre><code class="language-R">time_hours &lt;- c(0, 1, 2, 3, 4)
+series_a &lt;- c(1, 3, 6, 4, 9)
+series_b &lt;- c(2, 5, 4, 5, 12)
+
+plot(time_hours, series_a, type = &quot;o&quot;, col = &quot;#2878A5&quot;, pch = 16,
+     ylim = c(0, 12), xlab = &quot;Time (hours)&quot;, ylab = &quot;Simulated signal&quot;,
+     main = &quot;Two synthetic series&quot;)
+lines(time_hours, series_b, type = &quot;o&quot;, col = &quot;#D06030&quot;, pch = 17, lty = 2)
+legend(&quot;topleft&quot;, legend = c(&quot;Series A&quot;, &quot;Series B&quot;),
+       col = c(&quot;#2878A5&quot;, &quot;#D06030&quot;), pch = c(16, 17), lty = c(1, 2),
+       bty = &quot;n&quot;)
+</code></pre>
+<p><img alt="png" src="../BIOI611_introR_files/BIOI611_introR_45_0.png" /></p>
+<h3 id="scatterplots">Scatterplots</h3>
+<p>We use R's built-in <code>mtcars</code> dataset for plotting practice, so no additional download is needed. It describes 32 cars; <code>wt</code> is weight in <strong>1,000 pounds</strong>, and <code>mpg</code> is miles per US gallon. Row names contain car model names.</p>
+<p><code>lm(mpg ~ wt, data = mtcars)</code> fits a straight-line relationship. Its line summarizes an association, which by itself does not establish causation.</p>
+<pre><code class="language-R">mtcars &lt;- datasets::mtcars
+head(mtcars)
+
+plot(mtcars$wt, mtcars$mpg,
+     main = &quot;Fuel economy and car weight&quot;,
+     xlab = &quot;Weight (1,000 lb)&quot;, ylab = &quot;Fuel economy (miles/US gallon)&quot;,
+     pch = 16, col = &quot;#2878A5&quot;)
+abline(lm(mpg ~ wt, data = mtcars), col = &quot;#D06030&quot;, lwd = 2)
+# Label one example to keep the figure readable.
+text(mtcars$wt[1], mtcars$mpg[1], labels = rownames(mtcars)[1],
+     pos = 4, cex = 0.7)
+</code></pre>
+<pre><code>                   mpg cyl disp  hp drat    wt  qsec vs am gear carb
+Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
+Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1
+</code></pre>
+<p><img alt="png" src="../BIOI611_introR_files/BIOI611_introR_47_1.png" /></p>
+<h3 id="histograms-and-density">Histograms and density</h3>
+<p><code>probability = TRUE</code> scales the histogram so the <strong>sum of bar areas</strong> is 1. A bar's area (height × width) is the fraction of observations in its interval; its height alone is a density, not a probability. <code>density()</code> adds a smoothed estimate of the distribution. The dashed vertical line marks the mean.</p>
+<pre><code class="language-R">hist(mtcars$hp, probability = TRUE, breaks = 6,
+     main = &quot;Horsepower in mtcars&quot;, xlab = &quot;Gross horsepower&quot;,
+     ylab = &quot;Density&quot;, col = &quot;lightblue&quot;, border = &quot;white&quot;)
+lines(density(mtcars$hp), lwd = 2, col = &quot;#D06030&quot;)
+abline(v = mean(mtcars$hp), lty = &quot;dashed&quot;, col = &quot;#2878A5&quot;, lwd = 2)
+legend(&quot;topright&quot;, legend = c(&quot;Smoothed density&quot;, &quot;Mean&quot;),
+       col = c(&quot;#D06030&quot;, &quot;#2878A5&quot;), lty = c(1, 2), lwd = 2, bty = &quot;n&quot;)
+</code></pre>
+<p><img alt="png" src="../BIOI611_introR_files/BIOI611_introR_49_0.png" /></p>
+<h3 id="save-a-figure">Save a figure</h3>
+<p><code>png()</code> opens a graphics file. Draw the plot while that device is open, then call <code>dev.off()</code> to finish writing the file. Look in <code>introR_results/</code> for the saved image.</p>
+<pre><code class="language-R">png(file.path(results_dir, &quot;mtcars_weight_mpg.png&quot;),
+    width = 1600, height = 1000, res = 200)
+plot(mtcars$wt, mtcars$mpg, pch = 16, col = &quot;#2878A5&quot;,
+     main = &quot;Fuel economy and car weight&quot;,
+     xlab = &quot;Weight (1,000 lb)&quot;, ylab = &quot;Fuel economy (miles/US gallon)&quot;)
+abline(lm(mpg ~ wt, data = mtcars), col = &quot;#D06030&quot;, lwd = 2)
+dev.off()
+</code></pre>
+<h2 id="5-optional-produce-graphs-with-ggplot2">5. Optional: produce graphs with ggplot2</h2>
+<p>Install ggplot2 once in your R environment if needed, then load it for the session. The examples use <code>after_stat()</code> for calculated density and <code>linewidth</code> for line thickness (ggplot2 3.4.0 or later).</p>
+<p><code>ggplot(data, aes(...))</code> chooses data and maps columns to axes. Add layers with <code>+</code>. A fixed color goes outside <code>aes()</code>; mapping a column to color inside <code>aes()</code> creates groups and a legend.</p>
+<pre><code class="language-R">if (!requireNamespace(&quot;ggplot2&quot;, quietly = TRUE)) {
+    install.packages(&quot;ggplot2&quot;, repos = &quot;https://cloud.r-project.org&quot;)
+}
+stopifnot(packageVersion(&quot;ggplot2&quot;) &gt;= &quot;3.4.0&quot;)
+library(ggplot2)
+</code></pre>
+<pre><code class="language-R">scatter_plot &lt;- ggplot(mtcars, aes(x = wt, y = mpg)) +
+    geom_point(size = 2.5, color = &quot;#2878A5&quot;) +
+    geom_smooth(method = &quot;lm&quot;, formula = y ~ x, se = FALSE,
+                color = &quot;#D06030&quot;, linewidth = 0.8) +
+    labs(title = &quot;Fuel economy and car weight&quot;,
+         x = &quot;Weight (1,000 lb)&quot;, y = &quot;Fuel economy (miles/US gallon)&quot;) +
+    theme_minimal(base_size = 12)
+scatter_plot
+</code></pre>
+<p><img alt="png" src="../BIOI611_introR_files/BIOI611_introR_54_0.png" /></p>
+<p><code>se = FALSE</code> omits the confidence band so this scatterplot matches the base-R example. The histogram below uses the same density scale as its smoothed curve. Changing the bins or smoothing bandwidth can change the appearance; describe the pattern without treating the smooth curve as the exact population distribution.</p>
+<pre><code class="language-R">density_plot &lt;- ggplot(mtcars, aes(x = hp)) +
+    geom_histogram(aes(y = after_stat(density)), bins = 6,
+                   fill = &quot;lightblue&quot;, color = &quot;white&quot;) +
+    geom_density(color = &quot;#D06030&quot;, linewidth = 1) +
+    geom_vline(xintercept = mean(mtcars$hp), linetype = &quot;dashed&quot;,
+               color = &quot;#2878A5&quot;, linewidth = 0.8) +
+    labs(title = &quot;Horsepower in mtcars&quot;, x = &quot;Gross horsepower&quot;, y = &quot;Density&quot;) +
+    theme_minimal(base_size = 12)
+density_plot
+
+ggsave(file.path(results_dir, &quot;mtcars_ggplot_scatter.png&quot;), plot = scatter_plot,
+       width = 7, height = 4.5, dpi = 200)
+</code></pre>
+<p><img alt="png" src="../BIOI611_introR_files/BIOI611_introR_56_0.png" /></p>
+<h2 id="practice-and-completion-checks">Practice and completion checks</h2>
+<p>Before moving on, check that your count matrix has 46,926 rows and six columns, that there are three samples per group, and that the sample-order check returns <code>TRUE</code>. Confirm that the two CSV files, RDS file, and base-R PNG exist in <code>introR_results/</code>.</p>
+<ol>
+<li>Use <code>coldata_df</code> to select the day-7 sample names. How many are there?</li>
+<li>Count genes with at least 10 raw counts in at least three samples. Explain what the two comparisons in your code select.</li>
+<li>Change the point color and title of a scatterplot, then save it with a new filename.</li>
+<li>Explain why neither unequal assigned-count totals nor a high raw count is sufficient evidence for differential expression.</li>
+</ol>
+<p>Record the R and package versions used for your work. If you skipped Section 5, run the final cell anyway.</p>
+<pre><code class="language-R">capture.output(sessionInfo(), file = file.path(results_dir, &quot;sessionInfo.txt&quot;))
+sessionInfo()
+</code></pre>
+<h3 id="hints-for-practice">Hints for practice</h3>
+<p>Try the questions before opening the hints.</p>
+<details>
+<summary>Show hints for questions 1 and 2</summary>
+
+
+<pre><code class="language-r"># 1. Extract row names after selecting the group.
+day7_samples &lt;- rownames(coldata_df)[coldata_df$group == &quot;N2_day7&quot;]
+day7_samples
+length(day7_samples)
+
+# 2. First compare each gene-by-sample count with 10.
+#    Then count qualifying samples for each gene, and require at least three.
+keep &lt;- rowSums(count_matrix &gt;= 10) &gt;= 3
+sum(keep)
+</code></pre>
+
+
+This is an example expression filter. The next analysis lesson should explain and justify the filter it uses. A raw-count threshold is not a significance test.
+
+</details>
+
+<h3 id="troubleshooting">Troubleshooting</h3>
+<table>
+<thead>
+<tr>
+<th>Message or symptom</th>
+<th>What to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>object ... not found</code></td>
+<td>Run the cell that creates the object; check spelling and capitalization. After a restart, run from the beginning.</td>
+</tr>
+<tr>
+<td>Cannot open a count file</td>
+<td>Check <code>getwd()</code>, <code>data_dir</code>, internet access, and the download cell.</td>
+</tr>
+<tr>
+<td>File-list check fails</td>
+<td>The selected directory must contain exactly the six expected count tables. Check filenames and use a separate directory for other experiments.</td>
+</tr>
+<tr>
+<td>Gene-set or duplicate-identifier check fails</td>
+<td>Check whether files use the same annotation and whether an input was truncated or edited. Do not remove the check to force a merge.</td>
+</tr>
+<tr>
+<td>Sample-order check is <code>FALSE</code></td>
+<td>Match count-matrix column names to metadata row names before analysis.</td>
+</tr>
+<tr>
+<td>ggplot2 version check fails</td>
+<td>Update ggplot2, restart R if it was already loaded, then run the notebook again.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://cran.r-project.org/doc/manuals/r-release/R-intro.html">R: An Introduction to R</a></li>
+<li><a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/make.names.html">R: valid object names</a></li>
+<li><a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/list.files.html">R: file listing and regular expressions</a></li>
+<li><a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/merge.html">R: merging data frames</a></li>
+<li><a href="https://github.com/alexdobin/STAR/blob/2.7.11b/doc/STARmanual.pdf">STAR manual: gene counts and strand conventions</a></li>
+<li><a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html">R: the built-in mtcars dataset</a></li>
+<li><a href="https://stat.ethz.ch/R-manual/R-devel/library/graphics/html/hist.html">R: histogram density scaling</a></li>
+<li><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">ggplot2: calculated aesthetics and after_stat()</a></li>
+<li><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">ggplot2: density plots</a></li>
+</ul>
+<p>Additional plotting tutorials used in the earlier version of this lesson:</p>
+<ul>
+<li><a href="https://sites.harding.edu/fmccown/R/">F. McCown: Producing Simple Graphs with R</a></li>
+<li><a href="https://jtr13.github.io/cc21fall2/base-r-vs.-ggplot2-visualization.html#base-r-vs.-ggplot2-visualization">Base R vs. ggplot2 visualization</a></li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../Phred_FQ/" class="btn btn-neutral float-left" title="Phred score in FASTQ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../BIOI611_DESeq2_analysis/" class="btn btn-neutral float-right" title="DEG analysis using DESeq2">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../Phred_FQ/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../BIOI611_DESeq2_analysis/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
