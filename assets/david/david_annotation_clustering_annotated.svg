@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1788" height="1534" viewBox="0 0 1788 1534" role="img" aria-labelledby="title desc">
+  <title id="title">Modern DAVID Functional Annotation Clustering for the C. elegans worked example</title>
+  <desc id="desc">Annotated clustering report showing the foreground and custom background, Medium stringency and EASE threshold, cluster count and export controls, Group Enrichment Score, member terms and genes, and term-level P and Benjamini values.</desc>
+  <defs>
+    <style>
+      .focus { fill: none; stroke: #f28e2b; stroke-width: 5; }
+      .marker { fill: #f28e2b; stroke: #ffffff; stroke-width: 4; }
+      .marker-text { fill: #ffffff; font: 700 22px Arial, Helvetica, sans-serif; text-anchor: middle; dominant-baseline: central; }
+      .key-title { fill: #17365d; font: 700 30px Arial, Helvetica, sans-serif; }
+      .key-text { fill: #17365d; font: 22px Arial, Helvetica, sans-serif; }
+    </style>
+  </defs>
+  <rect width="1788" height="1534" fill="#ffffff"/>
+  <image href="david_2025_annotation_clustering_raw.png" x="0" y="0" width="1788" height="1214"/>
+
+  <rect class="focus" x="62" y="201" width="770" height="61" rx="9"/>
+  <g transform="translate(62 201)"><circle class="marker" r="22"/><text class="marker-text">1</text></g>
+  <rect class="focus" x="62" y="267" width="1665" height="58" rx="9"/>
+  <g transform="translate(62 267)"><circle class="marker" r="22"/><text class="marker-text">2</text></g>
+  <rect class="focus" x="62" y="334" width="1665" height="49" rx="9"/>
+  <g transform="translate(1727 334)"><circle class="marker" r="22"/><text class="marker-text">3</text></g>
+  <rect class="focus" x="62" y="468" width="1218" height="42" rx="9"/>
+  <g transform="translate(1280 468)"><circle class="marker" r="22"/><text class="marker-text">4</text></g>
+  <rect class="focus" x="142" y="409" width="1405" height="590" rx="9"/>
+  <g transform="translate(142 409)"><circle class="marker" r="22"/><text class="marker-text">5</text></g>
+  <rect class="focus" x="1545" y="409" width="182" height="590" rx="9"/>
+  <g transform="translate(1727 409)"><circle class="marker" r="22"/><text class="marker-text">6</text></g>
+
+  <rect x="0" y="1214" width="1788" height="320" fill="#eef5fb"/>
+  <line x1="0" y1="1214" x2="1788" y2="1214" stroke="#3b6ea5" stroke-width="4"/>
+  <text class="key-title" x="45" y="1260">Clustering interpretation key</text>
+  <g transform="translate(55 1310)"><circle class="marker" r="20"/><text class="marker-text">1</text></g>
+  <text class="key-text" x="90" y="1318">Confirm foreground and custom background.</text>
+  <g transform="translate(55 1382)"><circle class="marker" r="20"/><text class="marker-text">2</text></g>
+  <text class="key-text" x="90" y="1390">Medium stringency and EASE threshold 1 are shown.</text>
+  <g transform="translate(55 1454)"><circle class="marker" r="20"/><text class="marker-text">3</text></g>
+  <text class="key-text" x="90" y="1462">Search, cluster count, sublist, and export controls.</text>
+  <g transform="translate(905 1310)"><circle class="marker" r="20"/><text class="marker-text">4</text></g>
+  <text class="key-text" x="940" y="1302">Enrichment Score summarizes member EASE scores;</text>
+  <text class="key-text" x="940" y="1332">it is not an adjusted P value.</text>
+  <g transform="translate(905 1406)"><circle class="marker" r="20"/><text class="marker-text">5</text></g>
+  <text class="key-text" x="940" y="1414">Member terms share genes; inspect term and gene columns.</text>
+  <g transform="translate(905 1478)"><circle class="marker" r="20"/><text class="marker-text">6</text></g>
+  <text class="key-text" x="940" y="1486">Use term-level Benjamini values when judging evidence.</text>
+</svg>

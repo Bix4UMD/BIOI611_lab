@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1514" viewBox="0 0 1800 1514" role="img" aria-labelledby="title desc">
+  <title id="title">DAVID Gene List Report mapping quality control for the C. elegans foreground list</title>
+  <desc id="desc">Annotated Gene List Report showing the current list and population, 1,039 records mapped to 1,039 DAVID genes, WormBase user IDs, gene names, and species.</desc>
+  <defs>
+    <style>
+      .focus { fill: none; stroke: #f28e2b; stroke-width: 5; }
+      .marker { fill: #f28e2b; stroke: #ffffff; stroke-width: 4; }
+      .marker-text { fill: #ffffff; font: 700 22px Arial, Helvetica, sans-serif; text-anchor: middle; dominant-baseline: central; }
+      .key-title { fill: #17365d; font: 700 30px Arial, Helvetica, sans-serif; }
+      .key-text { fill: #17365d; font: 23px Arial, Helvetica, sans-serif; }
+    </style>
+  </defs>
+  <rect width="1800" height="1514" fill="#ffffff"/>
+  <image href="david_2025_gene_list_report_raw.png" x="0" y="0" width="1800" height="1214"/>
+
+  <rect class="focus" x="102" y="316" width="600" height="62" rx="9"/>
+  <g transform="translate(102 316)"><circle class="marker" r="22"/><text class="marker-text">1</text></g>
+  <rect class="focus" x="382" y="387" width="310" height="47" rx="9"/>
+  <g transform="translate(382 387)"><circle class="marker" r="22"/><text class="marker-text">2</text></g>
+  <rect class="focus" x="105" y="438" width="180" height="260" rx="9"/>
+  <g transform="translate(105 438)"><circle class="marker" r="22"/><text class="marker-text">3</text></g>
+  <rect class="focus" x="363" y="438" width="1028" height="260" rx="9"/>
+  <g transform="translate(363 438)"><circle class="marker" r="22"/><text class="marker-text">4</text></g>
+  <rect class="focus" x="1553" y="438" width="225" height="260" rx="9"/>
+  <g transform="translate(1778 438)"><circle class="marker" r="22"/><text class="marker-text">5</text></g>
+
+  <rect x="0" y="1214" width="1800" height="300" fill="#eef5fb"/>
+  <line x1="0" y1="1214" x2="1800" y2="1214" stroke="#3b6ea5" stroke-width="4"/>
+  <text class="key-title" x="45" y="1260">Mapping quality-control key</text>
+  <g transform="translate(55 1310)"><circle class="marker" r="20"/><text class="marker-text">1</text></g>
+  <text class="key-text" x="90" y="1318">Confirm the foreground list and organism.</text>
+  <g transform="translate(55 1382)"><circle class="marker" r="20"/><text class="marker-text">2</text></g>
+  <text class="key-text" x="90" y="1390">1,039 records = 1,039 DAVID genes: 100% mapped.</text>
+  <g transform="translate(920 1310)"><circle class="marker" r="20"/><text class="marker-text">3</text></g>
+  <text class="key-text" x="955" y="1318">User ID retains the submitted WormBase identifier.</text>
+  <g transform="translate(920 1382)"><circle class="marker" r="20"/><text class="marker-text">4</text></g>
+  <text class="key-text" x="955" y="1390">Gene Name provides a mapping sanity check.</text>
+  <g transform="translate(920 1454)"><circle class="marker" r="20"/><text class="marker-text">5</text></g>
+  <text class="key-text" x="955" y="1462">Species should be Caenorhabditis elegans.</text>
+</svg>

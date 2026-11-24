@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Shaojun Xie" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Pathway analysis using DAVID - Lab note for UMD BIOI611</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../stylesheets/basic_linux.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Pathway analysis using DAVID";
+        var mkdocs_page_input_path = "BIOI611_DAVID.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Lab note for UMD BIOI611
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Get ready for the course</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux/">Basic Linux</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../basic_linux_optional/">Optional Linux and HPC extensions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bulk RNA-seq</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bulkRNAseq_lab/">Read QC and alignment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Phred_FQ/">Phred score in FASTQ</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_introR/">Minimal R Introduction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_DESeq2_analysis/">DEG analysis using DESeq2</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Pathway analysis using DAVID</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#learning-objectives">Learning objectives</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-prepare-the-c-elegans-input-lists">1. Prepare the C. elegans input lists</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-upload-the-foreground-in-the-current-david-interface">2. Upload the foreground in the current DAVID interface</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-check-identifier-mapping-before-enrichment">3. Check identifier mapping before enrichment</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-upload-and-confirm-the-custom-background">4. Upload and confirm the custom background</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-read-the-david-reports">5. Read the DAVID reports</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#functional-annotation-summary">Functional Annotation Summary</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#functional-annotation-chart">Functional Annotation Chart</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#functional-annotation-table">Functional Annotation Table</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#functional-annotation-clustering">Functional Annotation Clustering</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#6-understand-fishers-exact-test-and-the-ease-score">6. Understand Fisher's exact test and the EASE score</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#7-interpretation-and-reproducibility-checklist">7. Interpretation and reproducibility checklist</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#references">References</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_ballgown_example/">DE analysis at isoform-leve using ballgown (example data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_bulkRNA_SE_ballgown/">DE analysis at isoform-leve using ballgown (C. ele data)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_long_read_transcriptome/">Long read transcriptome</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">scRNA-seq</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_analysis_10x_dataset_PBMC/">Initial analysis of 10x scRNA-seq data for human PBMC using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA/">Downstream analysis of 10x scRNA-seq data for human PBMC using Seurat</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_seq_cele_cellranger/">Initial analysis of 10x scRNA-seq data for C. elegans using cellranger</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../BIOI611_scRNA_cele/">Downstream analysis of 10x scRNA-seq data for C. elegans data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bioi611_monocle_cele/">Downstream analysis - trajectory analysis using Monocle3</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Lab note for UMD BIOI611</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Bulk RNA-seq</li>
+      <li class="breadcrumb-item active">Pathway analysis using DAVID</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git/edit/master/docs/BIOI611_DAVID.md">Edit on Bix4UMD/BIOI611_lab</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a href="https://colab.research.google.com/github/Bix4UMD/BIOI611_lab/blob/main/docs/BIOI611_DAVID.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a></p>
+<h1 id="functional-enrichment-with-david">Functional enrichment with DAVID</h1>
+<p><a href="https://davidbioinformatics.nih.gov/">DAVID</a> tests whether functional annotations occur more often in a submitted gene list than expected from a suitable background. It combines Gene Ontology, pathways, protein domains, sequence features, and other annotation sources in one interface.</p>
+<blockquote>
+<p><strong>Version used in this lab:</strong> DAVID 2025 system release (March 2026), Knowledgebase v2026_2 (released October 6, 2026), accessed November 3, 2026. DAVID's interface and knowledgebase change over time, so record both versions in your report.</p>
+</blockquote>
+<h2 id="learning-objectives">Learning objectives</h2>
+<p>By the end of this lab, you should be able to:</p>
+<ol>
+<li>create a foreground gene list and a matching tested-gene background;</li>
+<li>upload WormBase identifiers using the current taxonomy-based DAVID interface;</li>
+<li>check identifier mapping before enrichment;</li>
+<li>distinguish the Summary, Chart, Table, and Clustering reports; and</li>
+<li>interpret EASE and Benjamini values without treating enrichment as proof of mechanism.</li>
+</ol>
+<h2 id="1-prepare-the-c-elegans-input-lists">1. Prepare the <em>C. elegans</em> input lists</h2>
+<p>The worked example uses <code>BIOI_bulkRNAseq_SE_DESeq2_res_filter.xlsx</code>, which contains one DESeq2-results row per WormBase gene identifier. The spreadsheet filter is reproduced exactly:</p>
+<ul>
+<li><strong>Foreground:</strong> <code>log2FoldChange &gt; 2</code> and <code>padj &lt; 0.05</code> (strictly greater than 2), giving <strong>1,039 unique genes</strong>.</li>
+<li><strong>Background upload:</strong> every gene with a nonmissing <code>padj</code>, giving <strong>18,709 unique WormBase IDs</strong>. These are the genes eligible to enter a foreground defined by an adjusted-P-value cutoff.</li>
+</ul>
+<p>The 1,039-gene foreground is below DAVID's current 3,000-gene limit for Functional Annotation Clustering.</p>
+<p>For this example, positive log2 fold change is labeled “Day 7 upregulated.” Before reusing the workflow for another contrast, confirm which condition is the numerator in your DESeq2 results. The workbook alone does not encode that direction.</p>
+<p>Ready-to-upload files:</p>
+<ul>
+<li><a href="https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/main/docs/assets/david/BIOI_bulkRNAseq_SE_DAVID_upregulated_WormBase_IDs.txt">Foreground: 1,039 upregulated WormBase IDs</a></li>
+<li><a href="https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/main/docs/assets/david/BIOI_bulkRNAseq_SE_DAVID_background_nonmissing_padj_WormBase_IDs.txt">Background: 18,709 tested WormBase IDs</a></li>
+</ul>
+<blockquote>
+<p>A whole-genome background is not automatically appropriate. The background should represent the genes that could have been selected by the experiment and upstream analysis. Changing the background can change both the enrichment estimates and the conclusions.</p>
+</blockquote>
+<pre><code class="language-R"># Optional: reproduce the two text files from the supplied workbook.
+# In Colab, upload BIOI_bulkRNAseq_SE_DESeq2_res_filter.xlsx first.
+if (!requireNamespace(&quot;readxl&quot;, quietly = TRUE)) {
+  install.packages(&quot;readxl&quot;, repos = &quot;https://cloud.r-project.org&quot;)
+}
+
+res &lt;- readxl::read_excel(
+  &quot;BIOI_bulkRNAseq_SE_DESeq2_res_filter.xlsx&quot;,
+  na = c(&quot;&quot;, &quot;NA&quot;)
+)
+names(res)[1] &lt;- &quot;WormBase_gene_id&quot;
+res$WormBase_gene_id &lt;- trimws(as.character(res$WormBase_gene_id))
+
+foreground_ids &lt;- unique(res$WormBase_gene_id[
+  !is.na(res$log2FoldChange) &amp; !is.na(res$padj) &amp;
+    res$log2FoldChange &gt; 2 &amp; res$padj &lt; 0.05
+])
+background_ids &lt;- unique(res$WormBase_gene_id[!is.na(res$padj)])
+
+# These expected counts apply to the supplied workbook.
+stopifnot(
+  length(foreground_ids) == 1039,
+  length(background_ids) == 18709,
+  all(grepl(&quot;^WBGene[0-9]{8}$&quot;, foreground_ids)),
+  all(grepl(&quot;^WBGene[0-9]{8}$&quot;, background_ids)),
+  all(foreground_ids %in% background_ids)
+)
+
+writeLines(foreground_ids, &quot;BIOI_bulkRNAseq_SE_DAVID_upregulated_WormBase_IDs.txt&quot;)
+writeLines(background_ids, &quot;BIOI_bulkRNAseq_SE_DAVID_background_nonmissing_padj_WormBase_IDs.txt&quot;)
+
+c(foreground = length(foreground_ids), background = length(background_ids))
+</code></pre>
+<h2 id="2-upload-the-foreground-in-the-current-david-interface">2. Upload the foreground in the current DAVID interface</h2>
+<ol>
+<li>Open <a href="https://davidbioinformatics.nih.gov/workspace.html">DAVID Start Analysis</a>.</li>
+<li>In <strong>List Manager</strong>, choose <strong>Upload User List</strong>.</li>
+<li>Paste the one-ID-per-line contents (the illustrated workflow), with no header. If you instead choose <strong>Upload file</strong>, select the first column as <strong>Identifier</strong> and uncheck <strong>File has header row?</strong> because the prepared text file is headerless.</li>
+<li>Choose <strong>Caenorhabditis elegans (6239)</strong> as the taxonomy.</li>
+<li>Use a descriptive name such as <code>Day 7 upregulated (LFC &gt; 2; DESeq2 padj &lt; 0.05)</code>, then select <strong>Upload List</strong>.</li>
+</ol>
+<p>The current interface resolves <code>WBGene…</code> identifiers automatically within the selected taxonomy; it does not normally ask for the old <code>WORMBASE_GENE_ID</code> choice. The IDs in this exercise are stable WormBase identifiers such as <code>WBGene00000001</code>, not gene symbols.</p>
+<blockquote>
+<p><strong>Terminology note:</strong> The captured screenshots use <code>FDR &lt; 0.05</code> in the list name as shorthand for the upstream DESeq2 <code>padj &lt; 0.05</code> filter. That label is not DAVID's separate FDR output column. Use <code>DESeq2 padj</code> in future list names.</p>
+</blockquote>
+<figure>
+  <img src="https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/main/docs/assets/david/david_upload_worm_list_annotated.png" alt="Annotated current DAVID Upload User List dialog showing the WormBase foreground, list name, and Caenorhabditis elegans taxonomy" style="width:100%; max-width:1100px;">
+  <figcaption><strong>Figure 1.</strong> Current Upload User List dialog for the 1,039-gene foreground. Orange labels identify the decisions that must be checked before upload. <a href="https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/main/docs/assets/david/david_upload_worm_list_annotated.png" target="_blank">Open full-size image</a>.</figcaption>
+</figure>
+
+<h2 id="3-check-identifier-mapping-before-enrichment">3. Check identifier mapping before enrichment</h2>
+<p>Open <strong>Gene List Report</strong> and compare the mapped count with the number of submitted IDs. A low mapping rate can produce a misleading enrichment result even when DAVID completes the analysis.</p>
+<table>
+<thead>
+<tr>
+<th>List</th>
+<th style="text-align: right;">Submitted unique IDs</th>
+<th style="text-align: right;">Mapped submitted IDs</th>
+<th style="text-align: right;">Effective DAVID genes</th>
+<th style="text-align: right;">Mapping rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Foreground</td>
+<td style="text-align: right;">1,039</td>
+<td style="text-align: right;">1,039</td>
+<td style="text-align: right;">1,039</td>
+<td style="text-align: right;">100.00%</td>
+</tr>
+<tr>
+<td>Background</td>
+<td style="text-align: right;">18,709</td>
+<td style="text-align: right;">18,702</td>
+<td style="text-align: right;">18,702</td>
+<td style="text-align: right;">99.96%</td>
+</tr>
+</tbody>
+</table>
+<p>DAVID returned 18,703 background mapping rows because <code>WBGene00000464</code> mapped to two DAVID genes. In the other direction, <code>WBGene00022661</code> and <code>WBGene00022662</code> collapsed to the same DAVID gene (<code>191228</code>). After DAVID-gene de-duplication, the effective background population is therefore <strong>18,702 DAVID genes</strong>, not 18,709. Report both the submitted-ID and effective-population counts, and keep the seven unmapped IDs in the audit trail.</p>
+<details><summary>Seven background IDs not mapped in Knowledgebase v2026_2</summary>
+
+`WBGene00018587`, `WBGene00014472`, `WBGene00010958`, `WBGene00014454`, `WBGene00271812`, `WBGene00010959`, and `WBGene00007501`.
+
+</details>
+
+<figure>
+  <img src="https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/main/docs/assets/david/david_gene_list_report_annotated.png" alt="Annotated current DAVID Gene List Report showing 1,039 mapped WormBase identifiers and the main mapping quality-control columns" style="width:100%; max-width:1100px;">
+  <figcaption><strong>Figure 2.</strong> Gene List Report for the foreground. Check the list name, record count, submitted WormBase ID, mapped gene, and species. <a href="https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/main/docs/assets/david/david_gene_list_report_annotated.png" target="_blank">Open full-size image</a>.</figcaption>
+</figure>
+
+<h2 id="4-upload-and-confirm-the-custom-background">4. Upload and confirm the custom background</h2>
+<p>Use <strong>Background Manager → Upload User Background</strong> to upload the 18,709-ID background with the same <em>C. elegans</em> taxonomy. Before interpreting a report, confirm that DAVID shows both:</p>
+<ul>
+<li><strong>Current Gene List:</strong> the 1,039-gene foreground; and</li>
+<li><strong>Current Population:</strong> the tested background named for its 18,709 submitted IDs; mapping and de-duplication give an effective population of 18,702 DAVID genes.</li>
+</ul>
+<p>If the Current Population instead shows the default genome, stop and select the custom background. DAVID explicitly recommends a population that represents the genes from which the submitted list was derived; an inappropriate genome background can inflate apparent enrichment.</p>
+<h2 id="5-read-the-david-reports">5. Read the DAVID reports</h2>
+<h3 id="functional-annotation-summary">Functional Annotation Summary</h3>
+<p>The Summary organizes annotation sources and reports annotation <strong>coverage</strong>. A long bar or high percentage means that many submitted genes have that type of annotation; it is not evidence of enrichment. Choose focused sources appropriate to the question—for example GO BP/CC/MF Direct and selected pathway databases—rather than treating every source as independent evidence.</p>
+<figure>
+  <img src="https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/main/docs/assets/david/david_annotation_summary_annotated.png" alt="Annotated current DAVID Functional Annotation Summary showing the foreground, custom background, category tabs, annotation coverage, and report buttons" style="width:100%; max-width:1100px;">
+  <figcaption><strong>Figure 3.</strong> Functional Annotation Summary using the custom background: 18,709 submitted IDs and an effective population of 18,702 mapped, de-duplicated DAVID genes. <a href="https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/main/docs/assets/david/david_annotation_summary_annotated.png" target="_blank">Open full-size image</a>.</figcaption>
+</figure>
+
+<h3 id="functional-annotation-chart">Functional Annotation Chart</h3>
+<p>The Chart is the term-centric enrichment report. In the current interface, the default display filters are <strong>EASE ≤ 0.1</strong> and <strong>Count ≥ 2</strong>. For this saved session, those settings produced 224 chart records; that number can change when categories, filters, the background, or DAVID's knowledgebase change.</p>
+<ul>
+<li><strong>P-Value</strong> is DAVID's EASE score (modified one-sided Fisher test).</li>
+<li><strong>Benjamini</strong> is the Benjamini–Hochberg adjusted value within the relevant annotation-source family and should be the primary multiplicity-aware evidence column.</li>
+<li><strong>Genes</strong>, <strong>Count</strong>, and the gene links show which foreground genes support a term.</li>
+<li><strong>RT</strong> opens related terms and helps reveal redundant annotations.</li>
+</ul>
+<figure>
+  <img src="https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/main/docs/assets/david/david_annotation_chart_annotated.png" alt="Annotated current DAVID Functional Annotation Chart showing custom background, filters, term columns, gene coverage, EASE P-Value, and Benjamini value" style="width:100%; max-width:1100px;">
+  <figcaption><strong>Figure 4.</strong> Chart report for the 1,039-gene foreground. The visible leading terms include overlapping F-box, cuticle/collagen, immune-response, and cytochrome-P450 annotations; treat these as version- and background-dependent hypotheses, not independent confirmations or causal conclusions. <a href="https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/main/docs/assets/david/david_annotation_chart_annotated.png" target="_blank">Open full-size image</a>.</figcaption>
+</figure>
+
+<h3 id="functional-annotation-table">Functional Annotation Table</h3>
+<p>The Table is gene-centric: it is useful for looking up annotations assigned to individual genes, but it is not an enrichment-statistics report.</p>
+<h3 id="functional-annotation-clustering">Functional Annotation Clustering</h3>
+<p>Clustering groups annotations that share genes, reducing some of the redundancy in the Chart. The current default shown here uses <strong>Medium</strong> classification stringency and an EASE threshold of 1.</p>
+<p>A cluster's <strong>Enrichment Score</strong> summarizes its member EASE values on a negative-log scale; it is <strong>not</strong> an adjusted P value. Judge statistical evidence using the member terms' Benjamini values, then inspect the shared genes and biological coherence. In this session, the leading groups summarize F-box, cuticle/collagen, and cytochrome-P450-related annotations.</p>
+<figure>
+  <img src="https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/main/docs/assets/david/david_annotation_clustering_annotated.png" alt="Annotated current DAVID Functional Annotation Clustering report showing custom background, clustering settings, cluster enrichment score, member terms, and term-level Benjamini values" style="width:100%; max-width:1100px;">
+  <figcaption><strong>Figure 5.</strong> Functional Annotation Clustering report. The Group Enrichment Score ranks related-term groups but does not replace term-level multiple-testing correction. <a href="https://raw.githubusercontent.com/Bix4UMD/BIOI611_lab/main/docs/assets/david/david_annotation_clustering_annotated.png" target="_blank">Open full-size image</a>.</figcaption>
+</figure>
+
+<h2 id="6-understand-fishers-exact-test-and-the-ease-score">6. Understand Fisher's exact test and the EASE score</h2>
+<p>For one annotation term, DAVID compares the input list with the selected population using a 2 × 2 table:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align: right;">In the term</th>
+<th style="text-align: right;">Not in the term</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Input list</td>
+<td style="text-align: right;">List Hits (LH)</td>
+<td style="text-align: right;">List Total − LH</td>
+</tr>
+<tr>
+<td>Other genes in the population</td>
+<td style="text-align: right;">Population Hits − LH</td>
+<td style="text-align: right;">Remaining population genes</td>
+</tr>
+</tbody>
+</table>
+<p>A one-sided Fisher test asks whether the observed overlap is at least as large as expected under independence. DAVID's <strong>EASE score</strong> removes one term hit from the modified input list: List Hits becomes <code>LH − 1</code>, list non-hits stay unchanged, and the modified list total becomes <code>LT − 1</code>. This deliberately penalizes terms supported by few genes. If a term has only one List Hit, its EASE score provides no enrichment evidence.</p>
+<p>DAVID calculates each Chart row from the genes annotated in that row's annotation source. Its displayed List Total (LT) and Population Total (PT) can therefore be smaller than the overall 1,039-gene foreground and 18,702-gene effective population.</p>
+<p>A small raw value supports over-representation under the chosen list, population, and annotation definitions. It does not show that a pathway is activated, causal, or biologically important by itself. Because DAVID tests many correlated terms, interpret <strong>Benjamini</strong> values alongside gene counts, effect sizes, and the underlying genes. A <strong>Benjamini value</strong> above 0.05 means the analysis did not provide strong multiplicity-adjusted evidence at that threshold; it is not proof of no biological effect.</p>
+<pre><code class="language-R"># Conceptual example: a 300-gene list, a 30,000-gene population,
+# 40 population genes in a term, and 3 list genes in that term.
+LH &lt;- 3
+LT &lt;- 300
+PH &lt;- 40
+PT &lt;- 30000
+
+table_fisher &lt;- matrix(
+  c(LH, LT - LH, PH - LH, (PT - PH) - (LT - LH)),
+  nrow = 2, byrow = TRUE,
+  dimnames = list(
+    c(&quot;Input list&quot;, &quot;Other population genes&quot;),
+    c(&quot;In term&quot;, &quot;Not in term&quot;)
+  )
+)
+
+# EASE removes one list hit; list non-hits stay fixed, so modified LT = LT - 1.
+LH_ease &lt;- LH - 1
+table_ease &lt;- matrix(
+  c(LH_ease, LT - LH, PH - LH_ease, (PT - PH) - (LT - LH)),
+  nrow = 2, byrow = TRUE,
+  dimnames = dimnames(table_fisher)
+)
+
+data.frame(
+  test = c(&quot;one-sided Fisher&quot;, &quot;EASE-style modified Fisher&quot;),
+  p_value = c(
+    fisher.test(table_fisher, alternative = &quot;greater&quot;)$p.value,
+    fisher.test(table_ease, alternative = &quot;greater&quot;)$p.value
+  )
+)
+# Expected values are approximately 0.00744253 and 0.06027361.
+# A Benjamini value cannot be reproduced from one term alone; it depends
+# on the other terms in DAVID's relevant annotation-source family.
+</code></pre>
+<h2 id="7-interpretation-and-reproducibility-checklist">7. Interpretation and reproducibility checklist</h2>
+<p>Before reporting a result:</p>
+<ul>
+<li>[ ] Record the foreground rule, contrast direction, foreground size, and ID type.</li>
+<li>[ ] Record the background rule, submitted-ID count, and effective mapped population; verify <strong>Current Population</strong> in DAVID.</li>
+<li>[ ] Report foreground and background mapping rates.</li>
+<li>[ ] Record the DAVID system version, knowledgebase version, access date, selected annotation sources, and display thresholds.</li>
+<li>[ ] Use Benjamini values for multiplicity-aware interpretation; do not rank evidence by raw EASE alone.</li>
+<li>[ ] Inspect the genes behind each leading term and note overlapping/redundant terms.</li>
+<li>[ ] Describe enriched annotations as associations or hypotheses, not as proof of pathway activity or causation.</li>
+<li>[ ] Export the Chart and Clustering tables using <strong>CSV</strong> or <strong>Excel</strong> and retain the two uploaded ID files. DAVID exports the current filtered and sorted view, so record those settings.</li>
+</ul>
+<p>The exact files, checksums, mapping audit, screenshot provenance, and known limits for this worked example are recorded in the <a href="https://github.com/Bix4UMD/BIOI611_lab/blob/main/docs/assets/david/README.md">DAVID asset README</a>.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://davidbioinformatics.nih.gov/documentation/">DAVID current documentation</a></li>
+<li><a href="https://davidbioinformatics.nih.gov/documentation/tools/listManager.html">List Manager guide</a></li>
+<li><a href="https://davidbioinformatics.nih.gov/documentation/tools/tech-gene-enrichment.html">Gene-enrichment principles and background selection</a></li>
+<li><a href="https://davidbioinformatics.nih.gov/documentation/tools/chartReport.html">Functional Annotation Chart documentation</a></li>
+<li><a href="https://davidbioinformatics.nih.gov/documentation/tools/term2term.html">Functional Annotation Clustering documentation</a></li>
+<li><a href="https://davidbioinformatics.nih.gov/documentation/tools/release.html">DAVID system releases</a> and <a href="https://davidbioinformatics.nih.gov/documentation/tools/kbUpdate.html">knowledgebase releases</a></li>
+<li>Sherman BT, et al. DAVID: a web server for functional annotation and functional enrichment analysis of gene lists (2025 update). <em>Nucleic Acids Research</em>. 2026. <a href="https://doi.org/10.1093/nar/gkag470">doi:10.1093/nar/gkag470</a></li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../BIOI611_DESeq2_analysis/" class="btn btn-neutral float-left" title="DEG analysis using DESeq2"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../BIOI611_ballgown_example/" class="btn btn-neutral float-right" title="DE analysis at isoform-leve using ballgown (example data)">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2025 Shaojun Xie</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Bix4UMD/BIOI611_lab.git" class="fa fa-code-fork" style="color: #fcfcfc"> Bix4UMD/BIOI611_lab</a>
+        </span>
+    
+    
+      <span><a href="../BIOI611_DESeq2_analysis/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../BIOI611_ballgown_example/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
